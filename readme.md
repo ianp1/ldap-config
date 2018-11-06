@@ -1,5 +1,5 @@
 
-##LDAP auf STARTTLS umschalten##
+## LDAP auf STARTTLS umschalten
 https://www.digitalocean.com/community/tutorials/how-to-encrypt-openldap-connections-using-starttls
 ``` shell
 sudo mkdir /etc/ssl/templates
@@ -26,15 +26,15 @@ sudo service slapd force-reload
 ```
 Anschließend im ADS(Apache Directory Studio) überprüfen
 
-##STARTTLS verpflichtend##
+## STARTTLS verpflichtend
 https://www.digitalocean.com/community/tutorials/how-to-encrypt-openldap-connections-using-starttls
 ``` shell
 sudo ldapmodify -H ldapi:// -Y EXTERNAL -f forcetls.ldif
 sudo service slapd force-reload
 ```
 
-#Struktur anlegen#
-##Memberof overlay##
+# Struktur anlegen
+## Memberof overlay
 ``` shell
 sudo ldapadd -Q -Y EXTERNAL -H ldapi:// -f overlays/memberof.ldif
 sudo ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f overlays/refint1.ldif
@@ -42,12 +42,12 @@ sudo ldapadd -Q -Y EXTERNAL -H ldapi:/// -f overlays/refint2.ldif
 
 ```
 
-##Klassen##
+## Klassen
 ``` shell
 sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/fablabPerson.ldif
 sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/einweisungen.ldif
 ```
-##Einträge##
+## Einträge
 Erstellen von 
 ou=user,dc=ldap-provider,dc=fablab-luebeck
 ou=group,dc=ldap-provider,dc=fablab-luebeck
@@ -62,7 +62,7 @@ cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck
 
 mithilfe von ADS
 
-##Berechtigungen##
+## Berechtigungen
 ``` shell
 sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/permissions.ldif
 ```
