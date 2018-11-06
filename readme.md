@@ -42,3 +42,28 @@ sudo ldapadd -Q -Y EXTERNAL -H ldapi:/// -f overlays/refint2.ldif
 
 ```
 
+##Klassen##
+``` shell
+sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/fablabPerson.ldif
+sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/einweisungen.ldif
+```
+##Einträge##
+Erstellen von 
+ou=user,dc=ldap-provider,dc=fablab-luebeck
+ou=group,dc=ldap-provider,dc=fablab-luebeck
+
+ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
+ou=machine,dc=ldap-provider,dc=fablab-luebeck
+
+cn=ldap-admin,ou=group,dc=ldap-provider,dc=fablab-luebeck
+cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck
+cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck
+cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck
+
+mithilfe von ADS
+
+##Berechtigungen##
+``` shell
+sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/permissions.ldif
+```
+
