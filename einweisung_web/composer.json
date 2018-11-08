@@ -1,0 +1,6 @@
+{
+	"require": {
+		"php": ">=5.3.0",
+		"zendframework/zend-ldap": "2.3.*@dev"
+	}
+}
