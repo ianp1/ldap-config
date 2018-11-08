@@ -68,3 +68,23 @@ mithilfe von ADS
 sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/permissions.ldif
 ```
 
+## Überprüfen
+So werden die Berechtigungen und Einstellungen überprüft:
+
+### Erstellen von Testbenutzern
+* `uid=einweisungvtest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
+* `uid=finanzvtest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
+* `uid=mitgliedvtest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
+* `uid=normaltest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
+Anschließend hinzufügen zu den jeweiligen Gruppen
+
+### Ausführen der automatischen Tests
+``` shell
+cd testsuite
+mvn test
+```
+### Manueller Test
+* Einloggen per ADS
+* Sichtung der Einträge in den jeweiligen Testaccounts
+
+### Testnutzer löschen
