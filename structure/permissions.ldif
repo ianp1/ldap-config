@@ -5,8 +5,6 @@ replace: olcAccess
 olcAccess: to * by dn.base="cn=admin,dc=ldap-provider,dc=fablab-luebeck" manage by group.exact="cn=ldap-admin,ou=group,dc=ldap-provider,dc=fablab-luebeck" manage by * break
 #Root
 olcAccess: to dn.base="dc=ldap-provider,dc=fablab-luebeck" by users read by * break
-#UserRoot
-olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by users read by * break
 #passwords
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by self write by anonymous auth by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" by self read by * break 
@@ -15,6 +13,7 @@ olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=mit
 olcAccess: to dn.base="ou=users,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #mitgliederverwaltung
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=bemerkungMitglied,beginn,ende,aktiv,entry,uid,objectClass,cn,sn,givenName,mail,mitgliedsnummer,mitgliedsart,beitrag,geburtstag by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 #einweisungen
 olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
@@ -35,5 +34,7 @@ olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,
 #olcAccess: to dn.subtree="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #maschinen
 olcAccess: to dn.subtree="ou=maschine,dc=ldap-provider,dc=fablab-luebeck" by users read by * break
+#UserRoot
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by users read by * break
 #abschluss
 olcAccess: to * by * none
