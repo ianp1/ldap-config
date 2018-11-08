@@ -76,6 +76,7 @@ So werden die Berechtigungen und Einstellungen überprüft:
 * `uid=finanzvtest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
 * `uid=mitgliedvtest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
 * `uid=normaltest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
+
 Anschließend hinzufügen zu den jeweiligen Gruppen
 
 ### Ausführen der automatischen Tests
