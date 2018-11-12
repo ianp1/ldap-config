@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-einweisungen-eintragen',
   templateUrl: './einweisungen-eintragen.component.html',
-  styleUrls: ['./einweisungen-eintragen.component.sass']
+  styleUrls: ['./einweisungen-eintragen.component.scss']
 })
 export class EinweisungenEintragenComponent implements OnInit {
   txtQueryChanged: Subject<string> = new Subject<string>();

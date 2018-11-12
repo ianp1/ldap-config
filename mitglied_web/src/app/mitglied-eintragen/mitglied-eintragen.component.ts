@@ -4,7 +4,7 @@ import { AppComponent } from '../app.component';
 @Component({
   selector: 'app-mitglied-eintragen',
   templateUrl: './mitglied-eintragen.component.html',
-  styleUrls: ['./mitglied-eintragen.component.sass']
+  styleUrls: ['./mitglied-eintragen.component.scss']
 })
 export class MitgliedEintragenComponent implements OnInit {
 

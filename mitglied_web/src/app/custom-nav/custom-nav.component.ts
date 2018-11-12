@@ -7,7 +7,7 @@ import { AppComponent } from '../app.component'
 @Component({
   selector: 'custom-nav',
   templateUrl: './custom-nav.component.html',
-  styleUrls: ['./custom-nav.component.sass'],
+  styleUrls: ['./custom-nav.component.scss'],
 })
 export class CustomNavComponent {
 

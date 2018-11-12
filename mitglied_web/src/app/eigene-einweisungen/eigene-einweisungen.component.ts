@@ -4,7 +4,7 @@ import { AppComponent } from '../app.component';
 @Component({
   selector: 'app-eigene-einweisungen',
   templateUrl: './eigene-einweisungen.component.html',
-  styleUrls: ['./eigene-einweisungen.component.sass']
+  styleUrls: ['./eigene-einweisungen.component.scss']
 })
 export class EigeneEinweisungenComponent implements OnInit {
 
