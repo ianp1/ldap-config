@@ -1,3 +1,54 @@
-<p>
-  einweisungen-eintragen works!
-</p>
+<div>
+  Bitte gib hier deine Fablab-Zugangsdaten ein um eine neue Einweisung einzutragen:
+
+  <br>
+  <div class="input-mask">
+    <form [formGroup]="loginForm">
+      <mat-form-field>
+        <input matInput
+            placeholder="Nutzername"
+            value=""
+            (input)='checkLogin()'
+            [(ngModel)]="this.username"
+            formControlName="username"
+        >
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+            placeholder="Passwort"
+            type="password"
+            value=""
+            (input)='checkLogin()'
+            [(ngModel)]="this.password"
+            formControlName="password"
+        >
+      </mat-form-field>
+      <span *ngIf="validating">
+        <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
+      </span>
+    </form>
+  </div>
+  <div *ngIf="loading">
+    <p>
+      Einweisungsdaten:
+    </p>
+    <p class="input-mask">
+      <mat-form-field>
+        <input matInput placeholder="Eingewiesener" value="">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select placeholder="Gerät">
+          <mat-option *ngFor="let maschine of maschinen" [value]="maschine.name">
+            {{maschine.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </p>
+    <br>
+    <br>
+
+    <button mat-raised-button color="primary">
+      Einweisung eintragen
+    </button>
+  </div>
+</div>

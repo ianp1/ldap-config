@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatInputModule, MatCardModule, MatCheckboxModule, MatToolbar, MatToolbarModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
+import { MatSpinner, MatOptionModule, MatSelectModule, MatButtonModule, MatInputModule, MatCardModule, MatCheckboxModule, MatToolbar, MatToolbarModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CustomNavComponent } from './custom-nav/custom-nav.component';
@@ -16,6 +16,7 @@ import { EigeneEinweisungenComponent } from './eigene-einweisungen/eigene-einwei
 import { EinweisungenEintragenComponent } from './einweisungen-eintragen/einweisungen-eintragen.component';
 import { MitgliedEintragenComponent } from './mitglied-eintragen/mitglied-eintragen.component';
 
+import { ReactiveFormsModule } from '@angular/forms';
 
 const appRoutes:Routes = [
 	{path: 'eigene-einweisungen', component: EigeneEinweisungenComponent},
@@ -29,7 +30,8 @@ const appRoutes:Routes = [
 		CustomNavComponent,
 		EigeneEinweisungenComponent,
 		EinweisungenEintragenComponent,
-		MitgliedEintragenComponent
+		MitgliedEintragenComponent,
+		MatSpinner,
 	],
 	imports: [
 		BrowserModule,
@@ -39,9 +41,12 @@ const appRoutes:Routes = [
 		MatCheckboxModule,
 		NgbModule,
 		LayoutModule,
+		ReactiveFormsModule,
 		MatToolbarModule,
 		MatSidenavModule,
 		MatIconModule,
+		MatOptionModule,
+		MatSelectModule,
 		MatListModule,
 		MatCardModule,
 		MatInputModule,
