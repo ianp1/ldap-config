@@ -3,3 +3,4 @@
 **/*.iml
 **/*.swp
 **/vendor
+**/node_modules
