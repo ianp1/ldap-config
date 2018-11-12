@@ -5,24 +5,34 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatCheckboxModule, MatToolbar } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatToolbar, MatToolbarModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { CustomNavComponent } from './custom-nav/custom-nav.component';
+import { LayoutModule } from '@angular/cdk/layout'
 
 @NgModule({
 	declarations: [
 		AppComponent,
-		MatToolbar
+		CustomNavComponent
 	],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
 		BrowserAnimationsModule,
-		MatButtonModule, 
+		MatButtonModule,
 		MatCheckboxModule,
-		NgbModule
+		NgbModule,
+		LayoutModule,
+		MatToolbarModule,
+		MatSidenavModule,
+		MatIconModule,
+		MatListModule
 	],
 	providers: [],
+	exports: [
+		CustomNavComponent
+	],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }
