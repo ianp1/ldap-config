@@ -1,5 +1,6 @@
 <?php
 	require '../vendor/autoload.php';
+	require 'cors.php';
 
 	use \Psr\Http\Message\ServerRequestInterface as Request;
 	use \Psr\Http\Message\ResponseInterface as Response;
@@ -32,7 +33,7 @@
 		return $response -> withJson($data, 201);
 	});
 
-	$app -> get('/Maschine', function(Request $request, Response $response, array $args) {
+	$app -> get('/Maschinen', function(Request $request, Response $response, array $args) {
 		$data = array(
 			array(
 				"name" => "Lasercutter",
@@ -48,6 +49,14 @@
 				)
 			)
 		);
+		return $response -> withJson($data, 201);
+	});
+
+	$app -> get('/Authentifizierung', function(Request $request, Response $response, array $args) {
+		$username = $args['author_user'];
+		$password = $args['author_password'];
+
+		return $response -> withJson(true, 201);
 	});
 
 	$app -> run();

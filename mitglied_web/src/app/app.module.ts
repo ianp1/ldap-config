@@ -17,6 +17,7 @@ import { EinweisungenEintragenComponent } from './einweisungen-eintragen/einweis
 import { MitgliedEintragenComponent } from './mitglied-eintragen/mitglied-eintragen.component';
 
 import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 const appRoutes:Routes = [
 	{path: 'eigene-einweisungen', component: EigeneEinweisungenComponent},
@@ -35,6 +36,7 @@ const appRoutes:Routes = [
 	],
 	imports: [
 		BrowserModule,
+		HttpClientModule,
 		AppRoutingModule,
 		BrowserAnimationsModule,
 		MatButtonModule,
