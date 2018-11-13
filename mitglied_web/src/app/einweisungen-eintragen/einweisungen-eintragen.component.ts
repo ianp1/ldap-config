@@ -44,6 +44,11 @@ export class EinweisungenEintragenComponent implements OnInit {
             this.validating = false;
             this.valid = true;
           });
+        },
+        error => {
+          console.log(error);
+          this.validating = false;
+          this.valid = true;
         });
   }
 

@@ -55,8 +55,10 @@
 	$app -> get('/Authentifizierung', function(Request $request, Response $response, array $args) {
 		$username = $args['author_user'];
 		$password = $args['author_password'];
-
-		return $response -> withJson(true, 201);
+		if ($username == 'IanPoesse' && $password == '123geheim') {
+			return $response -> withJson(true, 201);
+		}
+		return $response -> withStatus(401);
 	});
 
 	$app -> run();
