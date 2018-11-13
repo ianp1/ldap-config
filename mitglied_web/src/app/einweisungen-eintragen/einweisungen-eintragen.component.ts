@@ -5,6 +5,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { FormGroup, FormControl } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
+
 @Component({
   selector: 'app-einweisungen-eintragen',
   templateUrl: './einweisungen-eintragen.component.html',
@@ -46,12 +47,12 @@ export class EinweisungenEintragenComponent implements OnInit {
               console.log("Authentifizierung erfolgreich: "+data);
               this.validating = false;
               this.valid = true;
+            },
+            error => {
+              console.log("fetched error: ", error);
+              this.validating = false;
+              this.valid = false;
             });
-          },
-          error => {
-            console.log(error);
-            this.validating = false;
-            this.valid = true;
           });
   }
 
