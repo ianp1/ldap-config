@@ -38,18 +38,21 @@ export class EinweisungenEintragenComponent implements OnInit {
         .pipe(debounceTime(500))
         .subscribe(model => {
           this.validating = true;
-          //console.log(this.loginForm.value);
-          this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/Authentifizierung').subscribe(data => {
-            console.log("Authentifizierung erfolgreich: "+data);
+          console.log(this.loginForm.value);
+          this.http.post('http://localhost/mitglied_web/api/v1.0/index.php/Authentifizierung', {
+            'author_user' : this.loginForm.value['username'],
+            'author_password' : this.loginForm.value['password']
+          }, {}).subscribe(data =>{
+              console.log("Authentifizierung erfolgreich: "+data);
+              this.validating = false;
+              this.valid = true;
+            });
+          },
+          error => {
+            console.log(error);
             this.validating = false;
             this.valid = true;
           });
-        },
-        error => {
-          console.log(error);
-          this.validating = false;
-          this.valid = true;
-        });
   }
 
   checkLogin() {
