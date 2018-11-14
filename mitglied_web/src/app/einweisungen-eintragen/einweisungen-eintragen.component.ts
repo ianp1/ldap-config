@@ -18,10 +18,15 @@ export class EinweisungenEintragenComponent implements OnInit {
   validColor: String = "primary";
 
   maschinen:any = [];
+  users:any = [];
 
   loginForm: FormGroup = new FormGroup({
     username: new FormControl(''),
     password: new FormControl('')
+  });
+  einweisungForm: FormGroup = new FormGroup({
+    eingewiesener: new FormControl(''),
+    maschine: new FormControl('')
   });
 
 
@@ -40,15 +45,8 @@ export class EinweisungenEintragenComponent implements OnInit {
         .subscribe(model => {
           this.validating = true;
           console.log(this.loginForm.value);
-          var user = this.loginForm.value['username'];
-          if (user == undefined) {
-            user = "";
-          }
-          var passw = this.loginForm.value['password'];
-          if (passw == undefined) {
-            passw = "";
-          }
-
+          var user = this.sanitize(this.loginForm.value['username']);
+          var passw = this.sanitize(this.loginForm.value['password']);
 
           this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/Authentifizierung?author_user='+user+'&author_password='+passw).subscribe(data =>{
               console.log("Authentifizierung erfolgreich: "+data);
@@ -65,6 +63,26 @@ export class EinweisungenEintragenComponent implements OnInit {
 
   checkLogin() {
     this.txtQueryChanged.next('');
+  }
+
+  sanitize(arg:String):String {
+    if (arg == undefined || arg == null) {
+      return "";
+    }
+    return arg;
+  }
+
+  fetchUsers() {
+    var user = this.sanitize(this.loginForm.value['username']);
+    var passw = this.sanitize(this.loginForm.value['password']);
+    var searchTerm = this.sanitize(this.einweisungForm.value['eingewiesener']);
+
+    this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/User?author_user='+user+'&autor_password='+passw+'&search_term='+searchTerm).subscribe(data => {
+      console.log("Suche erfolgreich: ", data);
+      this.users=data;
+    }, error => {
+      console.log("fetched error: ", error);
+    });
   }
 
 }

@@ -34,8 +34,18 @@
     </p>
     <p class="input-mask">
       <mat-form-field>
-        <input matInput placeholder="Eingewiesener" value="">
+        <input
+            matInput
+            placeholder="Eingewiesener"
+            value=""
+            [matAutocomplete]="auto"
+            (input)='fetchUsers()'
+        >
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let user of users" [value]="user.uid">{{user.name}}</mat-option>
+        </mat-autocomplete>
       </mat-form-field>
+
       <mat-form-field>
         <mat-select placeholder="Gerät">
           <mat-option *ngFor="let maschine of maschinen" [value]="maschine.name">
