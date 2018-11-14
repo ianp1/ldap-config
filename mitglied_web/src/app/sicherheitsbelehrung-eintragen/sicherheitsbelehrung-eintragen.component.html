@@ -1,0 +1,74 @@
+<div>
+  Bitte gib hier deine Fablab-Zugangsdaten ein um eine neue Einweisung einzutragen:
+
+  <br>
+  <div class="input-mask">
+    <form [formGroup]="loginForm">
+      <mat-form-field>
+        <input matInput
+            placeholder="Nutzername"
+            value=""
+            (input)='checkLogin()'
+            [(ngModel)]="this.username"
+            formControlName="username"
+        >
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+            placeholder="Passwort"
+            type="password"
+            value=""
+            (input)='checkLogin()'
+            [(ngModel)]="this.password"
+            formControlName="password"
+        >
+      </mat-form-field>
+      <span [hidden]="!validating">
+        <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
+      </span>
+    </form>
+  </div>
+  <div *ngIf="valid" class="input-mask">
+    <p>
+      Nutzerdaten:
+    </p>
+    <form [formGroup]="sicherheitForm">
+      <mat-form-field>
+        <input matInput
+            placeholder="Vorname"
+            value=""
+            [(ngModel)]="this.vorname"
+            formControlName="vorname"
+        >
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+            placeholder="Nachname"
+            value=""
+            [(ngModel)]="this.nachname"
+            formControlName="nachname"
+        >
+      </mat-form-field><br>
+      <mat-form-field>
+        <input matInput
+            placeholder="Geburtsdatum"
+            value=""
+            [(ngModel)]="this.geburtsdatum"
+            formControlName="geburtsdatum"
+            [matDatepicker]="geburtsdatumPicker"
+        >
+        <mat-datepicker #geburtsdatumPicker>
+        </mat-datepicker>
+
+        <mat-datepicker-toggle matSuffix [for]="geburtsdatumPicker"></mat-datepicker-toggle>
+      </mat-form-field>
+    </form>
+    <br><br>
+
+
+    <button mat-raised-button color="primary" (click)="checkExistance()">
+      Sicherheitsbelehrung eintragen
+    </button>
+  </div>
+
+</div>

@@ -91,7 +91,7 @@ export class EinweisungenEintragenComponent implements OnInit {
     var requestUser = this.sanitize(this.einweisungForm.value['eingewiesener']);
     var machine = this.sanitize(this.einweisungForm.value['maschine']);
 
-    this.http.post('http://localhost/mitglied_web/api/v1.0/index.php/Einweisung/'+requestUser, {
+    this.http.post('http://localhost/mitglied_web/api/v1.0/index.php/Einweisung'+requestUser, {
       'author_user' : user,
       'author_password' : passw,
       'machine' : machine

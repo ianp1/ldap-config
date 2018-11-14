@@ -38,6 +38,39 @@
 		return $response -> withJson($data, 201);
 	});
 
+	$app -> get('/User/{vorname}/{nachname}/{geburtsdatum}', function(Request $request, Response $response, array $args) {
+		$vorname = $args['vorname'];
+		$nachname = $args['nachname'];
+		$geburtsdatum = $args['geburtsdatum'];
+
+		$params = $request->getQueryParams();
+
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$searchTerm = "(objectClass=*)(cn=$vorname)(sn=$nachname)(birthday=$geburtsdatum)";
+
+		$searchResults = array(
+			array(
+				"vorname"=>"Max",
+				"nachname"=>"Müller",
+				"geburtsdatum"=>"01.01.1970",
+				"uid"=>'MaxMüller',
+				"TagId"=>"1010"
+			),
+			array(
+				"vorname"=>"Max",
+				"nachname"=>"Müller",
+				"geburtsdatum"=>"01.01.1970",
+				"uid"=>"MaxMüller1",
+				"TagId"=>"1022"
+			)
+		);
+
+		//$response->getBody()->write($searchTerm);
+		return $response->withJson($searchResults);
+	});
+
 	$app -> get('/Maschinen', function(Request $request, Response $response, array $args) {
 		$data = array(
 			array(

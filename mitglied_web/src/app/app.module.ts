@@ -56,12 +56,14 @@ import { MitgliedEintragenComponent } from './mitglied-eintragen/mitglied-eintra
 
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { SicherheitsbelehrungEintragenComponent } from './sicherheitsbelehrung-eintragen/sicherheitsbelehrung-eintragen.component';
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
 	{path: 'eigene-einweisungen', component: EigeneEinweisungenComponent},
 	{path: 'einweisungen-eintragen', component: EinweisungenEintragenComponent},
-	{path: 'mitglied-eintragen', component: MitgliedEintragenComponent}
+	{path: 'mitglied-eintragen', component: MitgliedEintragenComponent},
+  {path: 'sicherheitsbelehrung-eintragen', component: SicherheitsbelehrungEintragenComponent}
 ];
 
 @NgModule({
@@ -71,6 +73,7 @@ const appRoutes:Routes = [
 		EigeneEinweisungenComponent,
 		EinweisungenEintragenComponent,
 		MitgliedEintragenComponent,
+		SicherheitsbelehrungEintragenComponent,
 	],
 	imports: [
 		BrowserModule,
