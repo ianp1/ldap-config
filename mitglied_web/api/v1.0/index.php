@@ -52,9 +52,9 @@
 		return $response -> withJson($data, 201);
 	});
 
-	$app -> post('/Authentifizierung', function(Request $request, Response $response, array $args) {
+	$app -> get('/Authentifizierung', function(Request $request, Response $response, array $args) {
 
-		$params = $request->getParsedBody();
+		$params = $request->getQueryParams();
 
 		$username = $params['author_user'];
 		$password = $params['author_password'];

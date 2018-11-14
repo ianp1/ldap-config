@@ -40,10 +40,17 @@ export class EinweisungenEintragenComponent implements OnInit {
         .subscribe(model => {
           this.validating = true;
           console.log(this.loginForm.value);
-          this.http.post('http://localhost/mitglied_web/api/v1.0/index.php/Authentifizierung', {
-            'author_user' : this.loginForm.value['username'],
-            'author_password' : this.loginForm.value['password']
-          }, {}).subscribe(data =>{
+          var user = this.loginForm.value['username'];
+          if (user == undefined) {
+            user = "";
+          }
+          var passw = this.loginForm.value['password'];
+          if (passw == undefined) {
+            passw = "";
+          }
+
+
+          this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/Authentifizierung?author_user='+user+'&author_password='+passw).subscribe(data =>{
               console.log("Authentifizierung erfolgreich: "+data);
               this.validating = false;
               this.valid = true;
