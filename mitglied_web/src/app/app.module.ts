@@ -20,6 +20,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 const appRoutes:Routes = [
+	{path: '', component: EigeneEinweisungenComponent},
 	{path: 'eigene-einweisungen', component: EigeneEinweisungenComponent},
 	{path: 'einweisungen-eintragen', component: EinweisungenEintragenComponent},
 	{path: 'mitglied-eintragen', component: MitgliedEintragenComponent}
