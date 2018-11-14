@@ -7,23 +7,28 @@
 
 	$app = new \Slim\App;
 
-	$app -> post('/Einweisung', function (Request $request, Response $response, array $args) {
-		$AuthorUser = $args['author_user'];
-		$AuthorPassword = $args['author_password'];
+	$app -> post('/Einweisung/{RequestUser}', function (Request $request, Response $response, array $args) {
+		$params = $request -> getParsedBody();
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
 
-		$RequestUser = $args['request_user'];
-		$RequestMachine = $args['machine'];
+		$RequestUser = $args['RequestUser'];
+		$RequestMachine = $params['machine'];
 
-		echo "ldap insert with $RequestUser, $RequestMachine as User $AuthorUser with password $AuthorPassword";
+		$response->getBody()->write("ldap insert with $RequestUser, $RequestMachine as User $AuthorUser with password $AuthorPassword");
 
 		return $response;
 	});
 
 	$app -> get('/User', function (Request $request, Response $response, array $args) {
-		$AuthorUser = $args['author_user'];
-		$AuthorPassword = $args['author_password'];
+		$params = $request->getQueryParams();
 
-		$searchTerm = $args['search_term'];
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$searchTerm = $params['search_term'];
+
+
 		$data = array(
 			array(
 				"name" => "Max Mustermann",

@@ -23,7 +23,7 @@
             formControlName="password"
         >
       </mat-form-field>
-      <span *ngIf="validating">
+      <span [hidden]="!validating">
         <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
       </span>
     </form>
@@ -32,32 +32,40 @@
     <p>
       Einweisungsdaten:
     </p>
-    <p class="input-mask">
-      <mat-form-field>
-        <input
-            matInput
-            placeholder="Eingewiesener"
-            value=""
-            [matAutocomplete]="auto"
-            (input)='fetchUsers()'
-        >
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let user of users" [value]="user.uid">{{user.name}}</mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+    <div class="input-mask">
+      <form [formGroup]="einweisungForm">
+        <mat-form-field>
+          <input
+              matInput
+              placeholder="Eingewiesener"
+              value=""
+              [matAutocomplete]="auto"
+              (input)='fetchUsers()'
+              [(ngModel)]="this.eingewiesener"
+              formControlName="eingewiesener"
+          >
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let user of users" [value]="user.uid">{{user.name}}</mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-select placeholder="Gerät">
-          <mat-option *ngFor="let maschine of maschinen" [value]="maschine.name">
-            {{maschine.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </p>
+        <mat-form-field>
+          <mat-select
+              placeholder="Gerät"
+              [(ngModel)]="this.maschine"
+              formControlName="maschine"
+          >
+            <mat-option *ngFor="let maschine of maschinen" [value]="maschine.name">
+              {{maschine.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </div>
     <br>
     <br>
 
-    <button mat-raised-button color="primary">
+    <button mat-raised-button color="primary" (click)="enterEinweisung()">
       Einweisung eintragen
     </button>
   </div>

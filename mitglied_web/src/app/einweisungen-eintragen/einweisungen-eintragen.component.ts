@@ -77,9 +77,26 @@ export class EinweisungenEintragenComponent implements OnInit {
     var passw = this.sanitize(this.loginForm.value['password']);
     var searchTerm = this.sanitize(this.einweisungForm.value['eingewiesener']);
 
-    this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/User?author_user='+user+'&autor_password='+passw+'&search_term='+searchTerm).subscribe(data => {
+    this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/User?author_user='+user+'&author_password='+passw+'&search_term='+searchTerm).subscribe(data => {
       console.log("Suche erfolgreich: ", data);
       this.users=data;
+    }, error => {
+      console.log("fetched error: ", error);
+    });
+  }
+
+  enterEinweisung() {
+    var user = this.sanitize(this.loginForm.value['username']);
+    var passw = this.sanitize(this.loginForm.value['password']);
+    var requestUser = this.sanitize(this.einweisungForm.value['eingewiesener']);
+    var machine = this.sanitize(this.einweisungForm.value['maschine']);
+
+    this.http.post('http://localhost/mitglied_web/api/v1.0/index.php/Einweisung/'+requestUser, {
+      'author_user' : user,
+      'author_password' : passw,
+      'machine' : machine
+    }).subscribe(data => {
+      console.log("successfully posted einweisung: ", data);
     }, error => {
       console.log("fetched error: ", error);
     });
