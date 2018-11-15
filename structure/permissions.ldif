@@ -33,7 +33,7 @@ olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,
 #olcAccess: to dn.subtree="ou=user,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=bot,dc=ldap-provider,dc=fablab-luebeck" write by * break
 #olcAccess: to dn.subtree="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #maschinen
-olcAccess: to dn.subtree="ou=maschine,dc=ldap-provider,dc=fablab-luebeck" by users read by * break
+olcAccess: to dn.subtree="ou=maschine,dc=ldap-provider,dc=fablab-luebeck" by * read 
 #UserRoot
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by users read by * break
 #abschluss

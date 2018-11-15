@@ -17,6 +17,8 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   validating: boolean = false;
   valid: boolean = false;
 
+  url_base:String = 'https://192.168.2.201:446/';
+
   loginForm: FormGroup = new FormGroup({
     username: new FormControl(''),
     password: new FormControl('')
@@ -41,7 +43,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
           var user = this.sanitize(this.loginForm.value['username']);
           var passw = this.sanitize(this.loginForm.value['password']);
 
-          this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/Authentifizierung?author_user='+user+'&author_password='+passw).subscribe(data =>{
+          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung?author_user='+user+'&author_password='+passw).subscribe(data =>{
               console.log("Authentifizierung erfolgreich: "+data);
               this.validating = false;
               this.valid = true;
@@ -74,7 +76,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var geburtsdatum = this.sanitize(this.sicherheitForm.value['geburtsdatum']);
 
     if (vorname != '' && nachname != '' && geburtsdatum != '') {
-      this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'?author_user='+user+'&author_password='+passw).subscribe(data => {
+      this.http.get(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'?author_user='+user+'&author_password='+passw).subscribe(data => {
         console.log("Sicherheitsbelehrungen vorhanden für: "+data);
       }, error=> {
         console.log("fetched error: ", error);
@@ -89,5 +91,4 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   templateUrl: 'dialog-user-existing.html'
 })
 export class DialogUserExisting {
-  
 }*/

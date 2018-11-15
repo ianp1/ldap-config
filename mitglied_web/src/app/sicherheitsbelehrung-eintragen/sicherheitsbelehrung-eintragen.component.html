@@ -9,7 +9,6 @@
             placeholder="Nutzername"
             value=""
             (input)='checkLogin()'
-            [(ngModel)]="this.username"
             formControlName="username"
         >
       </mat-form-field>
@@ -19,7 +18,6 @@
             type="password"
             value=""
             (input)='checkLogin()'
-            [(ngModel)]="this.password"
             formControlName="password"
         >
       </mat-form-field>

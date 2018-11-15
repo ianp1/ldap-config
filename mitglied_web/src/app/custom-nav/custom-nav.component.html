@@ -1,8 +1,8 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport="true"
-      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-      [mode]="(isHandset$ | async) ? 'over' : 'side'"
-      [opened]="async">
+      [attr.role]="(isHandset$ ) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$) ? 'over' : 'side'"
+      >
     <mat-toolbar>Menü</mat-toolbar>
     <mat-nav-list>
       <a mat-list-item href="/eigene-einweisungen">Eigene Einweisungen einsehen</a>
@@ -21,7 +21,7 @@
         >
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <span>{{appComponent.title}}</span>
+      <span>{{this.appComponent.title}}</span>
     </mat-toolbar>
     <mat-card class="page_container">
       <router-outlet></router-outlet>

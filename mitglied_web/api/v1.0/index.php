@@ -7,6 +7,25 @@
 
 	$app = new \Slim\App;
 
+	$app -> get('/Einweisung/{RequestUser}/{RequestMachine}', function (Request $request, Response $response, array $args) {
+		$params = $request->getQueryParams();
+
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestUser = $args['RequestUser'];
+		$RequestMachine = $args['RequestMachine'];
+
+		//$response -> getBody() -> write($RequestUser." ".$RequestMachine);
+
+		if ($RequestUser == "Test" && $RequestMachine == "Lasercutter") {
+			$response -> getBody() -> write("true");
+		} else {
+			$response -> getBody() -> write("false");
+		}
+		return $response;
+	});
+
 	$app -> post('/Einweisung/{RequestUser}', function (Request $request, Response $response, array $args) {
 		$params = $request -> getParsedBody();
 		$AuthorUser = $params['author_user'];
