@@ -16,6 +16,6 @@ export class CustomNavComponent {
       map(result => result.matches)
     );
 
-  constructor(private breakpointObserver: BreakpointObserver, private appComponent: AppComponent) {}
+  constructor(private breakpointObserver: BreakpointObserver, public appComponent: AppComponent) {}
 
 }

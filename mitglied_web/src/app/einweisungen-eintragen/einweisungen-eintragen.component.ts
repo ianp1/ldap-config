@@ -11,11 +11,14 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './einweisungen-eintragen.component.html',
   styleUrls: ['./einweisungen-eintragen.component.scss']
 })
+
 export class EinweisungenEintragenComponent implements OnInit {
   txtQueryChanged: Subject<string> = new Subject<string>();
   validating: boolean = false;
   valid: boolean = false;
   validColor: String = "primary";
+
+  url_base: String = 'http://192.168.3.4/';
 
   maschinen:any = [];
   users:any = [];
@@ -35,7 +38,7 @@ export class EinweisungenEintragenComponent implements OnInit {
   ngOnInit() {
     this.appComponent.title = "Neue Einweisungen eintragen"
 
-    this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/Maschinen').subscribe(data => {
+    this.http.get(this.url_base+'/api/v1.0/index.php/Maschinen').subscribe(data => {
       this.maschinen = data;
       console.log(this.maschinen);
     });
@@ -48,7 +51,7 @@ export class EinweisungenEintragenComponent implements OnInit {
           var user = this.sanitize(this.loginForm.value['username']);
           var passw = this.sanitize(this.loginForm.value['password']);
 
-          this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/Authentifizierung?author_user='+user+'&author_password='+passw).subscribe(data =>{
+          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung?author_user='+user+'&author_password='+passw).subscribe(data =>{
               console.log("Authentifizierung erfolgreich: "+data);
               this.validating = false;
               this.valid = true;
@@ -77,7 +80,7 @@ export class EinweisungenEintragenComponent implements OnInit {
     var passw = this.sanitize(this.loginForm.value['password']);
     var searchTerm = this.sanitize(this.einweisungForm.value['eingewiesener']);
 
-    this.http.get('http://localhost/mitglied_web/api/v1.0/index.php/User?author_user='+user+'&author_password='+passw+'&search_term='+searchTerm).subscribe(data => {
+    this.http.get(this.url_base+'api/v1.0/index.php/User?author_user='+user+'&author_password='+passw+'&search_term='+searchTerm).subscribe(data => {
       console.log("Suche erfolgreich: ", data);
       this.users=data;
     }, error => {
@@ -91,7 +94,7 @@ export class EinweisungenEintragenComponent implements OnInit {
     var requestUser = this.sanitize(this.einweisungForm.value['eingewiesener']);
     var machine = this.sanitize(this.einweisungForm.value['maschine']);
 
-    this.http.post('http://localhost/mitglied_web/api/v1.0/index.php/Einweisung'+requestUser, {
+    this.http.post(this.url_base+'api/v1.0/index.php/Einweisung'+requestUser, {
       'author_user' : user,
       'author_password' : passw,
       'machine' : machine
