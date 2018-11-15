@@ -116,7 +116,7 @@ export class EinweisungenEintragenComponent implements OnInit {
 
     console.log(this.encodeURL(machine));
 
-    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+this.encodeURL(requestUser)+"/"+this.encodeURL(machine)+"/20181108192753.487Z",
+    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+this.encodeURL(requestUser)+"/"+this.encodeURL(machine)+"/19950111183220.733Z",
       params
     ).subscribe(data => {
       if (data) {

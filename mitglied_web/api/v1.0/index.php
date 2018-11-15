@@ -174,27 +174,32 @@
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
-		$searchTerm = "(objectClass=fablabPerson)(cn=$vorname)(sn=$nachname)(birthday=$geburtsdatum)";
+		$searchTerm = "(&(objectClass=inetOrgPerson)(cn=$vorname)(sn=$nachname)(geburtstag=$geburtsdatum))";
 
-		$searchResults = array(
-			array(
-				"vorname"=>"Max",
-				"nachname"=>"Müller",
-				"geburtsdatum"=>"01.01.1970",
-				"uid"=>'MaxMüller',
-				"TagId"=>"1010"
-			),
-			array(
-				"vorname"=>"Max",
-				"nachname"=>"Müller",
-				"geburtsdatum"=>"01.01.1970",
-				"uid"=>"MaxMüller1",
-				"TagId"=>"1022"
-			)
-		);
+		$ldapconn = $request -> getAttribute("ldapconn");
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+			$dn = "ou=user,".$ldap_base_dn;
+
+			$erg = ldap_search($ldapconn, $dn, $searchTerm, array("cn", "sn", "uid", "dn"));
+			$results = ldap_get_entries($ldapconn, $erg);
+			$ar = array();
+			for ($i = 0; $i < $results['count']; $i++) {
+				array_push($ar, array(
+					"vorname"=>$results[$i]["cn"][0],
+					"nachname"=>$results[$i]["sn"][0],
+					"uid"=>$results[$i]["uid"][0],
+					"dn"=>$results[$i]["dn"]
+				));
+			}
+
+			return $response -> withJson($ar, 201);
+
+		}
 
 		//$response->getBody()->write($searchTerm);
-		return $response->withJson($searchResults);
+		return $response->withStatus(401);
 	});
 
 	/**

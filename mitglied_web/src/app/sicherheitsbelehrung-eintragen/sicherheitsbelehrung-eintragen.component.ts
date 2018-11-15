@@ -17,7 +17,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   validating: boolean = false;
   valid: boolean = false;
 
-  url_base:String = 'https://192.168.2.201:446/';
+  url_base:String = 'http://127.0.0.1/mitglied_web/';
 
   loginForm: FormGroup = new FormGroup({
     username: new FormControl(''),
@@ -74,7 +74,8 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var vorname = this.sanitize(this.sicherheitForm.value['vorname']);
     var nachname = this.sanitize(this.sicherheitForm.value['nachname']);
     var geburtsdatum = this.sanitize(this.sicherheitForm.value['geburtsdatum']);
-
+    console.log("test");
+    console.log("vorname:",vorname,"nachname:",nachname,"geburtsdatum:",geburtsdatum);
     if (vorname != '' && nachname != '' && geburtsdatum != '') {
       this.http.get(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'?author_user='+user+'&author_password='+passw).subscribe(data => {
         console.log("Sicherheitsbelehrungen vorhanden für: "+data);
