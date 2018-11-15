@@ -31,6 +31,14 @@
 		return $response;
 	});
 
+	/**
+	* $RequestToken : RFID-Token des Abgefragten Nutzers
+	* $RequestMachine : DN der Angefragten Maschine
+	* author_user : UID des anfragenden Nutzers
+	* author_password : Passwort des anfragenden Nutzers
+	*
+	* Prüft ob Einweisung in Gerät für Nutzer vorhanden ist
+	*/
 	$app -> get('/Einweisung/{RequestToken}/{RequestMachine}', function (Request $request, Response $response, array $args) {
 		$params = $request->getQueryParams();
 
@@ -69,24 +77,58 @@
 		return $response -> withJson(false, 201);
 	});
 
-	$app -> post('/Einweisung/{RequestUser}/{RequestDate}', function (Request $request, Response $response, array $args) {
+
+	/**
+	* $RequestUser : DN des zu ändernden Nutzers
+	* $RequestMachine : DN der eingewiesenen Maschine
+	* $RequestDate : Datum der Einweisung
+	* author_user : UID des anfragenden Nutzers
+	* author_password : Passwort des anfragenden Nutzers
+	*
+	* Legt eine Einweisung am gegebenen Datum für den zu ändernden Nutzer an
+	*/
+	$app -> post('/Einweisung/{RequestUser}/{RequestMachine}/{RequestDate}', function (Request $request, Response $response, array $args) {
 		$params = $request -> getParsedBody();
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
 		$RequestUser = $args['RequestUser'];
-		$RequestMachine = $params['machine'];
+		$RequestMachine = $args['RequestMachine'];
+		$RequestDate = $args['RequestDate'];
 
-		return $response;
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		//TODO: Sanitycheck inputs!
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+			$entry = array();
+			$entry["objectClass"] = "einweisung";
+			$entry["eingewiesener"] = $RequestUser;
+			$entry["geraet"] = $RequestMachine;
+			$entry["einweisungsdatum"] = $RequestDate;
+			$entry["distinctname"] = uniqid("e_");
+
+			return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",ou=einweisung,dc=ldap-provider,dc=fablab-luebeck", $entry), 201);
+		}
+
+
+		return $response -> withStatus(401);
 	});
 
-	$app -> get('/User', function (Request $request, Response $response, array $args) {
+	/**
+	* $search_term : Name der gesucht wird
+	* author_user : UID des anfragenden Benutzers
+	* author_password : Passwort des anfragenden Benutzers
+	*
+	* Sucht nach Nutzern die zum Suchterm passen
+	*/
+	$app -> get('/User/{SearchTerm}', function (Request $request, Response $response, array $args) {
 		$params = $request->getQueryParams();
 
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
-		$st = $params['search_term'];
+		$st = $args['SearchTerm'];
 
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
@@ -96,14 +138,15 @@
 			$dn = "ou=user,".$ldap_base_dn;
 			$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
 
-			$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid"));
+			$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid", "dn"));
 			$results = ldap_get_entries($ldapconn, $erg);
 			$ar = array();
 			for ($i = 0; $i < $results['count']; $i++) {
 				array_push($ar, array(
 					"vorname"=>$results[$i]["cn"][0],
 					"nachname"=>$results[$i]["sn"][0],
-					"uid"=>$results[$i]["uid"][0]
+					"uid"=>$results[$i]["uid"][0],
+					"dn"=>$results[$i]["dn"]
 				));
 			}
 			return $response -> withJson($ar, 201);
@@ -112,6 +155,15 @@
 		}
 	});
 
+	/**
+	* $vorname : Vorname des gesuchten Benutzers
+	* $nachname : Nachname des gesuchten Benutzers
+	* $geburtsdatum : Geburtstag des gesuchten Benutzers
+	* author_user : UID des anfragenden Benutzers
+	* author_password : Passwort des anfragenden Benutzers
+	*
+	* Sucht Nutzer mit gegebenen Daten
+	*/
 	$app -> get('/User/{vorname}/{nachname}/{geburtsdatum}', function(Request $request, Response $response, array $args) {
 		$vorname = $args['vorname'];
 		$nachname = $args['nachname'];
@@ -122,7 +174,7 @@
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
-		$searchTerm = "(objectClass=*)(cn=$vorname)(sn=$nachname)(birthday=$geburtsdatum)";
+		$searchTerm = "(objectClass=fablabPerson)(cn=$vorname)(sn=$nachname)(birthday=$geburtsdatum)";
 
 		$searchResults = array(
 			array(
@@ -145,6 +197,9 @@
 		return $response->withJson($searchResults);
 	});
 
+	/**
+	* Gibt alle vorhandenen Geräte des Fablab zurück
+	*/
 	$app -> get('/Maschinen', function(Request $request, Response $response, array $args) {
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$ldapconn = $request -> getAttribute("ldapconn");
@@ -163,6 +218,12 @@
 		return $response -> withJson($ar, 201);
 	});
 
+	/**
+	* author_user : UID des anfragenden Benutzers
+	* author_password : Passwort des anfragenden Benutzers
+	*
+	* Überprüft Zugangsdaten
+	*/
 	$app -> get('/Authentifizierung', function(Request $request, Response $response, array $args) {
 
 		$params = $request->getQueryParams();

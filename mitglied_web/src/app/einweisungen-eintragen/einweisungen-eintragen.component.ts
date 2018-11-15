@@ -75,7 +75,7 @@ export class EinweisungenEintragenComponent implements OnInit {
               if (searchTerm != "") {
                 this.searching = true;
 
-                this.http.get(this.url_base+'api/v1.0/index.php/User?author_user='+user+'&author_password='+passw+'&search_term='+searchTerm).subscribe(data => {
+                this.http.get(this.url_base+'api/v1.0/index.php/User/'+searchTerm+'?author_user='+user+'&author_password='+passw).subscribe(data => {
                   console.log("Suche erfolgreich: ", data);
                   this.users=data;
                   this.searching = false;
@@ -109,15 +109,28 @@ export class EinweisungenEintragenComponent implements OnInit {
     var requestUser = this.sanitize(this.einweisungForm.value['eingewiesener']);
     var machine = this.sanitize(this.einweisungForm.value['maschine']);
 
-    this.http.post(this.url_base+'api/v1.0/index.php/Einweisung'+requestUser, {
+    var params = {
       'author_user' : user,
-      'author_password' : passw,
-      'machine' : machine
-    }).subscribe(data => {
-      console.log("successfully posted einweisung: ", data);
+      'author_password' : passw
+    };
+
+    console.log(this.encodeURL(machine));
+
+    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+this.encodeURL(requestUser)+"/"+this.encodeURL(machine)+"/20181108192753.487Z",
+      params
+    ).subscribe(data => {
+      if (data) {
+        console.log("successfully posted einweisung: ", data);
+      } else {
+        console.log("error posting einweisung");
+      }
     }, error => {
       console.log("fetched error: ", error);
     });
   }
 
+
+  encodeURL(param:String):String {
+    return encodeURI(param+"");
+  }
 }

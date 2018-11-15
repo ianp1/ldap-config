@@ -43,7 +43,7 @@
               formControlName="eingewiesener"
           >
           <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let user of users" [value]="user.uid">{{user.vorname}} {{user.nachname}}</mat-option>
+            <mat-option *ngFor="let user of users" [value]="user.dn">{{user.vorname}} {{user.nachname}}</mat-option>
           </mat-autocomplete>
         </mat-form-field>
 
@@ -53,7 +53,7 @@
               [(ngModel)]="this.maschine"
               formControlName="maschine"
           >
-            <mat-option *ngFor="let maschine of maschinen" [value]="maschine.name">
+            <mat-option *ngFor="let maschine of maschinen" [value]="maschine.dn">
               {{maschine.name}}
             </mat-option>
           </mat-select>
