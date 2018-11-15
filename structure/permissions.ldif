@@ -4,7 +4,7 @@ replace: olcAccess
 #Admins
 olcAccess: to * by dn.base="cn=admin,dc=ldap-provider,dc=fablab-luebeck" manage by group.exact="cn=ldap-admin,ou=group,dc=ldap-provider,dc=fablab-luebeck" manage by * break
 #Root
-olcAccess: to dn.base="dc=ldap-provider,dc=fablab-luebeck" by users read by * break
+olcAccess: to dn.base="dc=ldap-provider,dc=fablab-luebeck" by * read 
 #passwords
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by self write by anonymous auth by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" by self read by * break 
