@@ -2,9 +2,36 @@
 <mat-dialog-content class="mat-typography">
   <p>
     Ein Nutzer mit diesen Daten existiert bereits.
+    Soll die Sicherheitsbelehrung eines bestehenden Nutzers erneuert werden oder ein neuer Nutzer angelegt werden?
   </p>
   <div>
-    <table mat-table >
+    <div *ngFor="let user of interfaceString">
+      {{user.dn}}
+    </div>
+    <table mat-table dataSource=interfaceString>
+      <ng-container matColumnDef="DN">
+        <th mat-header-cell *matHeaderCellDef>
+          DN
+        </th>
+        <td mat-cell *matCellDef="let user">{{user.dn}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Name">
+        <th mat-header-cell *matHeaderCellDef>
+          Name
+        </th>
+        <td mat-cell *matCellDef="let user">{{user.vorname}} {{user.nachname}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="UID">
+        <th mat-header-cell *matHeaderCellDef>
+          UID
+        </th>
+        <td mat-cell *matCellDef="let user">{{user.uid}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns:displayedColumns"></tr>
     </table>
   </div>
 </mat-dialog-content>

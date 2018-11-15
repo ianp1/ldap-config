@@ -56,7 +56,7 @@ import { MitgliedEintragenComponent } from './mitglied-eintragen/mitglied-eintra
 
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { SicherheitsbelehrungEintragenComponent } from './sicherheitsbelehrung-eintragen/sicherheitsbelehrung-eintragen.component';
+import { SicherheitsbelehrungEintragenComponent, DialogUserExisting } from './sicherheitsbelehrung-eintragen/sicherheitsbelehrung-eintragen.component';
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -74,6 +74,7 @@ const appRoutes:Routes = [
 		EinweisungenEintragenComponent,
 		MitgliedEintragenComponent,
 		SicherheitsbelehrungEintragenComponent,
+    DialogUserExisting
 	],
 	imports: [
 		BrowserModule,
@@ -124,6 +125,9 @@ const appRoutes:Routes = [
 	exports: [
 		CustomNavComponent
 	],
+  entryComponents: [
+    DialogUserExisting
+  ],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }
