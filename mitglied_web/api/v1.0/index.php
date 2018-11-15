@@ -70,16 +70,30 @@
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
-		$searchTerm = $params['search_term'];
+		$st = $params['search_term'];
 
+		$ldapconn = $request -> getAttribute("ldapconn");
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 
-		$data = array(
-			array(
-				"name" => "Max Mustermann",
-				"uid" => "MaxMustermann123"
-			)
-		);
-		return $response -> withJson($data, 201);
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+
+			$dn = "ou=user,".$ldap_base_dn;
+			$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
+
+			$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid"));
+			$results = ldap_get_entries($ldapconn, $erg);
+			$ar = array();
+			for ($i = 0; $i < $results['count']; $i++) {
+				array_push($ar, array(
+					"vorname"=>$results[$i]["cn"][0],
+					"nachname"=>$results[$i]["sn"][0],
+					"uid"=>$results[$i]["uid"][0]
+				));
+			}
+			return $response -> withJson($ar, 201);
+		} else {
+			return $response -> withStatus(401);
+		}
 	});
 
 	$app -> get('/User/{vorname}/{nachname}/{geburtsdatum}', function(Request $request, Response $response, array $args) {
@@ -141,7 +155,7 @@
 
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
-		
+
 		if (ldap_bind($ldapconn, "uid=".$username.",ou=user,".$ldap_base_dn, $password)) {
 			return $response -> withJson(true, 201);
 		}

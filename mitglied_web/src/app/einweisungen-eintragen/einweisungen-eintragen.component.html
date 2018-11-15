@@ -21,7 +21,7 @@
             formControlName="password"
         >
       </mat-form-field>
-      <span [hidden]="!validating">
+      <span [class]="validating ? '' : 'hidden'">
         <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
       </span>
     </form>
@@ -43,7 +43,7 @@
               formControlName="eingewiesener"
           >
           <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let user of users" [value]="user.uid">{{user.name}}</mat-option>
+            <mat-option *ngFor="let user of users" [value]="user.uid">{{user.vorname}} {{user.nachname}}</mat-option>
           </mat-autocomplete>
         </mat-form-field>
 
@@ -58,6 +58,9 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <span [class]="searching? '' : 'hidden'">
+          <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
+        </span>
       </form>
     </div>
     <br>
