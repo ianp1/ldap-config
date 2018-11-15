@@ -24,7 +24,12 @@
 		ldap_set_option($ldapconn,LDAP_OPT_PROTOCOL_VERSION,3);
 		ldap_start_tls($ldapconn);
 		$app->ldapconn = $ldapconn;
-		return $next($request, $response);
+
+		$response = $next($request, $response);
+
+		ldap_close($ldapconn);
+
+		return $response;
 	});
 
 	$app -> get('/Einweisung/{RequestUser}/{RequestMachine}', function (Request $request, Response $response, array $args) {
@@ -133,7 +138,11 @@
 		$params = $request->getQueryParams();
 		$username = $params['author_user'];
 		$password = $params['author_password'];
-		if ($username == 'IanPoesse' && $password == '123geheim') {
+
+		$ldapconn = $request -> getAttribute("ldapconn");
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+		
+		if (ldap_bind($ldapconn, "uid=".$username.",ou=user,".$ldap_base_dn, $password)) {
 			return $response -> withJson(true, 201);
 		}
 		return $response -> withStatus(401);
