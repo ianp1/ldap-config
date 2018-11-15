@@ -18,7 +18,7 @@ export class EinweisungenEintragenComponent implements OnInit {
   valid: boolean = false;
   validColor: String = "primary";
 
-  url_base: String = 'http://192.168.3.4/';
+  url_base: String = 'https://192.168.2.201:446/';
 
   maschinen:any = [];
   users:any = [];

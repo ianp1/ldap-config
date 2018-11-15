@@ -17,7 +17,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   validating: boolean = false;
   valid: boolean = false;
 
-  url_base:String = 'http://192.168.3.4/';
+  url_base:String = 'https://192.168.2.201:446/';
 
   loginForm: FormGroup = new FormGroup({
     username: new FormControl(''),
