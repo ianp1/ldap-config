@@ -18,7 +18,7 @@ export class EinweisungenEintragenComponent implements OnInit {
   valid: boolean = false;
   validColor: String = "primary";
 
-  url_base: String = 'https://192.168.2.201:446/';
+  url_base: String = 'http://127.0.0.1/mitglied_web/';
 
   maschinen:any = [];
   users:any = [];
@@ -38,7 +38,7 @@ export class EinweisungenEintragenComponent implements OnInit {
   ngOnInit() {
     this.appComponent.title = "Neue Einweisungen eintragen"
 
-    this.http.get(this.url_base+'/api/v1.0/index.php/Maschinen').subscribe(data => {
+    this.http.get(this.url_base+'api/v1.0/index.php/Maschinen').subscribe(data => {
       this.maschinen = data;
       console.log(this.maschinen);
     });

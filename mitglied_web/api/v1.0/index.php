@@ -7,6 +7,26 @@
 
 	$app = new \Slim\App;
 
+	$app -> add(function($request, $response, $next) {
+		$ldaphost = "192.168.3.4";
+		$ldapport = 389;
+
+		$ldapconn = ldap_connect($ldaphost, $ldapport);
+		if (!$ldapconn) {
+			$response -> getBody() -> write("LDAP-Server Verbindung nicht möglich<br>");
+			$response -> getBody() -> write(ldap_error($ldapconn));
+			return $response -> withStatus(500);
+		}
+
+		$request = $request -> withAttribute("ldapconn", $ldapconn);
+		$request = $request -> withAttribute("ldap_base_dn", "dc=ldap-provider,dc=fablab-luebeck");
+
+		ldap_set_option($ldapconn,LDAP_OPT_PROTOCOL_VERSION,3);
+		ldap_start_tls($ldapconn);
+		$app->ldapconn = $ldapconn;
+		return $next($request, $response);
+	});
+
 	$app -> get('/Einweisung/{RequestUser}/{RequestMachine}', function (Request $request, Response $response, array $args) {
 		$params = $request->getQueryParams();
 
@@ -91,28 +111,26 @@
 	});
 
 	$app -> get('/Maschinen', function(Request $request, Response $response, array $args) {
-		$data = array(
-			array(
-				"name" => "Lasercutter",
-				"mentoren" => array(
-					"Andre",
-					"Christian"
-				)
-			),
-			array(
-				"name" => "Ultimaker 1 Original",
-				"mentoren" => array(
-					"Bjarne"
-				)
-			)
-		);
-		return $response -> withJson($data, 201);
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+		$ldapconn = $request -> getAttribute("ldapconn");
+
+		$dn = "ou=maschine,".$ldap_base_dn;
+		$filter = "(objectClass=geraet)";
+
+		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname"));
+
+		$result = ldap_get_entries($ldapconn, $sr);
+		$ar = array();
+		for ($i = 0; $i < $result['count']; $i++) {
+			array_push($ar, array("name"=>$result[$i]["geraetname"][0]));
+		}
+
+		return $response -> withJson($ar, 201);
 	});
 
 	$app -> get('/Authentifizierung', function(Request $request, Response $response, array $args) {
 
 		$params = $request->getQueryParams();
-
 		$username = $params['author_user'];
 		$password = $params['author_password'];
 		if ($username == 'IanPoesse' && $password == '123geheim') {
