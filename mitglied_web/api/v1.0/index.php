@@ -23,7 +23,6 @@
 
 		ldap_set_option($ldapconn,LDAP_OPT_PROTOCOL_VERSION,3);
 		ldap_start_tls($ldapconn);
-		$app->ldapconn = $ldapconn;
 
 		$response = $next($request, $response);
 
@@ -32,34 +31,51 @@
 		return $response;
 	});
 
-	$app -> get('/Einweisung/{RequestUser}/{RequestMachine}', function (Request $request, Response $response, array $args) {
+	$app -> get('/Einweisung/{RequestToken}/{RequestMachine}', function (Request $request, Response $response, array $args) {
 		$params = $request->getQueryParams();
 
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
-		$RequestUser = $args['RequestUser'];
+		$RequestToken = $args['RequestToken'];
 		$RequestMachine = $args['RequestMachine'];
 
-		//$response -> getBody() -> write($RequestUser." ".$RequestMachine);
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 
-		if ($RequestUser == "Test" && $RequestMachine == "Lasercutter") {
-			$response -> getBody() -> write("true");
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+			$dn = "ou=user,".$ldap_base_dn;
+			$userterm = "(&(objectClass=fablabPerson)(rfid=$RequestToken))";
+
+			$RequestUserErg = ldap_search($ldapconn, $dn, $userterm, array("dn"));
+			$RequestUserResults = ldap_get_entries($ldapconn, $RequestUserErg);
+
+			if ($RequestUserResults["count"] === 1) {
+				$RequestUser = $RequestUserResults[0]["dn"];
+
+				$einweisungdn = "ou=einweisung,".$ldap_base_dn;
+				$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser)(geraet=$RequestMachine))";
+
+				$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
+				$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+
+				if ($einweisungResult['count'] === 1) {
+					return $response -> withJson(true, 201);
+				}
+			}
 		} else {
-			$response -> getBody() -> write("false");
+			return $response -> withStatus(401);
 		}
-		return $response;
+		return $response -> withJson(false, 201);
 	});
 
-	$app -> post('/Einweisung/{RequestUser}', function (Request $request, Response $response, array $args) {
+	$app -> post('/Einweisung/{RequestUser}/{RequestDate}', function (Request $request, Response $response, array $args) {
 		$params = $request -> getParsedBody();
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
 		$RequestUser = $args['RequestUser'];
 		$RequestMachine = $params['machine'];
-
-		$response->getBody()->write("ldap insert with $RequestUser, $RequestMachine as User $AuthorUser with password $AuthorPassword");
 
 		return $response;
 	});
@@ -136,12 +152,12 @@
 		$dn = "ou=maschine,".$ldap_base_dn;
 		$filter = "(objectClass=geraet)";
 
-		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname"));
+		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn"));
 
 		$result = ldap_get_entries($ldapconn, $sr);
 		$ar = array();
 		for ($i = 0; $i < $result['count']; $i++) {
-			array_push($ar, array("name"=>$result[$i]["geraetname"][0]));
+			array_push($ar, array("name"=>$result[$i]["geraetname"][0], "dn"=>$result[$i]["dn"]));
 		}
 
 		return $response -> withJson($ar, 201);
