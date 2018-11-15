@@ -83,11 +83,11 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   }
 }
 
-
+/*
 @Component({
   selector: 'dialog-user-existing',
   templateUrl: 'dialog-user-existing.html'
 })
 export class DialogUserExisting {
   
-}
+}*/
