@@ -68,13 +68,15 @@
 				$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
 
 				if ($einweisungResult['count'] === 1) {
-					return $response -> withJson(true, 201);
+					$response -> getBody() -> write("true\n");
+					return $response -> withStatus(201);
 				}
 			}
 		} else {
 			return $response -> withStatus(401);
 		}
-		return $response -> withJson(false, 201);
+		$response -> getBody() -> write("false\n");
+		return $response -> withStatus(201);
 	});
 
 
