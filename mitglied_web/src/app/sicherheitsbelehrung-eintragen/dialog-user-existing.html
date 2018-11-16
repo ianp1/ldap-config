@@ -1,10 +1,39 @@
 <h2 mat-dialog-title>Nutzer existiert bereits</h2>
 <mat-dialog-content class="mat-typography">
   <p>
-    Ein Nutzer mit diesen Daten existiert bereits.
+    Ein oder mehrere Nutzer mit diesen Daten existieren bereits.
+    Soll die Sicherheitsbelehrung eines bestehenden Nutzers erneuert werden oder ein neuer Nutzer angelegt werden?
   </p>
   <div>
-    <table mat-table >
+    <table mat-table [dataSource]="interfaceString" class="mat-elevation-z8">
+      <ng-container matColumnDef="Name">
+        <th mat-header-cell *matHeaderCellDef>
+          Name
+        </th>
+        <td mat-cell *matCellDef="let user">{{user.vorname}} {{user.nachname}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="UID">
+        <th mat-header-cell *matHeaderCellDef>
+          UID
+        </th>
+        <td mat-cell *matCellDef="let user">{{user.uid}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="DN">
+        <th mat-header-cell *matHeaderCellDef>
+          Sicherheitsbelehrung auffrischen?
+        </th>
+        <td mat-cell *matCellDef="let user"><button mat-raised-button color="primary" (click)="updateUser(user.DN)">Auffrischen</button></td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns:displayedColumns"></tr>
     </table>
+    <br>
+    <p class="new_user">
+      <button mat-raised-button color="warn" (click)="createUser()">Neuen Nutzer anlegen</button>
+        <button mat-raised-button color="primary" (click)="abort()">Abbrechen</button>
+    </p>
   </div>
 </mat-dialog-content>

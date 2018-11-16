@@ -14,9 +14,11 @@ import { HttpClient } from '@angular/common/http';
 
 export class EinweisungenEintragenComponent implements OnInit {
   txtQueryChanged: Subject<string> = new Subject<string>();
+  userQueryChanged: Subject<string> = new Subject<string>();
   validating: boolean = false;
   valid: boolean = false;
   validColor: String = "primary";
+  searching: boolean = false;
 
   url_base: String = 'http://127.0.0.1/mitglied_web/';
 
@@ -62,6 +64,28 @@ export class EinweisungenEintragenComponent implements OnInit {
               this.valid = false;
             });
           });
+      this.userQueryChanged
+          .pipe(debounceTime(500))
+          .subscribe(
+            model => {
+              var user = this.sanitize(this.loginForm.value['username']);
+              var passw = this.sanitize(this.loginForm.value['password']);
+              var searchTerm = this.sanitize(this.einweisungForm.value['eingewiesener']);
+
+              if (searchTerm != "") {
+                this.searching = true;
+
+                this.http.get(this.url_base+'api/v1.0/index.php/User/'+searchTerm+'?author_user='+user+'&author_password='+passw).subscribe(data => {
+                  console.log("Suche erfolgreich: ", data);
+                  this.users=data;
+                  this.searching = false;
+                }, error => {
+                  this.searching = false;
+                  console.log("fetched error: ", error);
+                });
+              }
+            }
+          );
   }
 
   checkLogin() {
@@ -76,16 +100,7 @@ export class EinweisungenEintragenComponent implements OnInit {
   }
 
   fetchUsers() {
-    var user = this.sanitize(this.loginForm.value['username']);
-    var passw = this.sanitize(this.loginForm.value['password']);
-    var searchTerm = this.sanitize(this.einweisungForm.value['eingewiesener']);
-
-    this.http.get(this.url_base+'api/v1.0/index.php/User?author_user='+user+'&author_password='+passw+'&search_term='+searchTerm).subscribe(data => {
-      console.log("Suche erfolgreich: ", data);
-      this.users=data;
-    }, error => {
-      console.log("fetched error: ", error);
-    });
+    this.userQueryChanged.next('');
   }
 
   enterEinweisung() {
@@ -94,15 +109,28 @@ export class EinweisungenEintragenComponent implements OnInit {
     var requestUser = this.sanitize(this.einweisungForm.value['eingewiesener']);
     var machine = this.sanitize(this.einweisungForm.value['maschine']);
 
-    this.http.post(this.url_base+'api/v1.0/index.php/Einweisung'+requestUser, {
+    var params = {
       'author_user' : user,
-      'author_password' : passw,
-      'machine' : machine
-    }).subscribe(data => {
-      console.log("successfully posted einweisung: ", data);
+      'author_password' : passw
+    };
+
+    console.log(this.encodeURL(machine));
+
+    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+this.encodeURL(requestUser)+"/"+this.encodeURL(machine)+"/19950111183220.733Z",
+      params
+    ).subscribe(data => {
+      if (data) {
+        console.log("successfully posted einweisung: ", data);
+      } else {
+        console.log("error posting einweisung");
+      }
     }, error => {
       console.log("fetched error: ", error);
     });
   }
 
+
+  encodeURL(param:String):String {
+    return encodeURI(param+"");
+  }
 }
