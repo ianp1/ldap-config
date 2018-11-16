@@ -117,6 +117,55 @@
 		return $response -> withStatus(401);
 	});
 
+	$app -> post('/User/{Vorname}/{Nachname}/{Geburtstag}', function(Request $request, Response $response, array $args) {
+		$params = $request -> getParsedBody();
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestVorname = $args['Vorname'];
+		$RequestNachname = $args['Nachname'];
+		//$RequestGeburtstag = $args['Geburtstag'];
+		$RequestGeburtstag = "19950111183220.733Z";
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		//TODO: Sanitycheck inputs!
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+
+			$entry = array();
+			$entry["objectClass"][0] = "inetOrgPerson";
+			$entry["objectClass"][1] = "fablabPerson";
+			$entry["uid"] = $RequestVorname.$RequestNachname;
+			$entry["cn"] = $RequestVorname;
+			$entry["sn"] = $RequestNachname;
+			$entry["geburtstag"] = $RequestGeburtstag;
+
+			$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
+			$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
+			$i = 0;
+
+			while ($test) {
+				$i++;
+				$dn = "uid=".$entry["uid"].$i.",ou=user,dc=ldap-provider,dc=fablab-luebeck";
+				$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
+			}
+			$entry["uid"] = $entry["uid"].$i;
+
+			if (ldap_add($ldapconn, $dn, $entry)) {
+				return $response -> withJson($dn, 201);
+			} else {
+				$response -> getBody() -> write(ldap_error($ldapconn));
+				ldap_get_option($ldapconn, LDAP_OPT_DIAGNOSTIC_MESSAGE, $err);
+				$response -> getBody() -> write("ldap_get_option: ".$err);
+				return $response;
+				return $response -> withJson("false", 201);
+			}
+		}
+
+
+	});
+
 	/**
 	* $search_term : Name der gesucht wird
 	* author_user : UID des anfragenden Benutzers
