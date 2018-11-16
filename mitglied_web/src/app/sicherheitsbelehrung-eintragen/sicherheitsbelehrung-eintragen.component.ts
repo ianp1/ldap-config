@@ -99,34 +99,37 @@ export interface DialogUserExistingData {
 }
 
 export interface DialogUserExistingColumn {
-  dn: String;
   vorname: String;
   nachname: String;
   uid: String;
+  dn: String;
 }
 
 @Component({
   selector: 'dialog-user-existing',
-  templateUrl: 'dialog-user-existing.html'
+  templateUrl: 'dialog-user-existing.html',
+  styleUrls: ['./dailog-user-existing.scss']
 })
 export class DialogUserExisting {
-  displayedColumns: string[] = ['DN', 'Name', 'UID'];
+  displayedColumns: string[] = ['Name', 'UID', 'DN'];
   dataArray: any[];
   interfaceString: DialogUserExistingColumn[];
   constructor (public dialogRef: MatDialogRef<DialogUserExisting>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogUserExistingData) {
+        @Inject(MAT_DIALOG_DATA) public data: DialogUserExistingData) {
 
-      console.warn(data);
-      this.dataArray = data.users as any[];
-      this.interfaceString = this.dataArray.map(obj => {
-        return {
-          dn:obj.dn,
-          vorname:obj.vorname,
-          nachname:obj.nachname,
-          uid:obj.uid
-        };
-      });
-      console.warn(this.dataArray);
-      console.warn(this.interfaceString);
+    console.warn(data);
+    this.dataArray = data.users as any[];
+    this.interfaceString = this.dataArray.map(obj => {
+      return {
+        vorname:obj.vorname,
+        nachname:obj.nachname,
+        uid:obj.uid,
+        dn:obj.dn,
+      };
+    });
+  }
+
+  updateUser(DN:String) {
+    console.log("updating user ", DN);
   }
 }
