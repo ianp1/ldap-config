@@ -82,9 +82,10 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
     var vorname = this.encodeURL(this.sanitize(this.sicherheitForm.value['vorname']));
     var nachname = this.encodeURL(this.sanitize(this.sicherheitForm.value['nachname']));
-    var geburtsdatum = this.encodeURL(this.sanitize(this.sicherheitForm.value['geburtsdatum']));
-    console.log("test");
-    console.log("vorname:",vorname,"nachname:",nachname,"geburtsdatum:",geburtsdatum);
+    var geburtsdatum = this.sanitize(this.sicherheitForm.value['geburtsdatum']);
+
+    geburtsdatum = this.appComponent.formatLDAPDate(geburtsdatum);
+
     if (vorname != '' && nachname != '' && geburtsdatum != '') {
       var headers = new HttpHeaders();
       var params = new HttpParams();
@@ -141,15 +142,19 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var user = this.sanitize(this.loginForm.value['username']);
     var passw = this.sanitize(this.loginForm.value['password']);
 
-    var date = "19950111183220.733Z";
+    console.log("unformatted date: ", new Date());
+    var date = this.appComponent.formatLDAPDate(new Date());
+    console.log("current date: ", date);
 
     var vorname = this.encodeURL(this.sanitize(this.sicherheitForm.value['vorname']));
     var nachname = this.encodeURL(this.sanitize(this.sicherheitForm.value['nachname']));
-    var geburtsdatum = this.encodeURL(this.sanitize(this.sicherheitForm.value['geburtsdatum']));
+    var geburtsdatum = this.sanitize(this.sicherheitForm.value['geburtsdatum']);
+
+    geburtsdatum = this.appComponent.formatLDAPDate(geburtsdatum);
 
     console.warn("creating user ", vorname, nachname, geburtsdatum);
 
-    this.http.post(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum,
+    this.http.post(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'/'+date,
       {
         author_user: user,
         author_password: passw

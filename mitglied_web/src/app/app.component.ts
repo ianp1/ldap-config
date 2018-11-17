@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Mitgliederverwaltung';
+
+  formatLDAPDate(date:any):string {
+    return formatDate(date, 'yyyyMMdd', 'de-DE')+'000000Z'
+  }
 }

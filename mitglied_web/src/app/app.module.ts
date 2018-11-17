@@ -58,6 +58,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SicherheitsbelehrungEintragenComponent, DialogUserExisting } from './sicherheitsbelehrung-eintragen/sicherheitsbelehrung-eintragen.component';
 
+import localeDe from '@angular/common/locales/de';
+import { registerLocaleData } from '@angular/common';
+
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
 	{path: 'eigene-einweisungen', component: EigeneEinweisungenComponent},
@@ -65,6 +68,8 @@ const appRoutes:Routes = [
 	{path: 'mitglied-eintragen', component: MitgliedEintragenComponent},
   {path: 'sicherheitsbelehrung-eintragen', component: SicherheitsbelehrungEintragenComponent}
 ];
+
+registerLocaleData(localeDe, 'de');
 
 @NgModule({
 	declarations: [

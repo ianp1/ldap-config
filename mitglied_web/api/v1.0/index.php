@@ -101,7 +101,7 @@
 	/**
 	* $RequestUser : DN des zu ändernden Nutzers
 	* $RequestMachine : DN der eingewiesenen Maschine
-	* $RequestDate : Datum der Einweisung
+	* $RequestDate : Datum der Einweisung in LDAP-Format
 	* author_user : UID des anfragenden Nutzers
 	* author_password : Passwort des anfragenden Nutzers
 	*
@@ -134,15 +134,16 @@
 		return $response -> withStatus(401);
 	});
 
-	$app -> post('/User/{Vorname}/{Nachname}/{Geburtstag}', function(Request $request, Response $response, array $args) {
+	$app -> post('/User/{Vorname}/{Nachname}/{Geburtstag}/{Sicherheitsbelehrung}', function(Request $request, Response $response, array $args) {
 		$params = $request -> getParsedBody();
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
 		$RequestVorname = $args['Vorname'];
 		$RequestNachname = $args['Nachname'];
-		//$RequestGeburtstag = $args['Geburtstag'];
-		$RequestGeburtstag = "19950111183220.733Z";
+		$RequestGeburtstag = $args['Geburtstag'];
+		$RequestSicherheitsbelehrung = $args['Sicherheitsbelehrung'];
+		//$RequestGeburtstag = "19950111183220.733Z";
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
@@ -157,7 +158,7 @@
 			$entry["cn"] = $RequestVorname;
 			$entry["sn"] = $RequestNachname;
 			$entry["geburtstag"] = $RequestGeburtstag;
-			$entry["sicherheitsbelehrung"] = "20181101001432.484Z";
+			$entry["sicherheitsbelehrung"] = $RequestSicherheitsbelehrung;
 
 			$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
 			$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
