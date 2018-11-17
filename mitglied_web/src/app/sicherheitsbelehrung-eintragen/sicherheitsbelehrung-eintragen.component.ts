@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 
 import { AppComponent } from '../app.component';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
@@ -19,7 +19,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   validating: boolean = false;
   valid: boolean = false;
 
-  url_base:String = 'http://127.0.0.1/mitglied_web/';
+  url_base:string = 'http://127.0.0.1/mitglied_web/';
 
   loginForm: FormGroup = new FormGroup({
     username: new FormControl(''),
@@ -44,8 +44,15 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
           console.log(this.loginForm.value);
           var user = this.sanitize(this.loginForm.value['username']);
           var passw = this.sanitize(this.loginForm.value['password']);
+          var headers = new HttpHeaders();
+          var params = new HttpParams();
+          params = params.append('author_user', user);
+          params = params.append('author_password', passw);
 
-          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung?author_user='+user+'&author_password='+passw).subscribe(data =>{
+          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung', {
+            headers: headers,
+            params: params
+          }).subscribe(data =>{
               console.log("Authentifizierung erfolgreich: "+data);
               this.validating = false;
               this.valid = true;
@@ -62,7 +69,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     this.txtQueryChanged.next('');
   }
 
-  sanitize(arg:String):String {
+  sanitize(arg:string):string {
     if (arg == undefined || arg == null) {
       return "";
     }
@@ -73,13 +80,21 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var user = this.sanitize(this.loginForm.value['username']);
     var passw = this.sanitize(this.loginForm.value['password']);
 
-    var vorname = this.sanitize(this.sicherheitForm.value['vorname']);
-    var nachname = this.sanitize(this.sicherheitForm.value['nachname']);
-    var geburtsdatum = this.sanitize(this.sicherheitForm.value['geburtsdatum']);
+    var vorname = this.encodeURL(this.sanitize(this.sicherheitForm.value['vorname']));
+    var nachname = this.encodeURL(this.sanitize(this.sicherheitForm.value['nachname']));
+    var geburtsdatum = this.encodeURL(this.sanitize(this.sicherheitForm.value['geburtsdatum']));
     console.log("test");
     console.log("vorname:",vorname,"nachname:",nachname,"geburtsdatum:",geburtsdatum);
     if (vorname != '' && nachname != '' && geburtsdatum != '') {
-      this.http.get(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'?author_user='+user+'&author_password='+passw)
+      var headers = new HttpHeaders();
+      var params = new HttpParams();
+      params = params.append('author_user', user);
+      params = params.append('author_password', passw);
+
+      this.http.get(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum, {
+        headers: headers,
+        params: params
+      })
         .subscribe(data => {
         var ar = data as Array<any>;
         if (ar.length != 0) {
@@ -105,7 +120,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     }
   }
 
-  updateSicherheitsbelehrung(DN:String) {
+  updateSicherheitsbelehrung(DN:string) {
     var user = this.sanitize(this.loginForm.value['username']);
     var passw = this.sanitize(this.loginForm.value['password']);
 
@@ -128,13 +143,13 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
     var date = "19950111183220.733Z";
 
-    var vorname = this.sanitize(this.sicherheitForm.value['vorname']);
-    var nachname = this.sanitize(this.sicherheitForm.value['nachname']);
-    var geburtsdatum = this.sanitize(this.sicherheitForm.value['geburtsdatum']);
+    var vorname = this.encodeURL(this.sanitize(this.sicherheitForm.value['vorname']));
+    var nachname = this.encodeURL(this.sanitize(this.sicherheitForm.value['nachname']));
+    var geburtsdatum = this.encodeURL(this.sanitize(this.sicherheitForm.value['geburtsdatum']));
 
     console.warn("creating user ", vorname, nachname, geburtsdatum);
 
-    this.http.post(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'?author_user='+user+'&author_password='+passw,
+    this.http.post(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum,
       {
         author_user: user,
         author_password: passw
@@ -149,7 +164,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   }
 
 
-  encodeURL(param:String):String {
+  encodeURL(param:string):string {
     return encodeURI(param+"");
   }
 }
@@ -159,10 +174,10 @@ export interface DialogUserExistingData {
 }
 
 export interface DialogUserExistingColumn {
-  vorname: String;
-  nachname: String;
-  uid: String;
-  dn: String;
+  vorname: string;
+  nachname: string;
+  uid: string;
+  dn: string;
 }
 
 @Component({
@@ -173,13 +188,13 @@ export interface DialogUserExistingColumn {
 export class DialogUserExisting {
   displayedColumns: string[] = ['Name', 'UID', 'DN'];
   dataArray: any[];
-  interfaceString: DialogUserExistingColumn[];
+  interfacestring: DialogUserExistingColumn[];
   constructor (public dialogRef: MatDialogRef<DialogUserExisting>,
         @Inject(MAT_DIALOG_DATA) public data: DialogUserExistingData) {
 
     console.warn(data);
     this.dataArray = data.users as any[];
-    this.interfaceString = this.dataArray.map(obj => {
+    this.interfacestring = this.dataArray.map(obj => {
       return {
         vorname:obj.vorname,
         nachname:obj.nachname,
@@ -189,7 +204,7 @@ export class DialogUserExisting {
     });
   }
 
-  updateUser(DN:String) {
+  updateUser(DN:string) {
     this.dialogRef.close({
       createUser: false,
       UserDN:DN
