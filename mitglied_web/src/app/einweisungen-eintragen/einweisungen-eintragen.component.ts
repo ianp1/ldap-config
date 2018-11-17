@@ -125,6 +125,8 @@ export class EinweisungenEintragenComponent implements OnInit {
     var requestUser = this.encodeURL(this.sanitize(this.einweisungForm.value['eingewiesener']));
     var machine = this.encodeURL(this.sanitize(this.einweisungForm.value['maschine']));
 
+    var date = this.appComponent.formatLDAPDate(new Date());
+
     var params = {
       'author_user' : user,
       'author_password' : passw
@@ -132,7 +134,7 @@ export class EinweisungenEintragenComponent implements OnInit {
 
     console.log(this.encodeURL(machine));
 
-    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/19950111183220.733Z",
+    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/"+date,
       params
     ).subscribe(data => {
       if (data) {
