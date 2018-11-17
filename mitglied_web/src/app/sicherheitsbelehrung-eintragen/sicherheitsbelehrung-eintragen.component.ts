@@ -86,11 +86,71 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
           let pickDialog = this.dialog.open(DialogUserExisting, {
             data : {users:ar}
           })
+          pickDialog.afterClosed().subscribe(result => {
+            if (result) {
+              if (result["createUser"]) {
+                this.createUser();
+              } else {
+                console.warn("closed modal with ", result);
+                this.updateSicherheitsbelehrung(result["UserDN"]);
+              }
+            }
+          });
+        } else {
+          this.createUser();
         }
       }, error=> {
         console.log("fetched error: ", error);
       });
     }
+  }
+
+  updateSicherheitsbelehrung(DN:String) {
+    var user = this.sanitize(this.loginForm.value['username']);
+    var passw = this.sanitize(this.loginForm.value['password']);
+
+    var date = "19950111183220.733Z";
+
+    this.http.post(this.url_base+'api/v1.0/index.php/Sicherheitsbelehrung/'+this.encodeURL(DN), {
+      author_user: user,
+      author_password : passw,
+      new_date : date
+    }).subscribe(data=>{
+      console.log("updated user ", DN, "with response ", data);
+    }, error => {
+      console.log("error updating user: ", error);
+    });
+  }
+
+  createUser() {
+    var user = this.sanitize(this.loginForm.value['username']);
+    var passw = this.sanitize(this.loginForm.value['password']);
+
+    var date = "19950111183220.733Z";
+
+    var vorname = this.sanitize(this.sicherheitForm.value['vorname']);
+    var nachname = this.sanitize(this.sicherheitForm.value['nachname']);
+    var geburtsdatum = this.sanitize(this.sicherheitForm.value['geburtsdatum']);
+
+    console.warn("creating user ", vorname, nachname, geburtsdatum);
+
+    this.http.post(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'?author_user='+user+'&author_password='+passw,
+      {
+        author_user: user,
+        author_password: passw
+      })
+      .subscribe(data => {
+        console.log("added user with response: ", data);
+      }, error => {
+        console.warn("got error while creating user: ", error);
+      }
+    );
+
+  }
+
+
+  encodeURL(param:String):String {
+    return encodeURI(param+"");
   }
 }
 
@@ -130,6 +190,21 @@ export class DialogUserExisting {
   }
 
   updateUser(DN:String) {
-    console.log("updating user ", DN);
+    this.dialogRef.close({
+      createUser: false,
+      UserDN:DN
+    });
   }
+
+  createUser() {
+    this.dialogRef.close({
+      createUser: true,
+      UserDN: ""
+    });
+  }
+
+  abort() {
+    this.dialogRef.close(false);
+  }
+
 }

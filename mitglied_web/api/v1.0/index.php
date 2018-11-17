@@ -68,12 +68,32 @@
 				$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
 
 				if ($einweisungResult['count'] === 1) {
-					return $response -> withJson(true, 201);
+					$response -> getBody() -> write("true\n");
+					return $response -> withStatus(201);
 				}
 			}
 		} else {
 			return $response -> withStatus(401);
 		}
+		$response -> getBody() -> write("false\n");
+		return $response -> withStatus(201);
+	});
+
+
+	$app -> post('/Sicherheitsbelehrung/{RequestUser}', function (Request $request, Response $response, array $args) {
+		$params = $request -> getParsedBody();
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestUser = $args['RequestUser'];
+
+		$ldapconn = $request -> getAttribute("ldapconn");
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+			$entry["sicherheitsbelehrung"] = "19950111183220.733Z";
+			return $response -> withJson(ldap_mod_replace($ldapconn, $RequestUser, $entry), 201);
+		}
+
 		return $response -> withJson(false, 201);
 	});
 
@@ -113,6 +133,58 @@
 
 
 		return $response -> withStatus(401);
+	});
+
+	$app -> post('/User/{Vorname}/{Nachname}/{Geburtstag}', function(Request $request, Response $response, array $args) {
+		$params = $request -> getParsedBody();
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestVorname = $args['Vorname'];
+		$RequestNachname = $args['Nachname'];
+		//$RequestGeburtstag = $args['Geburtstag'];
+		$RequestGeburtstag = "19950111183220.733Z";
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		//TODO: Sanitycheck inputs!
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+
+			$entry = array();
+			$entry["objectClass"][0] = "inetOrgPerson";
+			$entry["objectClass"][1] = "fablabPerson";
+			$entry["uid"] = $RequestVorname.$RequestNachname;
+			$entry["cn"] = $RequestVorname;
+			$entry["sn"] = $RequestNachname;
+			$entry["geburtstag"] = $RequestGeburtstag;
+			$entry["sicherheitsbelehrung"] = "20181101001432.484Z";
+
+			$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
+			$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
+			$i = 0;
+
+			while ($test) {
+				$i++;
+				$dn = "uid=".$entry["uid"].$i.",ou=user,dc=ldap-provider,dc=fablab-luebeck";
+				$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
+			}
+			if ($i != 0) {
+				$entry["uid"] = $entry["uid"].$i;
+			}
+
+			if (ldap_add($ldapconn, $dn, $entry)) {
+				return $response -> withJson($dn, 201);
+			} else {
+				$response -> getBody() -> write(ldap_error($ldapconn));
+				ldap_get_option($ldapconn, LDAP_OPT_DIAGNOSTIC_MESSAGE, $err);
+				$response -> getBody() -> write("ldap_get_option: ".$err);
+				return $response;
+				return $response -> withJson("false", 201);
+			}
+		}
+
+
 	});
 
 	/**
