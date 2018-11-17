@@ -111,7 +111,15 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
     var date = "19950111183220.733Z";
 
-    console.warn("updating sicherheitsbelehrung for ", DN);
+    this.http.post(this.url_base+'api/v1.0/index.php/Sicherheitsbelehrung/'+this.encodeURL(DN), {
+      author_user: user,
+      author_password : passw,
+      new_date : date
+    }).subscribe(data=>{
+      console.log("updated user ", DN, "with response ", data);
+    }, error => {
+      console.log("error updating user: ", error);
+    });
   }
 
   createUser() {
@@ -138,6 +146,11 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
       }
     );
 
+  }
+
+
+  encodeURL(param:String):String {
+    return encodeURI(param+"");
   }
 }
 
@@ -193,4 +206,5 @@ export class DialogUserExisting {
   abort() {
     this.dialogRef.close(false);
   }
+
 }

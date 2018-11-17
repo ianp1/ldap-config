@@ -80,6 +80,24 @@
 	});
 
 
+	$app -> post('/Sicherheitsbelehrung/{RequestUser}', function (Request $request, Response $response, array $args) {
+		$params = $request -> getParsedBody();
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestUser = $args['RequestUser'];
+
+		$ldapconn = $request -> getAttribute("ldapconn");
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+			$entry["sicherheitsbelehrung"] = "19950111183220.733Z";
+			return $response -> withJson(ldap_mod_replace($ldapconn, $RequestUser, $entry), 201);
+		}
+
+		return $response -> withJson(false, 201);
+	});
+
+
 	/**
 	* $RequestUser : DN des zu ändernden Nutzers
 	* $RequestMachine : DN der eingewiesenen Maschine
