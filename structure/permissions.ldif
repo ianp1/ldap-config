@@ -16,9 +16,10 @@ olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by group.exac
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=bemerkungMitglied,beginn,ende,aktiv,entry,uid,objectClass,cn,sn,givenName,mail,mitgliedsnummer,mitgliedsart,beitrag,geburtstag by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 #einweisungen
-olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
-olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
-olcAccess: to dn.children="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * read
+olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by * read
+olcAccess: to dn.one="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * read
+olcAccess: to dn.subtree="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 olcAccess: to dn.subtree="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=uid,objectClass,cn,sn,givenName by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #selbst
