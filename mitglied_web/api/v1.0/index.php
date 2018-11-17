@@ -32,43 +32,6 @@
 	});
 
 	/**
-	* $RequestUser : DN des angefragten Nutzers
-	* $RequestMachine : DN der Angefragten Maschine
-	* author_user : UID des anfragenden Nutzers
-	* author_password : Passwort des anfragenden Nutzers
-	*
-	* Gibt Einweisungsdetails eines Nutzers zurück
-	*/
-	$app -> get('/Einweisung/DN/{RequestUser}/{RequestMachine}', function (Request $request, Response $response, array $args) {
-		$params = $request -> getQueryParams();
-
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
-		$RequestUser= $args['RequestUser'];
-		$RequestMachine = $args['RequestMachine'];
-
-		$ldapconn = $request -> getAttribute('ldapconn');
-		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
-
-		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
-			$einweisungdn = $RequestMachine;
-			$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
-
-			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn", "einweisungsdatum"));
-			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
-
-			if ($einweisungResult['count'] === 1) {
-				return $response -> withJson(array(
-					"dn"=>$einweisungResult[0]['dn'],
-					"einweisungsdatum"=>$einweisungResult[0]["einweisungsdatum"][0]
-				), 201);
-			}
-		}
-
-		return $response -> withJson(false, 201);
-	});
-	/**
 	* $RequestToken : RFID-Token des Abgefragten Nutzers
 	* $RequestMachine : DN der Angefragten Maschine
 	* author_user : UID des anfragenden Nutzers
@@ -134,7 +97,6 @@
 		return $response -> withJson(false, 201);
 	});
 
-
 	/**
 	* $RequestUser : DN des zu ändernden Nutzers
 	* $RequestMachine : DN der eingewiesenen Maschine
@@ -143,6 +105,7 @@
 	* author_password : Passwort des anfragenden Nutzers
 	*
 	* Legt eine Einweisung am gegebenen Datum für den zu ändernden Nutzer an
+	* Prüft ob bereits eine Einweisung vorhanden ist und updated diese ggf.
 	*/
 	$app -> post('/Einweisung/{RequestUser}/{RequestMachine}/{RequestDate}', function (Request $request, Response $response, array $args) {
 		$params = $request -> getParsedBody();
@@ -158,13 +121,39 @@
 
 		//TODO: Sanitycheck inputs!
 		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
-			$entry = array();
-			$entry["objectClass"] = "einweisung";
-			$entry["eingewiesener"] = $RequestUser;
-			$entry["einweisungsdatum"] = $RequestDate;
-			$entry["distinctname"] = uniqid("e_");
 
-			return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry), 201);
+			$existDN = $RequestMachine;
+			$existFilter = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
+			$einweisungErg = ldap_search($ldapconn, $existDN, $existFilter, array("dn", "einweisungsdatum"));
+			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+
+			$debug = var_export($einweisungResult, true);
+
+			if ($einweisungResult['count'] > 1) {
+				return $result -> withJson("Einweisungen inkonsistent. Bitte einem Administrator melden", 500);
+			} else if ($einweisungResult['count'] === 1) {
+				$currentDate = $einweisungResult[0]["einweisungsdatum"][0];
+				$DN = $einweisungResult[0]["dn"];
+
+				if (compareLDAPDates($RequestDate, $currentDate)) {
+					//Aktuell ist neuer,
+					//Nichts tun
+					return $response -> withJson("not updating", 201);
+				} else {
+					$entry = array();
+					$entry["einweisungsdatum"]=$RequestDate;
+					return $response -> withJson(ldap_mod_replace($ldapconn, $DN, $entry));
+				}
+			} else {
+				$entry = array();
+				$entry["objectClass"] = "einweisung";
+				$entry["eingewiesener"] = $RequestUser;
+				$entry["einweisungsdatum"] = $RequestDate;
+				$entry["distinctname"] = uniqid("e_");
+
+				return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry), 201);
+
+			}
 		}
 
 
@@ -355,4 +344,17 @@
 	});
 
 	$app -> run();
+
+	/**
+	*	Compares LDAP-Dates, does NOT care for times
+	*/
+	function compareLDAPDates($date1, $date2) {
+		for ($i = 0; $i < 8; $i++) {
+			if (intval($date1[$i]) < intval($date2[$i])) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 ?>

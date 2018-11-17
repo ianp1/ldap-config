@@ -12,4 +12,13 @@ export class AppComponent {
   formatLDAPDate(date:any):string {
     return formatDate(date, 'yyyyMMdd', 'de-DE')+'000000Z'
   }
+
+  compareLDAPDates(date1:string, date2:string):boolean {
+    for (var i = 0; i < 8; i++) {
+      if (parseInt(date1[i]) > parseInt(date2[i])) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
