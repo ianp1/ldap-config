@@ -61,8 +61,8 @@
 			if ($RequestUserResults["count"] === 1) {
 				$RequestUser = $RequestUserResults[0]["dn"];
 
-				$einweisungdn = "ou=einweisung,".$ldap_base_dn;
-				$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser)(geraet=$RequestMachine))";
+				$einweisungdn = $RequestMachine;
+				$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
 				$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
 				$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
@@ -124,11 +124,10 @@
 			$entry = array();
 			$entry["objectClass"] = "einweisung";
 			$entry["eingewiesener"] = $RequestUser;
-			$entry["geraet"] = $RequestMachine;
 			$entry["einweisungsdatum"] = $RequestDate;
 			$entry["distinctname"] = uniqid("e_");
 
-			return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",ou=einweisung,dc=ldap-provider,dc=fablab-luebeck", $entry), 201);
+			return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry), 201);
 		}
 
 
@@ -281,13 +280,14 @@
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$ldapconn = $request -> getAttribute("ldapconn");
 
-		$dn = "ou=maschine,".$ldap_base_dn;
+		$dn = "ou=einweisung,".$ldap_base_dn;
 		$filter = "(objectClass=geraet)";
 
 		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn"));
 
 		$result = ldap_get_entries($ldapconn, $sr);
 		$ar = array();
+
 		for ($i = 0; $i < $result['count']; $i++) {
 			array_push($ar, array("name"=>$result[$i]["geraetname"][0], "dn"=>$result[$i]["dn"]));
 		}
