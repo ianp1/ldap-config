@@ -3,7 +3,7 @@ import { AppComponent } from '../app.component';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { FormGroup, FormControl } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 
 @Component({
@@ -17,10 +17,10 @@ export class EinweisungenEintragenComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
   validating: boolean = false;
   valid: boolean = false;
-  validColor: String = "primary";
+  validColor: string = "primary";
   searching: boolean = false;
 
-  url_base: String = 'http://127.0.0.1/mitglied_web/';
+  url_base: string = 'http://127.0.0.1/mitglied_web/';
 
   maschinen:any = [];
   users:any = [];
@@ -53,7 +53,15 @@ export class EinweisungenEintragenComponent implements OnInit {
           var user = this.sanitize(this.loginForm.value['username']);
           var passw = this.sanitize(this.loginForm.value['password']);
 
-          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung?author_user='+user+'&author_password='+passw).subscribe(data =>{
+          var headers = new HttpHeaders();
+          var params = new HttpParams();
+          params = params.append('author_user', user);
+          params = params.append('author_password', passw);
+
+          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung', {
+            headers: headers,
+            params: params
+          }).subscribe(data =>{
               console.log("Authentifizierung erfolgreich: "+data);
               this.validating = false;
               this.valid = true;
@@ -70,12 +78,20 @@ export class EinweisungenEintragenComponent implements OnInit {
             model => {
               var user = this.sanitize(this.loginForm.value['username']);
               var passw = this.sanitize(this.loginForm.value['password']);
-              var searchTerm = this.sanitize(this.einweisungForm.value['eingewiesener']);
+              var searchTerm = this.encodeURL(this.sanitize(this.einweisungForm.value['eingewiesener']));
 
               if (searchTerm != "") {
                 this.searching = true;
 
-                this.http.get(this.url_base+'api/v1.0/index.php/User/'+searchTerm+'?author_user='+user+'&author_password='+passw).subscribe(data => {
+                var headers = new HttpHeaders();
+                var params = new HttpParams();
+                params = params.append('author_user', user);
+                params = params.append('author_password', passw);
+
+                this.http.get(this.url_base+'api/v1.0/index.php/User/'+searchTerm, {
+                  headers: headers,
+                  params: params
+                }).subscribe(data => {
                   console.log("Suche erfolgreich: ", data);
                   this.users=data;
                   this.searching = false;
@@ -92,7 +108,7 @@ export class EinweisungenEintragenComponent implements OnInit {
     this.txtQueryChanged.next('');
   }
 
-  sanitize(arg:String):String {
+  sanitize(arg:string):string {
     if (arg == undefined || arg == null) {
       return "";
     }
@@ -106,8 +122,8 @@ export class EinweisungenEintragenComponent implements OnInit {
   enterEinweisung() {
     var user = this.sanitize(this.loginForm.value['username']);
     var passw = this.sanitize(this.loginForm.value['password']);
-    var requestUser = this.sanitize(this.einweisungForm.value['eingewiesener']);
-    var machine = this.sanitize(this.einweisungForm.value['maschine']);
+    var requestUser = this.encodeURL(this.sanitize(this.einweisungForm.value['eingewiesener']));
+    var machine = this.encodeURL(this.sanitize(this.einweisungForm.value['maschine']));
 
     var params = {
       'author_user' : user,
@@ -116,7 +132,7 @@ export class EinweisungenEintragenComponent implements OnInit {
 
     console.log(this.encodeURL(machine));
 
-    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+this.encodeURL(requestUser)+"/"+this.encodeURL(machine)+"/19950111183220.733Z",
+    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/19950111183220.733Z",
       params
     ).subscribe(data => {
       if (data) {
@@ -130,7 +146,7 @@ export class EinweisungenEintragenComponent implements OnInit {
   }
 
 
-  encodeURL(param:String):String {
+  encodeURL(param:string):string {
     return encodeURI(param+"");
   }
 }
