@@ -140,6 +140,7 @@
 			$entry["cn"] = $RequestVorname;
 			$entry["sn"] = $RequestNachname;
 			$entry["geburtstag"] = $RequestGeburtstag;
+			$entry["sicherheitsbelehrung"] = "20181101001432.484Z";
 
 			$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
 			$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
@@ -150,7 +151,9 @@
 				$dn = "uid=".$entry["uid"].$i.",ou=user,dc=ldap-provider,dc=fablab-luebeck";
 				$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
 			}
-			$entry["uid"] = $entry["uid"].$i;
+			if ($i != 0) {
+				$entry["uid"] = $entry["uid"].$i;
+			}
 
 			if (ldap_add($ldapconn, $dn, $entry)) {
 				return $response -> withJson($dn, 201);
