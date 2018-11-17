@@ -21,7 +21,7 @@
             formControlName="password"
         >
       </mat-form-field>
-      <span [hidden]="!validating">
+      <span [class]="validating ? '' : 'hidden'">
         <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
       </span>
     </form>
