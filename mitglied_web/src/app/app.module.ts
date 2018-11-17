@@ -54,7 +54,7 @@ import { EigeneEinweisungenComponent } from './eigene-einweisungen/eigene-einwei
 import { EinweisungenEintragenComponent } from './einweisungen-eintragen/einweisungen-eintragen.component';
 import { MitgliedEintragenComponent } from './mitglied-eintragen/mitglied-eintragen.component';
 
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SicherheitsbelehrungEintragenComponent, DialogUserExisting } from './sicherheitsbelehrung-eintragen/sicherheitsbelehrung-eintragen.component';
 
@@ -89,6 +89,7 @@ registerLocaleData(localeDe, 'de');
 		NgbModule,
 		LayoutModule,
 		ReactiveFormsModule,
+    FormsModule,
 		MatAutocompleteModule,
     MatBadgeModule,
     MatBottomSheetModule,

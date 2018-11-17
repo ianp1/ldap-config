@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 
@@ -15,30 +15,44 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 export class EinweisungenEintragenComponent implements OnInit {
   txtQueryChanged: Subject<string> = new Subject<string>();
   userQueryChanged: Subject<string> = new Subject<string>();
+
   validating: boolean = false;
   valid: boolean = false;
-  validColor: string = "primary";
+
   searching: boolean = false;
+
 
   url_base: string = 'http://127.0.0.1/mitglied_web/';
 
   maschinen:any = [];
   users:any = [];
 
-  loginForm: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl('')
-  });
-  einweisungForm: FormGroup = new FormGroup({
-    eingewiesener: new FormControl(''),
-    maschine: new FormControl('')
-  });
+  loginForm: FormGroup;
+  einweisungForm: FormGroup;
 
 
-  constructor(private appComponent:AppComponent, private http:HttpClient) { }
+  constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder) { }
+
+
+  get loginControls() { return this.loginForm.controls; }
+  get einweisungControls() { return this.einweisungForm.controls; }
 
   ngOnInit() {
     this.appComponent.title = "Neue Einweisungen eintragen"
+
+    this.loginForm = this.formBuilder.group({
+       username: [''],
+       password: ['']
+    });
+
+    this.einweisungForm = this.formBuilder.group({
+      eingewiesener: [''],
+      maschine: [''],
+      useCurrentDate: [true],
+      date: [new Date()]
+    });
+
+    console.log(this.einweisungControls);
 
     this.http.get(this.url_base+'api/v1.0/index.php/Maschinen').subscribe(data => {
       this.maschinen = data;
@@ -126,7 +140,14 @@ export class EinweisungenEintragenComponent implements OnInit {
     var machine = this.encodeURL(this.sanitize(this.einweisungForm.value['maschine']));
 
     var date = this.appComponent.formatLDAPDate(new Date());
-
+    if (!this.einweisungForm.value['useCurrentDate']) {
+      var dateValue = this.sanitize(this.einweisungForm.value['date']);
+      if (dateValue == '') {
+        //TODO: Build warning
+        return ;
+      }
+      date = this.appComponent.formatLDAPDate(dateValue);
+    }
     var params = {
       'author_user' : user,
       'author_password' : passw
