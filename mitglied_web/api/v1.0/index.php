@@ -32,6 +32,43 @@
 	});
 
 	/**
+	* $RequestUser : DN des angefragten Nutzers
+	* $RequestMachine : DN der Angefragten Maschine
+	* author_user : UID des anfragenden Nutzers
+	* author_password : Passwort des anfragenden Nutzers
+	*
+	* Gibt Einweisungsdetails eines Nutzers zurück
+	*/
+	$app -> get('/Einweisung/DN/{RequestUser}/{RequestMachine}', function (Request $request, Response $response, array $args) {
+		$params = $request -> getQueryParams();
+
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestUser= $args['RequestUser'];
+		$RequestMachine = $args['RequestMachine'];
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+			$einweisungdn = $RequestMachine;
+			$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
+
+			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn", "einweisungsdatum"));
+			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+
+			if ($einweisungResult['count'] === 1) {
+				return $response -> withJson(array(
+					"dn"=>$einweisungResult[0]['dn'],
+					"einweisungsdatum"=>$einweisungResult[0]["einweisungsdatum"][0]
+				), 201);
+			}
+		}
+
+		return $response -> withJson(false, 201);
+	});
+	/**
 	* $RequestToken : RFID-Token des Abgefragten Nutzers
 	* $RequestMachine : DN der Angefragten Maschine
 	* author_user : UID des anfragenden Nutzers

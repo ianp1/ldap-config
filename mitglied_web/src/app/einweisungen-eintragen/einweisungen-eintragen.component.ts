@@ -148,24 +148,40 @@ export class EinweisungenEintragenComponent implements OnInit {
       }
       date = this.appComponent.formatLDAPDate(dateValue);
     }
-    var params = {
-      'author_user' : user,
-      'author_password' : passw
-    };
 
-    console.log(this.encodeURL(machine));
+    var headers = new HttpHeaders();
+    var params = new HttpParams();
+    params = params.append('author_user', user);
+    params = params.append('author_password', passw);
 
-    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/"+date,
-      params
-    ).subscribe(data => {
+    this.http.get(this.url_base+"api/v1.0/index.php/Einweisung/DN/"+requestUser+"/"+machine, {
+      headers:headers,
+      params:params
+    }).subscribe(data => {
       if (data) {
-        console.log("successfully posted einweisung: ", data);
+        console.warn("received existing einweisung: ", data);
       } else {
-        console.log("error posting einweisung");
+        var params = {
+          'author_user' : user,
+          'author_password' : passw
+        };
+
+        this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/"+date,
+          params
+        ).subscribe(data => {
+          if (data) {
+            console.log("successfully posted einweisung: ", data);
+          } else {
+            console.log("error posting einweisung");
+          }
+        }, error => {
+          console.log("fetched error: ", error);
+        });
       }
-    }, error => {
-      console.log("fetched error: ", error);
     });
+
+
+
   }
 
 
