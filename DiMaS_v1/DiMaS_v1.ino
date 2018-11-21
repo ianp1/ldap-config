@@ -35,7 +35,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
 
 CRGB leds[NUM_LEDS];
 
-const char* GERAET = "geraetname=Lasercutter,ou=maschine,dc=ldap-provider,dc=fablab-luebeck";
+const char* GERAET = "geraetname=Lasercutter,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
 
 int time_buffer = 1000; // amount of time in miliseconds that the relay will remain open
 
