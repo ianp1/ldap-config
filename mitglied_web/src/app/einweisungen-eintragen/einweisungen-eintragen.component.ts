@@ -143,7 +143,7 @@ export class EinweisungenEintragenComponent implements OnInit {
     if (!this.einweisungForm.value['useCurrentDate']) {
       var dateValue = this.sanitize(this.einweisungForm.value['date']);
       if (dateValue == '') {
-        //TODO: Build warning
+        //TODO: Build warning for empty date
         return ;
       }
       date = this.appComponent.formatLDAPDate(dateValue);
