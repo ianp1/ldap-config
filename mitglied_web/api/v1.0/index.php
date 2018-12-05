@@ -61,8 +61,8 @@
 			if ($RequestUserResults["count"] === 1) {
 				$RequestUser = $RequestUserResults[0]["dn"];
 
-				$einweisungdn = "ou=einweisung,".$ldap_base_dn;
-				$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser)(geraet=$RequestMachine))";
+				$einweisungdn = $RequestMachine;
+				$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
 				$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
 				$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
@@ -97,15 +97,15 @@
 		return $response -> withJson(false, 201);
 	});
 
-
 	/**
 	* $RequestUser : DN des zu ändernden Nutzers
 	* $RequestMachine : DN der eingewiesenen Maschine
-	* $RequestDate : Datum der Einweisung
+	* $RequestDate : Datum der Einweisung in LDAP-Format
 	* author_user : UID des anfragenden Nutzers
 	* author_password : Passwort des anfragenden Nutzers
 	*
 	* Legt eine Einweisung am gegebenen Datum für den zu ändernden Nutzer an
+	* Prüft ob bereits eine Einweisung vorhanden ist und updated diese ggf.
 	*/
 	$app -> post('/Einweisung/{RequestUser}/{RequestMachine}/{RequestDate}', function (Request $request, Response $response, array $args) {
 		$params = $request -> getParsedBody();
@@ -121,29 +121,55 @@
 
 		//TODO: Sanitycheck inputs!
 		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
-			$entry = array();
-			$entry["objectClass"] = "einweisung";
-			$entry["eingewiesener"] = $RequestUser;
-			$entry["geraet"] = $RequestMachine;
-			$entry["einweisungsdatum"] = $RequestDate;
-			$entry["distinctname"] = uniqid("e_");
 
-			return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",ou=einweisung,dc=ldap-provider,dc=fablab-luebeck", $entry), 201);
+			$existDN = $RequestMachine;
+			$existFilter = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
+			$einweisungErg = ldap_search($ldapconn, $existDN, $existFilter, array("dn", "einweisungsdatum"));
+			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+
+			$debug = var_export($einweisungResult, true);
+
+			if ($einweisungResult['count'] > 1) {
+				return $result -> withJson("Einweisungen inkonsistent. Bitte einem Administrator melden", 500);
+			} else if ($einweisungResult['count'] === 1) {
+				$currentDate = $einweisungResult[0]["einweisungsdatum"][0];
+				$DN = $einweisungResult[0]["dn"];
+
+				if (compareLDAPDates($RequestDate, $currentDate)) {
+					//Aktuell ist neuer,
+					//Nichts tun
+					return $response -> withJson("not updating", 201);
+				} else {
+					$entry = array();
+					$entry["einweisungsdatum"]=$RequestDate;
+					return $response -> withJson(ldap_mod_replace($ldapconn, $DN, $entry));
+				}
+			} else {
+				$entry = array();
+				$entry["objectClass"] = "einweisung";
+				$entry["eingewiesener"] = $RequestUser;
+				$entry["einweisungsdatum"] = $RequestDate;
+				$entry["distinctname"] = uniqid("e_");
+
+				return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry), 201);
+
+			}
 		}
 
 
 		return $response -> withStatus(401);
 	});
 
-	$app -> post('/User/{Vorname}/{Nachname}/{Geburtstag}', function(Request $request, Response $response, array $args) {
+	$app -> post('/User/{Vorname}/{Nachname}/{Geburtstag}/{Sicherheitsbelehrung}', function(Request $request, Response $response, array $args) {
 		$params = $request -> getParsedBody();
 		$AuthorUser = $params['author_user'];
 		$AuthorPassword = $params['author_password'];
 
 		$RequestVorname = $args['Vorname'];
 		$RequestNachname = $args['Nachname'];
-		//$RequestGeburtstag = $args['Geburtstag'];
-		$RequestGeburtstag = "19950111183220.733Z";
+		$RequestGeburtstag = $args['Geburtstag'];
+		$RequestSicherheitsbelehrung = $args['Sicherheitsbelehrung'];
+		//$RequestGeburtstag = "19950111183220.733Z";
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
@@ -158,7 +184,7 @@
 			$entry["cn"] = $RequestVorname;
 			$entry["sn"] = $RequestNachname;
 			$entry["geburtstag"] = $RequestGeburtstag;
-			$entry["sicherheitsbelehrung"] = "20181101001432.484Z";
+			$entry["sicherheitsbelehrung"] = $RequestSicherheitsbelehrung;
 
 			$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
 			$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
@@ -281,13 +307,14 @@
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$ldapconn = $request -> getAttribute("ldapconn");
 
-		$dn = "ou=maschine,".$ldap_base_dn;
+		$dn = "ou=einweisung,".$ldap_base_dn;
 		$filter = "(objectClass=geraet)";
 
 		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn"));
 
 		$result = ldap_get_entries($ldapconn, $sr);
 		$ar = array();
+
 		for ($i = 0; $i < $result['count']; $i++) {
 			array_push($ar, array("name"=>$result[$i]["geraetname"][0], "dn"=>$result[$i]["dn"]));
 		}
@@ -317,4 +344,17 @@
 	});
 
 	$app -> run();
+
+	/**
+	*	Compares LDAP-Dates, does NOT care for times
+	*/
+	function compareLDAPDates($date1, $date2) {
+		for ($i = 0; $i < 8; $i++) {
+			if (intval($date1[$i]) < intval($date2[$i])) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 ?>

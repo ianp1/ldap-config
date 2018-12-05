@@ -54,9 +54,12 @@ import { EigeneEinweisungenComponent } from './eigene-einweisungen/eigene-einwei
 import { EinweisungenEintragenComponent } from './einweisungen-eintragen/einweisungen-eintragen.component';
 import { MitgliedEintragenComponent } from './mitglied-eintragen/mitglied-eintragen.component';
 
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SicherheitsbelehrungEintragenComponent, DialogUserExisting } from './sicherheitsbelehrung-eintragen/sicherheitsbelehrung-eintragen.component';
+
+import localeDe from '@angular/common/locales/de';
+import { registerLocaleData } from '@angular/common';
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -65,6 +68,8 @@ const appRoutes:Routes = [
 	{path: 'mitglied-eintragen', component: MitgliedEintragenComponent},
   {path: 'sicherheitsbelehrung-eintragen', component: SicherheitsbelehrungEintragenComponent}
 ];
+
+registerLocaleData(localeDe, 'de');
 
 @NgModule({
 	declarations: [
@@ -84,6 +89,7 @@ const appRoutes:Routes = [
 		NgbModule,
 		LayoutModule,
 		ReactiveFormsModule,
+    FormsModule,
 		MatAutocompleteModule,
     MatBadgeModule,
     MatBottomSheetModule,

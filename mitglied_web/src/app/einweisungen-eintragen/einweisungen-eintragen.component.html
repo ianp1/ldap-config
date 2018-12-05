@@ -61,6 +61,28 @@
         <span [class]="searching? '' : 'hidden'">
           <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
         </span>
+
+        <br>
+        <br>
+        <mat-checkbox
+          formControlName="useCurrentDate"
+        >
+          Für aktuelles Datum eintragen
+        </mat-checkbox>
+        <div *ngIf="!einweisungControls.useCurrentDate.value" class="einweisungsdatumPicker">
+          <mat-form-field >
+            <input matInput
+                placeholder="Einweisungsdatum"
+                value=""
+                formControlName="date"
+                [matDatepicker]="einweisungsdatumPicker"
+            >
+            <mat-datepicker #einweisungsdatumPicker>
+            </mat-datepicker>
+
+            <mat-datepicker-toggle matSuffix [for]="einweisungsdatumPicker"></mat-datepicker-toggle>
+          </mat-form-field>
+        </div>
       </form>
     </div>
     <br>

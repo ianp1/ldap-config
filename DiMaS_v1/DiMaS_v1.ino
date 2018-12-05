@@ -15,18 +15,27 @@
 #include <WiFiClientSecure.h>
 #include <MFRC522.h>
 #include <Wire.h>
+#include <FastLED.h>
+#include <fastled_config.h>
+#include <fastled_delay.h>
+#include <pixeltypes.h> 
+#include <power_mgt.h>
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+
+#define NUM_LEDS  10
+#define DATA_PIN  8
 
 #define RST_PIN 20 // RST-PIN for RC522 - RFID - SPI - Module GPIO15 
 #define SS_PIN  2  // SDA-PIN for RC522 - RFID - SPI - Module GPIO2
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
 
-#define Relay 10
+//#define BlueLed 15
+//#define GreenLed 0
+//#define RedLed 3
 
-#define BlueLed 15
-#define GreenLed 0
-#define RedLed 3
+CRGB leds[NUM_LEDS];
 
-const char* GERAET = "geraetname=Lasercutter,ou=maschine,dc=ldap-provider,dc=fablab-luebeck";
+const char* GERAET = "geraetname=Lasercutter,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
 
 int time_buffer = 1000; // amount of time in miliseconds that the relay will remain open
 
@@ -40,7 +49,21 @@ const int httpsPort = 446;
 // SHA1 fingerprint of the certificate
 const char* fingerprint = "83 FE 78 E2 42 46 E2 DF 91 0D 84 50 D9 3D 63 BB 8D FB 92 3F";
 
+byte state = 0;
+
+//TIMING////////////////////////////////////////////////////////////////////////////////////
+long previousMillisBlink = 0,
+     blinkInterval = 500;
+
+//LED////////////////////////////
+bool light = false;
+int counter = 0;
+
 void setup() {
+  // sanity check delay - allows reprogramming if accidently blowing power w/leds
+  delay(2000);
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+  
   SPI.begin();           // Init SPI bus
   mfrc522.PCD_Init();    // Init MFRC522
   
@@ -57,33 +80,16 @@ void setup() {
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-
-  // Use WiFiClientSecure class to create TLS connection
-  
-  leds_off();
-  delay(3000);
-}
-
-void leds_off() {
-  analogWrite(BlueLed, 0);   // turn the LED off
-  analogWrite(GreenLed, 0);   // turn the LED off
-  analogWrite(RedLed, 0);   // turn the LED off
 }
 
 void reject() {
   Serial.println("not authorized");
-  analogWrite(RedLed, 767);   // turn the Red LED on
-  delay(2000);
-  leds_off(); 
+  state = 1;
 }
 
 void authorize() {
-  Serial.println("authorized");
-  analogWrite(GreenLed, 767);   // turn the Green LED on
-  digitalWrite(Relay,1);
-  delay(time_buffer);              // wait for a second 
-  digitalWrite(Relay,0);
-  leds_off(); 
+  Serial.println("authorized"); 
+  state = 2;
 }
 
 // Helper routine to dump a byte array as hex values to Serial
@@ -140,6 +146,14 @@ bool ServerRequest(String rfid){
 }
 
 void loop() {
+  if(state == 1){
+    LEDFalse();
+  }
+  if(state == 2){
+    LEDTrue();
+  }
+  FastLED.show();
+  
   if ( ! mfrc522.PICC_IsNewCardPresent()) {   
     delay(50);
     return;
@@ -168,4 +182,47 @@ void loop() {
     }
   }
   delay(10);
+
+}
+
+void LEDFalse(){
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillisBlink > blinkInterval) {
+    previousMillisBlink = currentMillis;
+    if(light == false){
+      counter++;
+      fill_solid(leds,NUM_LEDS,CRGB::Black);
+      //Serial.println("PUFF!");
+    }
+    else if(light == true){
+      fill_solid(leds,NUM_LEDS,CRGB::Red);      //Serial.println("PENG!");
+    }
+    light = !light;
+    if(counter > 3){
+      fill_solid(leds,NUM_LEDS,CRGB::Black);
+      counter = 0;
+      state = 0;
+    }
+  }
+}
+
+void LEDTrue(){
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillisBlink > blinkInterval) {
+    previousMillisBlink = currentMillis;
+    if(light == false){
+      counter++;
+      fill_solid(leds,NUM_LEDS,CRGB::Black);
+      //Serial.println("PUFF!");
+    }
+    else if(light == true){
+      fill_solid(leds,NUM_LEDS,CRGB::Green);      //Serial.println("PENG!");
+    }
+    light = !light;
+    if(counter > 3){
+      fill_solid(leds,NUM_LEDS,CRGB::Black);
+      counter = 0;
+      state = 0;
+    }
+  }
 }
