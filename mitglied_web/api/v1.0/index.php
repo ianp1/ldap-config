@@ -51,7 +51,13 @@
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 
-		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+		if (isset($AuthorUser)) {
+			$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
+		} else {
+			$user = "cn=".$params['author_bot'].",ou=bot,".$ldap_base_dn;
+		}
+
+		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
 			$dn = "ou=user,".$ldap_base_dn;
 			$userterm = "(&(objectClass=fablabPerson)(rfid=$RequestToken))";
 
