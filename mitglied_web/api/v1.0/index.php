@@ -32,7 +32,7 @@
 	});
 
 	/**
-	* $RequestUser : DN des zu prüfenden Benutzers
+	* $RequestUser : DN oder uid des zu prüfenden Benutzers
 	* author_user : UID des anfragenden Nutzers
 	* author_password : Passwort des anfragenden Nutzers
 	*
@@ -49,6 +49,12 @@
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 		$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
+
+
+		if (strpos($RequestUser, $ldap_base_dn) === false) {
+			$RequestUser = "uid=".$RequestUser.",ou=user,".$ldap_base_dn;
+		}
+
 
 		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
 			$dn = "ou=einweisung,".$ldap_base_dn;

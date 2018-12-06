@@ -23,7 +23,7 @@ export class EigeneEinweisungenComponent implements OnInit {
 
   einweisungen:any = [];
 
-  columnsToDisplay = ['geraet'];
+  columnsToDisplay = ['geraet', 'datum'];
 
 
   constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder) { }
@@ -91,7 +91,12 @@ export class EigeneEinweisungenComponent implements OnInit {
   showEinweisungen() {
     var user = this.sanitize(this.loginForm.value['username']);
     var passw = this.sanitize(this.loginForm.value['password']);
-    var searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['showUser']));
+    var searchTerm = "";
+    if (this.loginForm.value['ownUser']) {
+      searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['username']));
+    } else {
+      searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['showUser']));
+    }
 
     var headers = new HttpHeaders();
     var params = new HttpParams();
