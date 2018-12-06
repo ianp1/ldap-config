@@ -8,6 +8,12 @@ olcAccess: to dn.base="dc=ldap-provider,dc=fablab-luebeck" by * read
 #passwords
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by self write by anonymous auth by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" by self read by * break 
+#bots
+olcAccess: to dn.children="ou=bot,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by anonymous auth by * break
+olcAccess: to dn.children="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,uid,rfid by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #finanzen
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=mitgliedsart,mitgliedsnummer,cn,sn,beginn,ende,beitrag,aktiv,kontoinhaber,entry,objectClass,uid by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="ou=users,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break

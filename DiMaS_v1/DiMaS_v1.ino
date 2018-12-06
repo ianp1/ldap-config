@@ -103,7 +103,7 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
 bool ServerRequest(String rfid){
   WiFiClientSecure client;
   
-  String url = "/api/v1.0/index.php/Einweisung/"+rfid+"/"+GERAET+"?author_user=IanPoesse&author_password=abc";
+  String url = "/api/v1.0/index.php/Einweisung/"+rfid+"/"+GERAET+"?author_bot=terminal&author_password=LwRa2RPYY";
   Serial.print("requesting URL: ");
   Serial.println(url);
   Serial.println(host);
