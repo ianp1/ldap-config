@@ -32,6 +32,61 @@
 	});
 
 	/**
+	* $RequestUser : DN des zu prüfenden Benutzers
+	* author_user : UID des anfragenden Nutzers
+	* author_password : Passwort des anfragenden Nutzers
+	*
+	* Gibt alle Einweisungen des Nutzers zurück
+	*/
+	$app -> get('/Einweisung/{RequestUser}', function(Request $request, Response $response, array $args) {
+		$params = $request -> getQueryParams();
+
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestUser = $args['RequestUser'];
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+		$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
+
+		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
+			$dn = "ou=einweisung,".$ldap_base_dn;
+			$searchTerm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
+
+			$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum"));
+			$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
+			$ar = array();
+			for ($i = 0; $i < $einweisungenResult["count"]; $i++) {
+				$parent = "";
+				$split = ldap_explode_dn($einweisungenResult[$i]["dn"], 0);
+				for ($j = 1; $j < $split["count"]; $j++) {
+					if ($j != 1) {
+						$parent = $parent.",";
+					}
+					$parent = $parent.$split[$j];
+				}
+
+				$geraet = ldap_get_entries($ldapconn, ldap_read($ldapconn, $parent, "(objectClass=geraet)", array("geraetname","cn")));
+
+
+
+				array_push($ar, array(
+					"datum"=>$einweisungenResult[$i]["einweisungsdatum"][0],
+					"geraet"=>array(
+						"geraetname"=>$geraet[0]["geraetname"][0],
+						"cn"=>$geraet[0]["cn"][0]
+					)
+				));
+			}
+
+			return $response -> withJson($ar, 201);
+		} else {
+			return $response -> withStatus(401);
+		}
+	});
+
+	/**
 	* $RequestToken : RFID-Token des Abgefragten Nutzers
 	* $RequestMachine : DN der Angefragten Maschine
 	* author_user : UID des anfragenden Nutzers
