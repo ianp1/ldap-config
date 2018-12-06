@@ -2,19 +2,78 @@
   Bitte gib hier deine Fablab-Zugangsdaten ein um deine Einweisungen einzusehen:
 
   <br />
-  <p class="input-mask">
-    <mat-form-field>
-      <input matInput placeholder="Nutzername" value="">
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput placeholder="Passwort" type="password" value="">
-    </mat-form-field>
+  <div class="input-mask">
+    <form [formGroup]="loginForm">
+      <mat-form-field>
+        <input
+            matInput
+            placeholder="Nutzername"
+            value=""
+            formControlName="username">
+      </mat-form-field>
+      <mat-form-field>
+        <input
+            matInput
+            placeholder="Passwort"
+            type="password"
+            value=""
+            formControlName="password">
+      </mat-form-field>
 
-    <br>
-    <br>
+      <br>
+      <br>
+      <mat-checkbox
+        formControlName="ownUser"
+      >
+        Für eigenen Nutzer anzeigen
+      </mat-checkbox>
+      <br><br>
+      <div *ngIf="!loginControls.ownUser.value" class="">
 
-    <button mat-raised-button color="accent">
-      Einweisungen abfragen
-    </button>
-  </p>
+        <mat-form-field>
+          <input
+              matInput
+              placeholder="Nutzername zum Anzeigen"
+              value=""
+              [matAutocomplete]="auto"
+              (input)='fetchUsers()'
+              [(ngModel)]="this.showUser"
+              formControlName="showUser">
+        </mat-form-field>
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let user of users" [value]="user.dn">
+            {{user.vorname}} {{user.nachname}}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+
+      <button mat-raised-button color="accent" (click)="showEinweisungen()">
+        Einweisungen abfragen
+      </button>
+    </form>
+    <div *ngIf="einweisungen.length != 0">
+      <table mat-table [dataSource]="einweisungen" class="mat-elevation-z8">
+        <ng-container matColumnDef="geraet">
+          <th mat-header-cell *matHeaderCellDef>
+            Gerät
+          </th>
+          <td mat-cell *matCellDef="let einweisung">
+            {{einweisung.geraet.cn}}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="datum">
+          <th mat-header-cell *matHeaderCellDef>
+            Einweisungsdatum
+          </th>
+          <td mat-cell *matCellDef="let einweisung">
+            {{einweisung.datum|ldapDate|date:"dd.MM.yy"}}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+      </table>
+    </div>
+  </div>
 </div>

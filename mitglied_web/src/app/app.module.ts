@@ -60,6 +60,7 @@ import { SicherheitsbelehrungEintragenComponent, DialogUserExisting } from './si
 
 import localeDe from '@angular/common/locales/de';
 import { registerLocaleData } from '@angular/common';
+import { LdapDatePipe } from './ldap-date.pipe';
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -79,7 +80,8 @@ registerLocaleData(localeDe, 'de');
 		EinweisungenEintragenComponent,
 		MitgliedEintragenComponent,
 		SicherheitsbelehrungEintragenComponent,
-    DialogUserExisting
+    DialogUserExisting,
+    LdapDatePipe
 	],
 	imports: [
 		BrowserModule,
