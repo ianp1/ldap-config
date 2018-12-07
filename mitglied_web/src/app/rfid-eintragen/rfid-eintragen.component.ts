@@ -158,8 +158,10 @@ export class RfidEintragenComponent implements OnInit {
     };
     this.http.post(this.url_base+'api/v1.0/index.php/RFID/'+updateRfid+'/'+updateUser, params)
       .subscribe(data => {
+        console.log("rfid update successfull: ", data);
         //TODO:Bestägigung einbauen
       }, error => {
+        console.warn("rfid update error: ", error);
         //TODO: Fehlermeldung einbauen
       });
   }

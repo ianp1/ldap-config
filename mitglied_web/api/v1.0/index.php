@@ -31,6 +31,50 @@
 		return $response;
 	});
 
+	/**
+	* $RequestRfid : RFID-Token das verknüpft werden soll
+	* $RequestUser : DN des zu verknüpfenden Benutzers
+	* author_user : UID des anfragenden Nutzers
+	* author_password : Passwort des anfragenden Nutzers
+	*
+	* Verknüpft ein RFID-Token mit einem Nutzern
+	* Löscht alte Verknüpfungen
+	*/
+	$app -> post('/RFID/{RequestRfid}/{RequestUser}', function(Request $request, Response $response, array $args) {
+		$params = $request -> getParsedBody();
+
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestRfid = $args['RequestRfid'];
+		$RequestUser = $args['RequestUser'];
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		$dn = "ou=user,".$ldap_base_dn;
+		$filter = "(&(objectClass=fablabPerson)(rfid=$RequestRfid))";
+
+		$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
+
+		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
+			//Alte Verknüpfungen löschen
+			$user = ldap_search($ldapconn, $dn, $filter, array("dn", "rfid"));
+			$userResult = ldap_get_entries($ldapconn, $user);
+
+			for ($i = 0; $i < $userResult["count"]; $i ++) {
+				ldap_mod_replace($ldapconn, $userResult[$i]["dn"], array("rfid"=>array()));
+			}
+
+			//Neue Verknüpfung anlegen
+			$user = ldap_read($ldapconn, $RequestUser, "(objectClass=fablabPerson)", array("rfid"));
+			$userResult = ldap_get_entries($ldapconn, $user);
+
+			return $response -> withJson(ldap_mod_replace($ldapconn, $userResult[0]["dn"], array("rfid"=>$RequestRfid)), 201);
+		}
+
+		return $response -> withStatus(401);
+	});
 
 	$app -> get('/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
 		$params = $request -> getQueryParams();
@@ -72,6 +116,7 @@
 			return $response -> withStatus(401);
 		}
 	});
+
 	/**
 	* $RequestUser : DN oder uid des zu prüfenden Benutzers
 	* author_user : UID des anfragenden Nutzers
