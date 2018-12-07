@@ -188,7 +188,7 @@ export interface DialogUserExistingColumn {
 @Component({
   selector: 'dialog-user-existing',
   templateUrl: 'dialog-user-existing.html',
-  styleUrls: ['./dailog-user-existing.scss']
+  styleUrls: ['./dialog-user-existing.scss']
 })
 export class DialogUserExisting {
   displayedColumns: string[] = ['Name', 'UID', 'DN'];

@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>Nutzer existiert bereits</h2>
+<h2 mat-dialog-title>RFID-Tag ist bereits vergeben</h2>
 <mat-dialog-content class="mat-typography">
   <p>
-    Ein oder mehrere Nutzer mit diesen Daten existieren bereits.
-    Soll die Sicherheitsbelehrung eines bestehenden Nutzers erneuert werden oder ein neuer Nutzer angelegt werden?
+    Die folgenden Nutzer sind bereits mit diesem RFID-Tag verknüpft.
+    Sollen die Karte dennoch vergeben und die alten Verknüpfungen damit aufgehoben werden?
   </p>
   <div>
     <table mat-table [dataSource]="interfacestring" class="mat-elevation-z8">
@@ -22,10 +22,10 @@
 
       <ng-container matColumnDef="DN">
         <th mat-header-cell *matHeaderCellDef>
-          Sicherheitsbelehrung auffrischen?
+          Geburtsdatum
         </th>
         <td mat-cell *matCellDef="let user">
-          <button mat-raised-button color="primary" (click)="updateUser(user.dn)">Auffrischen</button>
+          {{user.geburtstag|ldapDate|date:"dd.MM.yyyy"}}
         </td>
       </ng-container>
 
@@ -34,7 +34,7 @@
     </table>
     <br>
     <p class="new_user">
-      <button mat-raised-button color="warn" (click)="createUser()">Neuen Nutzer anlegen</button>
+      <button mat-raised-button color="warn" (click)="connectRFID()">Vergeben und Verknüpfungen löschen</button>
       <button mat-raised-button color="primary" (click)="abort()">Abbrechen</button>
     </p>
   </div>

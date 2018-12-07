@@ -61,13 +61,15 @@ import { SicherheitsbelehrungEintragenComponent, DialogUserExisting } from './si
 import localeDe from '@angular/common/locales/de';
 import { registerLocaleData } from '@angular/common';
 import { LdapDatePipe } from './ldap-date.pipe';
+import { RfidEintragenComponent, DialogRfidExisting } from './rfid-eintragen/rfid-eintragen.component';
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
 	{path: 'eigene-einweisungen', component: EigeneEinweisungenComponent},
 	{path: 'einweisungen-eintragen', component: EinweisungenEintragenComponent},
 	{path: 'mitglied-eintragen', component: MitgliedEintragenComponent},
-  {path: 'sicherheitsbelehrung-eintragen', component: SicherheitsbelehrungEintragenComponent}
+  {path: 'sicherheitsbelehrung-eintragen', component: SicherheitsbelehrungEintragenComponent},
+  {path: 'rfid-eintragen', component: RfidEintragenComponent}
 ];
 
 registerLocaleData(localeDe, 'de');
@@ -81,7 +83,9 @@ registerLocaleData(localeDe, 'de');
 		MitgliedEintragenComponent,
 		SicherheitsbelehrungEintragenComponent,
     DialogUserExisting,
-    LdapDatePipe
+    DialogRfidExisting,
+    LdapDatePipe,
+    RfidEintragenComponent
 	],
 	imports: [
 		BrowserModule,
@@ -134,7 +138,8 @@ registerLocaleData(localeDe, 'de');
 		CustomNavComponent
 	],
   entryComponents: [
-    DialogUserExisting
+    DialogUserExisting,
+    DialogRfidExisting
   ],
 	bootstrap: [AppComponent]
 })

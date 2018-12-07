@@ -1,0 +1,63 @@
+<div>
+  Bitte gib hier deine Fablab-Zugangsdaten ein um eine RFID-Karte zu vergeben:
+
+  <br>
+  <div class="input-mask">
+    <form [formGroup]="loginForm">
+      <mat-form-field>
+        <input matInput
+            placeholder="Nutzername"
+            value=""
+            (input)='checkLogin()'
+            formControlName="username"
+        >
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+            placeholder="Passwort"
+            type="password"
+            value=""
+            (input)='checkLogin()'
+            formControlName="password"
+        >
+      </mat-form-field>
+      <span [class]="validating ? '' : 'hidden'">
+        <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
+      </span>
+      <br>
+      <div *ngIf="valid">
+        Hallo Welt!
+        <br>
+        Nutzerdaten:
+        <br>
+        <mat-form-field>
+          <input
+              matInput
+              placeholder="Eingewiesener"
+              value=""
+              [matAutocomplete]="auto"
+              (input)='fetchUsers()'
+              [(ngModel)]="this.eingewiesener"
+              formControlName="eingewiesener"
+          >
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let user of users" [value]="user.dn">{{user.vorname}} {{user.nachname}}</mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field>
+          <input
+              matInput
+              placeholder="RFID-Tag"
+              value=""
+              formControlName="rfid"
+          >
+        </mat-form-field>
+
+        <br><br>
+        <button mat-raised-button color="primary" (click)="enterRfid()">
+          RFID vergeben
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

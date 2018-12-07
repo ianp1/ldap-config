@@ -31,6 +31,47 @@
 		return $response;
 	});
 
+
+	$app -> get('/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
+		$params = $request -> getQueryParams();
+
+		$AuthorUser = $params['author_user'];
+		$AuthorPassword = $params['author_password'];
+
+		$RequestRfid = $args['RequestRfid'];
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		$dn = "ou=user,".$ldap_base_dn;
+		$filter = "(&(objectClass=fablabPerson)(rfid=$RequestRfid))";
+
+		$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
+
+		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
+			$user = ldap_search($ldapconn, $dn, $filter, array("dn","cn","sn","geburtstag","uid"));
+			$userResult = ldap_get_entries($ldapconn, $user);
+
+			if ($userResult["count"] === 0) {
+				return $response -> withStatus(401);
+			}
+
+			$ar = array();
+			for ($i = 0; $i < $userResult["count"]; $i ++) {
+				array_push($ar, array(
+					"dn" => $userResult[$i]["dn"],
+					"cn" => $userResult[$i]["cn"][0],
+					"sn" => $userResult[$i]["sn"][0],
+					"geburtstag" => $userResult[$i]["geburtstag"][0],
+					"uid" => $userResult[$i]["uid"][0]
+				));
+			}
+
+			return $response -> withJson($ar, 201);
+		} else {
+			return $response -> withStatus(401);
+		}
+	});
 	/**
 	* $RequestUser : DN oder uid des zu prüfenden Benutzers
 	* author_user : UID des anfragenden Nutzers
