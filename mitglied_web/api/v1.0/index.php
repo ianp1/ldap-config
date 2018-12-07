@@ -73,7 +73,7 @@
 			return $response -> withJson(ldap_mod_replace($ldapconn, $userResult[0]["dn"], array("rfid"=>$RequestRfid)), 201);
 		}
 
-		return $response -> withStatus(401);
+		return $response -> withStatus(404);
 	});
 
 	$app -> get('/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
@@ -97,7 +97,7 @@
 			$userResult = ldap_get_entries($ldapconn, $user);
 
 			if ($userResult["count"] === 0) {
-				return $response -> withStatus(401);
+				return $response -> withStatus(404);
 			}
 
 			$ar = array();
@@ -113,7 +113,7 @@
 
 			return $response -> withJson($ar, 201);
 		} else {
-			return $response -> withStatus(401);
+			return $response -> withStatus(404);
 		}
 	});
 
