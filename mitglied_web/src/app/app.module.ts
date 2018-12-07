@@ -62,6 +62,7 @@ import localeDe from '@angular/common/locales/de';
 import { registerLocaleData } from '@angular/common';
 import { LdapDatePipe } from './ldap-date.pipe';
 import { RfidEintragenComponent, DialogRfidExisting } from './rfid-eintragen/rfid-eintragen.component';
+import { RfidPruefenComponent } from './rfid-pruefen/rfid-pruefen.component';
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -69,7 +70,8 @@ const appRoutes:Routes = [
 	{path: 'einweisungen-eintragen', component: EinweisungenEintragenComponent},
 	{path: 'mitglied-eintragen', component: MitgliedEintragenComponent},
   {path: 'sicherheitsbelehrung-eintragen', component: SicherheitsbelehrungEintragenComponent},
-  {path: 'rfid-eintragen', component: RfidEintragenComponent}
+  {path: 'rfid-eintragen', component: RfidEintragenComponent},
+  {path: 'rfid-pruefen', component: RfidPruefenComponent}
 ];
 
 registerLocaleData(localeDe, 'de');
@@ -85,7 +87,8 @@ registerLocaleData(localeDe, 'de');
     DialogUserExisting,
     DialogRfidExisting,
     LdapDatePipe,
-    RfidEintragenComponent
+    RfidEintragenComponent,
+    RfidPruefenComponent
 	],
 	imports: [
 		BrowserModule,

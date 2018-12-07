@@ -1,0 +1,48 @@
+<div>
+  Bitte gib hier deine Fablab Zugangsdaten ein um den Besitzer einer RFID-Karte zu suchen:
+
+  <br>
+  <div class="input-mask">
+    <form [formGroup]="loginForm">
+      <mat-form-field>
+        <input matInput
+            placeholder="Nutzername"
+            value=""
+            (input)='checkLogin()'
+            formControlName="username"
+        >
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+            placeholder="Passwort"
+            type="password"
+            value=""
+            (input)='checkLogin()'
+            formControlName="password"
+        >
+      </mat-form-field>
+      <span [class]="validating ? '' : 'hidden'">
+        <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
+      </span>
+      <br>
+      <div *ngIf="valid">
+        <mat-form-field>
+          <input matInput
+              placeholder="RFID-Tag"
+              value=""
+              formControlName="rfid"
+              (input)='findUser()'
+          >
+        </mat-form-field>
+        <br>
+        <div *ngIf="found_users != null">
+          Benutzer mit dieser RFID-Karte:
+          <br>
+          <div *ngFor="let user of found_users">
+            {{user.cn}} {{user.sn}}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
