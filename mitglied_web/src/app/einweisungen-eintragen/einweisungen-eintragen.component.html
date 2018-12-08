@@ -16,47 +16,45 @@
         <div>
           Einweisungsdaten:
         </div>
-        <div class="input-mask">
-          <user-search
-            [usernameControl]="'username'"
-            [passwordControl]="'password'"
-            [eingewiesenerControl]="'eingewiesener'"
-            [formGroup]="loginForm"
-          >
-          </user-search>
+        <user-search
+          [usernameControl]="'username'"
+          [passwordControl]="'password'"
+          [eingewiesenerControl]="'eingewiesener'"
+          [formGroup]="loginForm"
+        >
+        </user-search>
 
-          <mat-form-field>
-            <mat-select
-                placeholder="Gerät"
-                [(ngModel)]="this.maschine"
-                formControlName="maschine"
+        <mat-form-field>
+          <mat-select
+              placeholder="Gerät"
+              [(ngModel)]="this.maschine"
+              formControlName="maschine"
+          >
+            <mat-option *ngFor="let maschine of maschinen" [value]="maschine.dn">
+              {{maschine.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <br>
+        <br>
+        <mat-checkbox
+          formControlName="useCurrentDate"
+        >
+          Für aktuelles Datum eintragen
+        </mat-checkbox>
+        <div *ngIf="!loginControls.useCurrentDate.value" class="einweisungsdatumPicker">
+          <mat-form-field >
+            <input matInput
+                placeholder="Einweisungsdatum"
+                value=""
+                formControlName="date"
+                [matDatepicker]="einweisungsdatumPicker"
             >
-              <mat-option *ngFor="let maschine of maschinen" [value]="maschine.dn">
-                {{maschine.name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <br>
-          <br>
-          <mat-checkbox
-            formControlName="useCurrentDate"
-          >
-            Für aktuelles Datum eintragen
-          </mat-checkbox>
-          <div *ngIf="!loginControls.useCurrentDate.value" class="einweisungsdatumPicker">
-            <mat-form-field >
-              <input matInput
-                  placeholder="Einweisungsdatum"
-                  value=""
-                  formControlName="date"
-                  [matDatepicker]="einweisungsdatumPicker"
-              >
-              <mat-datepicker #einweisungsdatumPicker>
-              </mat-datepicker>
+            <mat-datepicker #einweisungsdatumPicker>
+            </mat-datepicker>
 
-              <mat-datepicker-toggle matSuffix [for]="einweisungsdatumPicker"></mat-datepicker-toggle>
-            </mat-form-field>
-          </div>
+            <mat-datepicker-toggle matSuffix [for]="einweisungsdatumPicker"></mat-datepicker-toggle>
+          </mat-form-field>
         </div>
         <br>
         <br>

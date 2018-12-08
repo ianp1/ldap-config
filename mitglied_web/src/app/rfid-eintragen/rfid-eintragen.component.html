@@ -15,7 +15,13 @@
       <div *ngIf="valid">
         Nutzerdaten:
         <br>
-        
+        <user-search
+          [usernameControl]="'username'"
+          [passwordControl]="'password'"
+          [eingewiesenerControl]="'eingewiesener'"
+          [formGroup]="loginForm"
+        >
+        </user-search>
         <mat-form-field>
           <input
               matInput
