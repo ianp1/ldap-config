@@ -17,6 +17,7 @@ export class EigeneEinweisungenComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
   loginForm: FormGroup;
   searching: boolean;
+  validLogin: boolean = false;
 
   users:any = [];
   url_base: string = 'http://127.0.0.1/mitglied_web/';
