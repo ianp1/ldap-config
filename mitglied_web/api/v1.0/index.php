@@ -38,11 +38,16 @@
 			$params = $request -> getParsedBody();
 		}
 
-		if (isset($params["author_user"], $params["author_password"])) {
-			$user = "uid=".$params["author_user"].",ou=user,".$ldap_base_dn;
-		} else if (isset($params["author_bot"], $params["author_password"])) {
+		$AuthorUser = $params["author_user"];
+		$AuthorBot = $params["author_bot"];
+		$AuthorPassword = $params["author_password"];
+
+		if (isset($AuthorUser, $AuthorPassword)) {
+			$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
+		} else if (isset($AuthorBot, $AuthorPassword)) {
 			$user = "cn=".$params['author_bot'].",ou=bot,".$ldap_base_dn;
 		}
+
 		if (!ldap_bind($ldapconn, $user, $AuthorPassword)) {
 			return $response -> withStatus(401);
 		}
@@ -64,11 +69,6 @@
 	* Löscht alte Verknüpfungen
 	*/
 	$app -> post('/RFID/{RequestRfid}/{RequestUser}', function(Request $request, Response $response, array $args) {
-		$params = $request -> getParsedBody();
-
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
 		$RequestRfid = $args['RequestRfid'];
 		$RequestUser = $args['RequestUser'];
 
@@ -78,33 +78,22 @@
 		$dn = "ou=user,".$ldap_base_dn;
 		$filter = "(&(objectClass=fablabPerson)(rfid=$RequestRfid))";
 
-		$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
+		//Alte Verknüpfungen löschen
+		$user = ldap_search($ldapconn, $dn, $filter, array("dn", "rfid"));
+		$userResult = ldap_get_entries($ldapconn, $user);
 
-		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
-			//Alte Verknüpfungen löschen
-			$user = ldap_search($ldapconn, $dn, $filter, array("dn", "rfid"));
-			$userResult = ldap_get_entries($ldapconn, $user);
-
-			for ($i = 0; $i < $userResult["count"]; $i ++) {
-				ldap_mod_replace($ldapconn, $userResult[$i]["dn"], array("rfid"=>array()));
-			}
-
-			//Neue Verknüpfung anlegen
-			$user = ldap_read($ldapconn, $RequestUser, "(objectClass=fablabPerson)", array("rfid"));
-			$userResult = ldap_get_entries($ldapconn, $user);
-
-			return $response -> withJson(ldap_mod_replace($ldapconn, $userResult[0]["dn"], array("rfid"=>$RequestRfid)), 201);
+		for ($i = 0; $i < $userResult["count"]; $i ++) {
+			ldap_mod_replace($ldapconn, $userResult[$i]["dn"], array("rfid"=>array()));
 		}
 
-		return $response -> withStatus(404);
+		//Neue Verknüpfung anlegen
+		$user = ldap_read($ldapconn, $RequestUser, "(objectClass=fablabPerson)", array("rfid"));
+		$userResult = ldap_get_entries($ldapconn, $user);
+
+		return $response -> withJson(ldap_mod_replace($ldapconn, $userResult[0]["dn"], array("rfid"=>$RequestRfid)), 201);
 	});
 
 	$app -> get('/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
-		$params = $request -> getQueryParams();
-
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
 		$RequestRfid = $args['RequestRfid'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
@@ -112,32 +101,25 @@
 
 		$dn = "ou=user,".$ldap_base_dn;
 		$filter = "(&(objectClass=fablabPerson)(rfid=$RequestRfid))";
+		$user = ldap_search($ldapconn, $dn, $filter, array("dn","cn","sn","geburtstag","uid"));
+		$userResult = ldap_get_entries($ldapconn, $user);
 
-		$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
-
-		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
-			$user = ldap_search($ldapconn, $dn, $filter, array("dn","cn","sn","geburtstag","uid"));
-			$userResult = ldap_get_entries($ldapconn, $user);
-
-			if ($userResult["count"] === 0) {
-				return $response -> withStatus(404);
-			}
-
-			$ar = array();
-			for ($i = 0; $i < $userResult["count"]; $i ++) {
-				array_push($ar, array(
-					"dn" => $userResult[$i]["dn"],
-					"cn" => $userResult[$i]["cn"][0],
-					"sn" => $userResult[$i]["sn"][0],
-					"geburtstag" => $userResult[$i]["geburtstag"][0],
-					"uid" => $userResult[$i]["uid"][0]
-				));
-			}
-
-			return $response -> withJson($ar, 201);
-		} else {
+		if ($userResult["count"] === 0) {
 			return $response -> withStatus(404);
 		}
+
+		$ar = array();
+		for ($i = 0; $i < $userResult["count"]; $i ++) {
+			array_push($ar, array(
+				"dn" => $userResult[$i]["dn"],
+				"cn" => $userResult[$i]["cn"][0],
+				"sn" => $userResult[$i]["sn"][0],
+				"geburtstag" => $userResult[$i]["geburtstag"][0],
+				"uid" => $userResult[$i]["uid"][0]
+			));
+		}
+
+		return $response -> withJson($ar, 201);
 	});
 
 	/**
@@ -148,57 +130,43 @@
 	* Gibt alle Einweisungen des Nutzers zurück
 	*/
 	$app -> get('/Einweisung/{RequestUser}', function(Request $request, Response $response, array $args) {
-		$params = $request -> getQueryParams();
-
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
 		$RequestUser = $args['RequestUser'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
-		$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
-
 
 		if (strpos($RequestUser, $ldap_base_dn) === false) {
 			$RequestUser = "uid=".$RequestUser.",ou=user,".$ldap_base_dn;
 		}
 
+		$dn = "ou=einweisung,".$ldap_base_dn;
+		$searchTerm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
-		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
-			$dn = "ou=einweisung,".$ldap_base_dn;
-			$searchTerm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
-
-			$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum"));
-			$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
-			$ar = array();
-			for ($i = 0; $i < $einweisungenResult["count"]; $i++) {
-				$parent = "";
-				$split = ldap_explode_dn($einweisungenResult[$i]["dn"], 0);
-				for ($j = 1; $j < $split["count"]; $j++) {
-					if ($j != 1) {
-						$parent = $parent.",";
-					}
-					$parent = $parent.$split[$j];
+		$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum"));
+		$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
+		$ar = array();
+		for ($i = 0; $i < $einweisungenResult["count"]; $i++) {
+			$parent = "";
+			$split = ldap_explode_dn($einweisungenResult[$i]["dn"], 0);
+			for ($j = 1; $j < $split["count"]; $j++) {
+				if ($j != 1) {
+					$parent = $parent.",";
 				}
-
-				$geraet = ldap_get_entries($ldapconn, ldap_read($ldapconn, $parent, "(objectClass=geraet)", array("geraetname","cn")));
-
-
-
-				array_push($ar, array(
-					"datum"=>$einweisungenResult[$i]["einweisungsdatum"][0],
-					"geraet"=>array(
-						"geraetname"=>$geraet[0]["geraetname"][0],
-						"cn"=>$geraet[0]["cn"][0]
-					)
-				));
+				$parent = $parent.$split[$j];
 			}
 
-			return $response -> withJson($ar, 201);
-		} else {
-			return $response -> withStatus(401);
+			$geraet = ldap_get_entries($ldapconn, ldap_read($ldapconn, $parent, "(objectClass=geraet)", array("geraetname","cn")));
+
+			array_push($ar, array(
+				"datum"=>$einweisungenResult[$i]["einweisungsdatum"][0],
+				"geraet"=>array(
+					"geraetname"=>$geraet[0]["geraetname"][0],
+					"cn"=>$geraet[0]["cn"][0]
+				)
+			));
 		}
+
+		return $response -> withJson($ar, 201);
 	});
 
 	/**
@@ -210,67 +178,46 @@
 	* Prüft ob Einweisung in Gerät für Nutzer vorhanden ist
 	*/
 	$app -> get('/Einweisung/{RequestToken}/{RequestMachine}', function (Request $request, Response $response, array $args) {
-		$params = $request->getQueryParams();
-
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
 		$RequestToken = $args['RequestToken'];
 		$RequestMachine = $args['RequestMachine'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 
-		if (isset($AuthorUser)) {
-			$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
-		} else {
-			$user = "cn=".$params['author_bot'].",ou=bot,".$ldap_base_dn;
-		}
+		$dn = "ou=user,".$ldap_base_dn;
+		$userterm = "(&(objectClass=fablabPerson)(rfid=$RequestToken))";
 
-		if (ldap_bind($ldapconn, $user, $AuthorPassword)) {
-			$dn = "ou=user,".$ldap_base_dn;
-			$userterm = "(&(objectClass=fablabPerson)(rfid=$RequestToken))";
+		$RequestUserErg = ldap_search($ldapconn, $dn, $userterm, array("dn"));
+		$RequestUserResults = ldap_get_entries($ldapconn, $RequestUserErg);
 
-			$RequestUserErg = ldap_search($ldapconn, $dn, $userterm, array("dn"));
-			$RequestUserResults = ldap_get_entries($ldapconn, $RequestUserErg);
+		if ($RequestUserResults["count"] === 1) {
+			$RequestUser = $RequestUserResults[0]["dn"];
 
-			if ($RequestUserResults["count"] === 1) {
-				$RequestUser = $RequestUserResults[0]["dn"];
+			$einweisungdn = $RequestMachine;
+			$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
-				$einweisungdn = $RequestMachine;
-				$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
+			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
+			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
 
-				$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
-				$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
-
-				if ($einweisungResult['count'] === 1) {
-					$response -> getBody() -> write("true\n");
-					return $response -> withStatus(201);
-				}
+			if ($einweisungResult['count'] === 1) {
+				$response -> getBody() -> write("true\n");
+				return $response -> withStatus(201);
 			}
-		} else {
-			return $response -> withStatus(401);
 		}
+
 		$response -> getBody() -> write("false\n");
 		return $response -> withStatus(201);
 	});
 
 
-	$app -> post('/Sicherheitsbelehrung/{RequestUser}', function (Request $request, Response $response, array $args) {
-		$params = $request -> getParsedBody();
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
+	$app -> post('/Sicherheitsbelehrung/{RequestUser}/{RequestDate}', function (Request $request, Response $response, array $args) {
 		$RequestUser = $args['RequestUser'];
+		$RequestDate = $args['RequestDate'];
 
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
-		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
-			$entry["sicherheitsbelehrung"] = "19950111183220.733Z";
-			return $response -> withJson(ldap_mod_replace($ldapconn, $RequestUser, $entry), 201);
-		}
-
-		return $response -> withJson(false, 201);
+		$entry["sicherheitsbelehrung"] = $RequestDate;
+		return $response -> withJson(ldap_mod_replace($ldapconn, $RequestUser, $entry), 201);
 	});
 
 	/**
@@ -284,10 +231,6 @@
 	* Prüft ob bereits eine Einweisung vorhanden ist und updated diese ggf.
 	*/
 	$app -> post('/Einweisung/{RequestUser}/{RequestMachine}/{RequestDate}', function (Request $request, Response $response, array $args) {
-		$params = $request -> getParsedBody();
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
 		$RequestUser = $args['RequestUser'];
 		$RequestMachine = $args['RequestMachine'];
 		$RequestDate = $args['RequestDate'];
@@ -296,51 +239,41 @@
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 
 		//TODO: Sanitycheck inputs!
-		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+		$existDN = $RequestMachine;
+		$existFilter = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
+		$einweisungErg = ldap_search($ldapconn, $existDN, $existFilter, array("dn", "einweisungsdatum"));
+		$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
 
-			$existDN = $RequestMachine;
-			$existFilter = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
-			$einweisungErg = ldap_search($ldapconn, $existDN, $existFilter, array("dn", "einweisungsdatum"));
-			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+		$debug = var_export($einweisungResult, true);
 
-			$debug = var_export($einweisungResult, true);
+		if ($einweisungResult['count'] > 1) {
+			return $result -> withJson("Einweisungen inkonsistent. Bitte einem Administrator melden", 500);
+		} else if ($einweisungResult['count'] === 1) {
+			$currentDate = $einweisungResult[0]["einweisungsdatum"][0];
+			$DN = $einweisungResult[0]["dn"];
 
-			if ($einweisungResult['count'] > 1) {
-				return $result -> withJson("Einweisungen inkonsistent. Bitte einem Administrator melden", 500);
-			} else if ($einweisungResult['count'] === 1) {
-				$currentDate = $einweisungResult[0]["einweisungsdatum"][0];
-				$DN = $einweisungResult[0]["dn"];
-
-				if (compareLDAPDates($RequestDate, $currentDate)) {
-					//Aktuell ist neuer,
-					//Nichts tun
-					return $response -> withJson("not updating", 201);
-				} else {
-					$entry = array();
-					$entry["einweisungsdatum"]=$RequestDate;
-					return $response -> withJson(ldap_mod_replace($ldapconn, $DN, $entry));
-				}
+			if (compareLDAPDates($RequestDate, $currentDate)) {
+				//Aktuell ist neuer,
+				//Nichts tun
+				return $response -> withJson("not updating", 201);
 			} else {
 				$entry = array();
-				$entry["objectClass"] = "einweisung";
-				$entry["eingewiesener"] = $RequestUser;
-				$entry["einweisungsdatum"] = $RequestDate;
-				$entry["distinctname"] = uniqid("e_");
-
-				return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry), 201);
-
+				$entry["einweisungsdatum"]=$RequestDate;
+				return $response -> withJson(ldap_mod_replace($ldapconn, $DN, $entry));
 			}
+		} else {
+			$entry = array();
+			$entry["objectClass"] = "einweisung";
+			$entry["eingewiesener"] = $RequestUser;
+			$entry["einweisungsdatum"] = $RequestDate;
+			$entry["distinctname"] = uniqid("e_");
+
+			return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry), 201);
+
 		}
-
-
-		return $response -> withStatus(401);
 	});
 
 	$app -> post('/User/{Vorname}/{Nachname}/{Geburtstag}/{Sicherheitsbelehrung}', function(Request $request, Response $response, array $args) {
-		$params = $request -> getParsedBody();
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
 		$RequestVorname = $args['Vorname'];
 		$RequestNachname = $args['Nachname'];
 		$RequestGeburtstag = $args['Geburtstag'];
@@ -351,42 +284,38 @@
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 
 		//TODO: Sanitycheck inputs!
-		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
 
-			$entry = array();
-			$entry["objectClass"][0] = "inetOrgPerson";
-			$entry["objectClass"][1] = "fablabPerson";
-			$entry["uid"] = $RequestVorname.$RequestNachname;
-			$entry["cn"] = $RequestVorname;
-			$entry["sn"] = $RequestNachname;
-			$entry["geburtstag"] = $RequestGeburtstag;
-			$entry["sicherheitsbelehrung"] = $RequestSicherheitsbelehrung;
+		$entry = array();
+		$entry["objectClass"][0] = "inetOrgPerson";
+		$entry["objectClass"][1] = "fablabPerson";
+		$entry["uid"] = $RequestVorname.$RequestNachname;
+		$entry["cn"] = $RequestVorname;
+		$entry["sn"] = $RequestNachname;
+		$entry["geburtstag"] = $RequestGeburtstag;
+		$entry["sicherheitsbelehrung"] = $RequestSicherheitsbelehrung;
 
-			$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
+		$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
+		$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
+		$i = 0;
+
+		while ($test) {
+			$i++;
+			$dn = "uid=".$entry["uid"].$i.",ou=user,dc=ldap-provider,dc=fablab-luebeck";
 			$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
-			$i = 0;
-
-			while ($test) {
-				$i++;
-				$dn = "uid=".$entry["uid"].$i.",ou=user,dc=ldap-provider,dc=fablab-luebeck";
-				$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
-			}
-			if ($i != 0) {
-				$entry["uid"] = $entry["uid"].$i;
-			}
-
-			if (ldap_add($ldapconn, $dn, $entry)) {
-				return $response -> withJson($dn, 201);
-			} else {
-				$response -> getBody() -> write(ldap_error($ldapconn));
-				ldap_get_option($ldapconn, LDAP_OPT_DIAGNOSTIC_MESSAGE, $err);
-				$response -> getBody() -> write("ldap_get_option: ".$err);
-				return $response;
-				return $response -> withJson("false", 201);
-			}
+		}
+		if ($i != 0) {
+			$entry["uid"] = $entry["uid"].$i;
 		}
 
-
+		if (ldap_add($ldapconn, $dn, $entry)) {
+			return $response -> withJson($dn, 201);
+		} else {
+			$response -> getBody() -> write(ldap_error($ldapconn));
+			ldap_get_option($ldapconn, LDAP_OPT_DIAGNOSTIC_MESSAGE, $err);
+			$response -> getBody() -> write("ldap_get_option: ".$err);
+			return $response;
+			return $response -> withJson("false", 201);
+		}
 	});
 
 	/**
@@ -397,36 +326,26 @@
 	* Sucht nach Nutzern die zum Suchterm passen
 	*/
 	$app -> get('/User/{SearchTerm}', function (Request $request, Response $response, array $args) {
-		$params = $request->getQueryParams();
-
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
 		$st = $args['SearchTerm'];
 
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 
-		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
+		$dn = "ou=user,".$ldap_base_dn;
+		$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
 
-			$dn = "ou=user,".$ldap_base_dn;
-			$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
-
-			$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid", "dn"));
-			$results = ldap_get_entries($ldapconn, $erg);
-			$ar = array();
-			for ($i = 0; $i < $results['count']; $i++) {
-				array_push($ar, array(
-					"vorname"=>$results[$i]["cn"][0],
-					"nachname"=>$results[$i]["sn"][0],
-					"uid"=>$results[$i]["uid"][0],
-					"dn"=>$results[$i]["dn"]
-				));
-			}
-			return $response -> withJson($ar, 201);
-		} else {
-			return $response -> withStatus(401);
+		$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid", "dn"));
+		$results = ldap_get_entries($ldapconn, $erg);
+		$ar = array();
+		for ($i = 0; $i < $results['count']; $i++) {
+			array_push($ar, array(
+				"vorname"=>$results[$i]["cn"][0],
+				"nachname"=>$results[$i]["sn"][0],
+				"uid"=>$results[$i]["uid"][0],
+				"dn"=>$results[$i]["dn"]
+			));
 		}
+		return $response -> withJson($ar, 201);
 	});
 
 	/**
@@ -443,37 +362,26 @@
 		$nachname = $args['nachname'];
 		$geburtsdatum = $args['geburtsdatum'];
 
-		$params = $request->getQueryParams();
-
-		$AuthorUser = $params['author_user'];
-		$AuthorPassword = $params['author_password'];
-
 		$searchTerm = "(&(objectClass=inetOrgPerson)(cn=$vorname)(sn=$nachname)(geburtstag=$geburtsdatum))";
 
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 
-		if (ldap_bind($ldapconn, "uid=".$AuthorUser.",ou=user,".$ldap_base_dn, $AuthorPassword)) {
-			$dn = "ou=user,".$ldap_base_dn;
+		$dn = "ou=user,".$ldap_base_dn;
 
-			$erg = ldap_search($ldapconn, $dn, $searchTerm, array("cn", "sn", "uid", "dn"));
-			$results = ldap_get_entries($ldapconn, $erg);
-			$ar = array();
-			for ($i = 0; $i < $results['count']; $i++) {
-				array_push($ar, array(
-					"vorname"=>$results[$i]["cn"][0],
-					"nachname"=>$results[$i]["sn"][0],
-					"uid"=>$results[$i]["uid"][0],
-					"dn"=>$results[$i]["dn"]
-				));
-			}
-
-			return $response -> withJson($ar, 201);
-
+		$erg = ldap_search($ldapconn, $dn, $searchTerm, array("cn", "sn", "uid", "dn"));
+		$results = ldap_get_entries($ldapconn, $erg);
+		$ar = array();
+		for ($i = 0; $i < $results['count']; $i++) {
+			array_push($ar, array(
+				"vorname"=>$results[$i]["cn"][0],
+				"nachname"=>$results[$i]["sn"][0],
+				"uid"=>$results[$i]["uid"][0],
+				"dn"=>$results[$i]["dn"]
+			));
 		}
 
-		//$response->getBody()->write($searchTerm);
-		return $response->withStatus(401);
+		return $response -> withJson($ar, 201);
 	});
 
 	/**
@@ -505,18 +413,10 @@
 	* Überprüft Zugangsdaten
 	*/
 	$app -> get('/Authentifizierung', function(Request $request, Response $response, array $args) {
-
-		$params = $request->getQueryParams();
-		$username = $params['author_user'];
-		$password = $params['author_password'];
-
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 
-		if (ldap_bind($ldapconn, "uid=".$username.",ou=user,".$ldap_base_dn, $password)) {
 			return $response -> withJson(true, 201);
-		}
-		return $response -> withStatus(401);
 	});
 
 	$app -> run();

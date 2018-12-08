@@ -143,7 +143,7 @@ export class RfidEintragenComponent implements OnInit {
     }, error => {
       //404: Kein Nutzer mit diesem RFID
       //Sonst: Anderer Fehler
-      if (error.status === 401) {
+      if (error.status === 404) {
         this.connectRFID(user, passw, updateRfid, updateUser);
       }
       this.searching = false;
