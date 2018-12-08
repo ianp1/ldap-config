@@ -1,5 +1,5 @@
 <div [formGroup]="formGroup" class="search-mask">
-  <mat-form-field>
+  <mat-form-field class="userSearchField">
     <input
         matInput
         placeholder="Eingewiesener"
@@ -7,9 +7,10 @@
         [matAutocomplete]="auto"
         (input)='fetchUsers()'
         formControlName="eingewiesener"
+
     >
     <mat-autocomplete #auto="matAutocomplete">
-      <mat-option *ngFor="let user of users" [value]="user.dn">{{user.vorname}} {{user.nachname}}</mat-option>
+      <mat-option *ngFor="let user of users" [value]="user.dn">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}})</mat-option>
     </mat-autocomplete>
   </mat-form-field>
 
