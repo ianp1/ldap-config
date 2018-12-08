@@ -26,8 +26,6 @@ export class RfidPruefenComponent implements OnInit {
 
   searching:boolean = false;
 
-  url_base:string = 'http://127.0.0.1/mitglied_web/';
-
   found_users:any;
 
   constructor(public appComponent:AppComponent, private http:HttpClient) { }
@@ -49,7 +47,7 @@ export class RfidPruefenComponent implements OnInit {
 
           this.searching = true;
 
-          this.http.get(this.url_base+'api/v1.0/index.php/RFID/'+updateRfid, {
+          this.http.get(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid, {
             headers: headers,
             params: params
           }).subscribe(data => {

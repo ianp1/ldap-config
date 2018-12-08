@@ -15,20 +15,7 @@
       <div *ngIf="valid">
         Nutzerdaten:
         <br>
-        <mat-form-field>
-          <input
-              matInput
-              placeholder="Eingewiesener"
-              value=""
-              [matAutocomplete]="auto"
-              (input)='fetchUsers()'
-              [(ngModel)]="this.eingewiesener"
-              formControlName="eingewiesener"
-          >
-          <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let user of users" [value]="user.dn">{{user.vorname}} {{user.nachname}}</mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
+        
         <mat-form-field>
           <input
               matInput

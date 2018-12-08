@@ -20,40 +20,32 @@ export class EinweisungenEintragenComponent implements OnInit {
 
   searching: boolean = false;
 
-
-  url_base: string = 'http://127.0.0.1/mitglied_web/';
-
   maschinen:any = [];
   users:any = [];
 
   loginForm: FormGroup;
-  einweisungForm: FormGroup;
 
 
   constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder) { }
 
 
   get loginControls() { return this.loginForm.controls; }
-  get einweisungControls() { return this.einweisungForm.controls; }
 
   ngOnInit() {
     this.appComponent.title = "Neue Einweisungen eintragen"
 
     this.loginForm = this.formBuilder.group({
        username: [''],
-       password: ['']
+       password: [''],
+       eingewiesener: [''],
+       maschine: [''],
+       useCurrentDate: [true],
+       date: [new Date()]
     });
 
-    this.einweisungForm = this.formBuilder.group({
-      eingewiesener: [''],
-      maschine: [''],
-      useCurrentDate: [true],
-      date: [new Date()]
-    });
+    console.log(this.loginForm);
 
-    console.log(this.einweisungControls);
-
-    this.http.get(this.url_base+'api/v1.0/index.php/Maschinen').subscribe(data => {
+    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Maschinen').subscribe(data => {
       this.maschinen = data;
       console.log(this.maschinen);
     });
@@ -63,7 +55,7 @@ export class EinweisungenEintragenComponent implements OnInit {
             model => {
               var user = this.appComponent.sanitize(this.loginForm.value['username']);
               var passw = this.appComponent.sanitize(this.loginForm.value['password']);
-              var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.einweisungForm.value['eingewiesener']));
+              var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['eingewiesener']));
 
               if (searchTerm != "") {
                 this.searching = true;
@@ -73,7 +65,7 @@ export class EinweisungenEintragenComponent implements OnInit {
                 params = params.append('author_user', user);
                 params = params.append('author_password', passw);
 
-                this.http.get(this.url_base+'api/v1.0/index.php/User/'+searchTerm, {
+                this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
                   headers: headers,
                   params: params
                 }).subscribe(data => {
@@ -103,12 +95,12 @@ export class EinweisungenEintragenComponent implements OnInit {
   enterEinweisung() {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
-    var requestUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.einweisungForm.value['eingewiesener']));
-    var machine = this.appComponent.encodeURL(this.appComponent.sanitize(this.einweisungForm.value['maschine']));
+    var requestUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['eingewiesener']));
+    var machine = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['maschine']));
 
     var date = this.appComponent.formatLDAPDate(new Date());
-    if (!this.einweisungForm.value['useCurrentDate']) {
-      var dateValue = this.appComponent.sanitize(this.einweisungForm.value['date']);
+    if (!this.loginForm.value['useCurrentDate']) {
+      var dateValue = this.appComponent.sanitize(this.loginForm.value['date']);
       if (dateValue == '') {
         //TODO: Build warning for empty date
         return ;
@@ -120,7 +112,7 @@ export class EinweisungenEintragenComponent implements OnInit {
       'author_password' : passw
     };
 
-    this.http.post(this.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/"+date,
+    this.http.post(this.appComponent.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/"+date,
       params
     ).subscribe(data => {
       if (data) {

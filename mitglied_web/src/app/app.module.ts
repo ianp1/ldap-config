@@ -64,6 +64,7 @@ import { LdapDatePipe } from './ldap-date.pipe';
 import { RfidEintragenComponent, DialogRfidExisting } from './rfid-eintragen/rfid-eintragen.component';
 import { RfidPruefenComponent } from './rfid-pruefen/rfid-pruefen.component';
 import { LoginComponent } from './login/login.component';
+import { UserSearchComponent } from './user-search/user-search.component';
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -90,7 +91,8 @@ registerLocaleData(localeDe, 'de');
     LdapDatePipe,
     RfidEintragenComponent,
     RfidPruefenComponent,
-    LoginComponent
+    LoginComponent,
+    UserSearchComponent
 	],
 	imports: [
 		BrowserModule,

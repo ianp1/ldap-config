@@ -20,7 +20,6 @@ export class EigeneEinweisungenComponent implements OnInit {
   validLogin: boolean = false;
 
   users:any = [];
-  url_base: string = 'http://127.0.0.1/mitglied_web/';
 
   einweisungen:any = [];
 
@@ -58,7 +57,7 @@ export class EigeneEinweisungenComponent implements OnInit {
               params = params.append('author_user', user);
               params = params.append('author_password', passw);
 
-              this.http.get(this.url_base+'api/v1.0/index.php/User/'+searchTerm, {
+              this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
                 headers: headers,
                 params: params
               }).subscribe(data => {
@@ -95,7 +94,7 @@ export class EigeneEinweisungenComponent implements OnInit {
 
 
 
-    this.http.get(this.url_base+'api/v1.0/index.php/Einweisung/'+searchTerm, {
+    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/'+searchTerm, {
       headers: headers,
       params: params
     }).subscribe(data => {

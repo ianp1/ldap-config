@@ -18,8 +18,6 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   validating: boolean = false;
   valid: boolean = false;
 
-  url_base:string = 'http://127.0.0.1/mitglied_web/';
-
   loginForm: FormGroup = new FormGroup({
     username: new FormControl(''),
     password: new FormControl('')
@@ -53,7 +51,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
       params = params.append('author_user', user);
       params = params.append('author_password', passw);
 
-      this.http.get(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum, {
+      this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum, {
         headers: headers,
         params: params
       })
@@ -88,7 +86,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
     var date = this.appComponent.formatLDAPDate(new Date());
 
-    this.http.post(this.url_base+'api/v1.0/index.php/Sicherheitsbelehrung/'+this.appComponent.encodeURL(DN)+'/'+this.appComponent.encodeURL(date), {
+    this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Sicherheitsbelehrung/'+this.appComponent.encodeURL(DN)+'/'+this.appComponent.encodeURL(date), {
       author_user: user,
       author_password : passw,
       new_date : date
@@ -115,7 +113,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
     console.warn("creating user ", vorname, nachname, geburtsdatum);
 
-    this.http.post(this.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'/'+date,
+    this.http.post(this.appComponent.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'/'+date,
       {
         author_user: user,
         author_password: passw

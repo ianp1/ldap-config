@@ -14,7 +14,6 @@ import { debounceTime, map } from 'rxjs/operators';
 })
 export class LoginComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
-  url_base:string = 'http://127.0.0.1/mitglied_web/';
   validating : boolean = false;
   valid : boolean = false;
 
@@ -44,7 +43,7 @@ export class LoginComponent implements OnInit {
           params = params.append('author_user', user);
           params = params.append('author_password', passw);
 
-          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung', {
+          this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Authentifizierung', {
             headers: headers,
             params: params
           }).subscribe(data =>{
