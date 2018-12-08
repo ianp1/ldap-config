@@ -125,9 +125,9 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var user = this.sanitize(this.loginForm.value['username']);
     var passw = this.sanitize(this.loginForm.value['password']);
 
-    var date = "19950111183220.733Z";
+    var date = this.appComponent.formatLDAPDate(new Date());
 
-    this.http.post(this.url_base+'api/v1.0/index.php/Sicherheitsbelehrung/'+this.encodeURL(DN), {
+    this.http.post(this.url_base+'api/v1.0/index.php/Sicherheitsbelehrung/'+this.encodeURL(DN)+'/'+this.encodeURL(date), {
       author_user: user,
       author_password : passw,
       new_date : date
