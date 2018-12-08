@@ -1,0 +1,19 @@
+<div [formGroup]="formGroup" class="search-mask">
+  <mat-form-field>
+    <input
+        matInput
+        placeholder="Eingewiesener"
+        value=""
+        [matAutocomplete]="auto"
+        (input)='fetchUsers()'
+        formControlName="eingewiesener"
+    >
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let user of users" [value]="user.dn">{{user.vorname}} {{user.nachname}}</mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <span [class]="searching? '' : 'hidden'">
+    <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
+  </span>
+</div>
