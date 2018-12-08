@@ -24,6 +24,8 @@ export class RfidPruefenComponent implements OnInit {
   validating:boolean = false;
   valid:boolean = false;
 
+  searching:boolean = false;
+
   url_base:string = 'http://127.0.0.1/mitglied_web/';
 
   found_users:any;
@@ -45,11 +47,15 @@ export class RfidPruefenComponent implements OnInit {
           params = params.append('author_user', user);
           params = params.append('author_password', passw);
 
+          this.searching = true;
+
           this.http.get(this.url_base+'api/v1.0/index.php/RFID/'+updateRfid, {
             headers: headers,
             params: params
           }).subscribe(data => {
             this.found_users = data;
+
+            this.searching = false;
 
             console.log("found users: ", this.found_users);
           }, error => {

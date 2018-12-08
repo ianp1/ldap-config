@@ -21,6 +21,9 @@
               (input)='findUser()'
           >
         </mat-form-field>
+        <span [class]="searching ? '' : 'hidden'">
+          <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
+        </span>
         <br>
         <div *ngIf="found_users != null">
           Benutzer mit dieser RFID-Karte:
