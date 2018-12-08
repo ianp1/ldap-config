@@ -4,6 +4,7 @@
   <br>
   <div class="input-mask">
     <form [formGroup]="loginForm">
+      <!--
       <mat-form-field>
         <input matInput
             placeholder="Nutzername"
@@ -24,6 +25,15 @@
       <span [class]="validating ? '' : 'hidden'">
         <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
       </span>
+      -->
+
+      <login
+          [usernameControl]="'username'"
+          [passwordControl]="'password'"
+          [formGroup]="loginForm"
+          (validLogin)="valid=$event"
+          >
+      </login>
       <br>
       <div *ngIf="valid">
         <mat-form-field>
