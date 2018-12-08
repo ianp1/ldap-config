@@ -1,0 +1,23 @@
+<div [formGroup]="formGroup" class="login-mask">
+  <mat-form-field>
+    <input
+        matInput
+        placeholder="Nutzername"
+        value=""
+        formControlName="{{usernameControl}}"
+        (input)="changed()">
+  </mat-form-field>
+  <mat-form-field>
+    <input
+        matInput
+        placeholder="Passwort"
+        type="password"
+        value=""
+        formControlName="{{passwordControl}}"
+        (input)="changed()">
+  </mat-form-field>
+
+  <span [class]="validating ? '' : 'hidden'">
+    <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
+  </span>
+</div>
