@@ -13,7 +13,6 @@ import { Subject } from 'rxjs';
   styleUrls: ['./rfid-pruefen.component.scss']
 })
 export class RfidPruefenComponent implements OnInit {
-  txtQueryChanged: Subject<string> = new Subject<string>();
   rfidQueryChanged: Subject<string> = new Subject<string>();
 
   loginForm: FormGroup = new FormGroup({
@@ -57,39 +56,7 @@ export class RfidPruefenComponent implements OnInit {
             this.found_users = null;
             console.warn("error fetching users: ", error);
           });
-        })
-
-    this.txtQueryChanged
-        .pipe(debounceTime(500))
-        .subscribe(model => {
-          this.validating = true;
-          console.log(this.loginForm.value);
-          var user = this.sanitize(this.loginForm.value['username']);
-          var passw = this.sanitize(this.loginForm.value['password']);
-          var headers = new HttpHeaders();
-          var params = new HttpParams();
-          params = params.append('author_user', user);
-          params = params.append('author_password', passw);
-
-          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung', {
-            headers: headers,
-            params: params
-          }).subscribe(data =>{
-            console.log("Authentifizierung erfolgreich: "+data);
-            this.validating = false;
-            this.valid = true;
-          },
-          error => {
-            console.log("fetched error: ", error);
-            this.validating = false;
-            this.valid = false;
-          });
         });
-
-  }
-
-  checkLogin() {
-    this.txtQueryChanged.next('');
   }
 
   sanitize(arg:string):string {

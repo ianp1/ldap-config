@@ -15,8 +15,6 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./rfid-eintragen.component.scss']
 })
 export class RfidEintragenComponent implements OnInit {
-
-  txtQueryChanged: Subject<string> = new Subject<string>();
   userQueryChanged: Subject<string> = new Subject<string>();
   loginForm: FormGroup = new FormGroup({
     username: new FormControl(''),
@@ -35,67 +33,36 @@ export class RfidEintragenComponent implements OnInit {
 
   ngOnInit() {
     this.appComponent.title="RFID-Karte vergeben";
-    this.txtQueryChanged
-        .pipe(debounceTime(500))
-        .subscribe(model => {
-          this.validating = true;
-          console.log(this.loginForm.value);
-          var user = this.sanitize(this.loginForm.value['username']);
-          var passw = this.sanitize(this.loginForm.value['password']);
-          var headers = new HttpHeaders();
-          var params = new HttpParams();
-          params = params.append('author_user', user);
-          params = params.append('author_password', passw);
+      this.userQueryChanged
+          .pipe(debounceTime(500))
+          .subscribe(
+            model => {
+              var user = this.sanitize(this.loginForm.value['username']);
+              var passw = this.sanitize(this.loginForm.value['password']);
+              var searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['eingewiesener']));
 
-          this.http.get(this.url_base+'api/v1.0/index.php/Authentifizierung', {
-            headers: headers,
-            params: params
-          }).subscribe(data =>{
-            console.log("Authentifizierung erfolgreich: "+data);
-            this.validating = false;
-            this.valid = true;
-          },
-          error => {
-            console.log("fetched error: ", error);
-            this.validating = false;
-            this.valid = false;
-          });
-        });
+              if (searchTerm != "") {
+                this.searching = true;
 
-        this.userQueryChanged
-            .pipe(debounceTime(500))
-            .subscribe(
-              model => {
-                var user = this.sanitize(this.loginForm.value['username']);
-                var passw = this.sanitize(this.loginForm.value['password']);
-                var searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['eingewiesener']));
+                var headers = new HttpHeaders();
+                var params = new HttpParams();
+                params = params.append('author_user', user);
+                params = params.append('author_password', passw);
 
-                if (searchTerm != "") {
-                  this.searching = true;
-
-                  var headers = new HttpHeaders();
-                  var params = new HttpParams();
-                  params = params.append('author_user', user);
-                  params = params.append('author_password', passw);
-
-                  this.http.get(this.url_base+'api/v1.0/index.php/User/'+searchTerm, {
-                    headers: headers,
-                    params: params
-                  }).subscribe(data => {
-                    console.log("Suche erfolgreich: ", data);
-                    this.users=data;
-                    this.searching = false;
-                  }, error => {
-                    this.searching = false;
-                    console.log("fetched error: ", error);
-                  });
-                }
+                this.http.get(this.url_base+'api/v1.0/index.php/User/'+searchTerm, {
+                  headers: headers,
+                  params: params
+                }).subscribe(data => {
+                  console.log("Suche erfolgreich: ", data);
+                  this.users=data;
+                  this.searching = false;
+                }, error => {
+                  this.searching = false;
+                  console.log("fetched error: ", error);
+                });
               }
-            );
-  }
-
-  checkLogin() {
-    this.txtQueryChanged.next('');
+            }
+          );
   }
 
   sanitize(arg:string):string {

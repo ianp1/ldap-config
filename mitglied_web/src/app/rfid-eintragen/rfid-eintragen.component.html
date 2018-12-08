@@ -4,28 +4,6 @@
   <br>
   <div class="input-mask">
     <form [formGroup]="loginForm">
-      <!--
-      <mat-form-field>
-        <input matInput
-            placeholder="Nutzername"
-            value=""
-            (input)='checkLogin()'
-            formControlName="username"
-        >
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput
-            placeholder="Passwort"
-            type="password"
-            value=""
-            (input)='checkLogin()'
-            formControlName="password"
-        >
-      </mat-form-field>
-      <span [class]="validating ? '' : 'hidden'">
-        <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
-      </span>
-      -->
       <login
           [usernameControl]="'username'"
           [passwordControl]="'password'"

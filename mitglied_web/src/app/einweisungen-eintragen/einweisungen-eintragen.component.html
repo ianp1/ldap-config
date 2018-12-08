@@ -11,28 +11,6 @@
           (validLogin)="valid=$event"
           >
       </login>
-      <!--
-      <mat-form-field>
-        <input matInput
-            placeholder="Nutzername"
-            value=""
-            (input)='checkLogin()'
-            formControlName="username"
-        >
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput
-            placeholder="Passwort"
-            type="password"
-            value=""
-            (input)='checkLogin()'
-            formControlName="password"
-        >
-      </mat-form-field>
-      <span [class]="validating ? '' : 'hidden'">
-        <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
-      </span>
-    -->
     </form>
   </div>
   <div *ngIf="valid">
