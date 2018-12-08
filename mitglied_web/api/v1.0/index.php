@@ -8,8 +8,15 @@
 	$app = new \Slim\App;
 
 	$app -> add(function($request, $response, $next) {
+		if ($request -> getMethod() == "OPTIONS") {
+			$response = $next($request, $response);
+			return $response;
+		}
+
+
 		$ldaphost = "192.168.3.4";
 		$ldapport = 389;
+		$ldap_base_dn =  "dc=ldap-provider,dc=fablab-luebeck";
 
 		$ldapconn = ldap_connect($ldaphost, $ldapport);
 		if (!$ldapconn) {
@@ -19,10 +26,26 @@
 		}
 
 		$request = $request -> withAttribute("ldapconn", $ldapconn);
-		$request = $request -> withAttribute("ldap_base_dn", "dc=ldap-provider,dc=fablab-luebeck");
+		$request = $request -> withAttribute("ldap_base_dn", $ldap_base_dn);
 
 		ldap_set_option($ldapconn,LDAP_OPT_PROTOCOL_VERSION,3);
 		ldap_start_tls($ldapconn);
+
+		//Login if possible
+		if ($request -> getMethod() === "GET") {
+			$params = $request -> getQueryParams();
+		} else if ($request -> getMethod() === "POST") {
+			$params = $request -> getParsedBody();
+		}
+
+		if (isset($params["author_user"], $params["author_password"])) {
+			$user = "uid=".$params["author_user"].",ou=user,".$ldap_base_dn;
+		} else if (isset($params["author_bot"], $params["author_password"])) {
+			$user = "cn=".$params['author_bot'].",ou=bot,".$ldap_base_dn;
+		}
+		if (!ldap_bind($ldapconn, $user, $AuthorPassword)) {
+			return $response -> withStatus(401);
+		}
 
 		$response = $next($request, $response);
 
