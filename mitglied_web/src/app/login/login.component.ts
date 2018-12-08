@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 
+import { AppComponent } from '../app.component';
+
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
@@ -26,7 +28,7 @@ export class LoginComponent implements OnInit {
   @Output()
   validLogin = new EventEmitter<boolean>();
 
-  constructor(public http:HttpClient) {
+  constructor(public appComponent:AppComponent, public http:HttpClient) {
 
   }
 
@@ -35,8 +37,8 @@ export class LoginComponent implements OnInit {
         .pipe(debounceTime(500))
         .subscribe(model => {
           this.validating = true;
-          var user = this.sanitize(this.formGroup.value[this.usernameControl]);
-          var passw = this.sanitize(this.formGroup.value[this.passwordControl]);
+          var user = this.appComponent.sanitize(this.formGroup.value[this.usernameControl]);
+          var passw = this.appComponent.sanitize(this.formGroup.value[this.passwordControl]);
           var headers = new HttpHeaders();
           var params = new HttpParams();
           params = params.append('author_user', user);

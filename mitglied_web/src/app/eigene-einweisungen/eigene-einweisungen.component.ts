@@ -46,9 +46,9 @@ export class EigeneEinweisungenComponent implements OnInit {
         .pipe(debounceTime(500))
         .subscribe(
           model => {
-            var user = this.sanitize(this.loginForm.value['username']);
-            var passw = this.sanitize(this.loginForm.value['password']);
-            var searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['showUser']));
+            var user = this.appComponent.sanitize(this.loginForm.value['username']);
+            var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+            var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
 
             if (searchTerm != "") {
               this.searching = true;
@@ -74,29 +74,18 @@ export class EigeneEinweisungenComponent implements OnInit {
         );
   }
 
-  sanitize(arg:string):string {
-    if (arg == undefined || arg == null) {
-      return "";
-    }
-    return arg;
-  }
-
-  encodeURL(param:string):string {
-    return encodeURI(param+"");
-  }
-
   fetchUsers() {
     this.userQueryChanged.next('');
   }
 
   showEinweisungen() {
-    var user = this.sanitize(this.loginForm.value['username']);
-    var passw = this.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginForm.value['username']);
+    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
     var searchTerm = "";
     if (this.loginForm.value['ownUser']) {
-      searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['username']));
+      searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['username']));
     } else {
-      searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['showUser']));
+      searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
     }
 
     var headers = new HttpHeaders();

@@ -28,7 +28,7 @@ export class RfidPruefenComponent implements OnInit {
 
   found_users:any;
 
-  constructor(private appComponent:AppComponent, private http:HttpClient) { }
+  constructor(public appComponent:AppComponent, private http:HttpClient) { }
 
   ngOnInit() {
     this.appComponent.title = "RFID-Tag überprüfen";
@@ -36,9 +36,9 @@ export class RfidPruefenComponent implements OnInit {
     this.rfidQueryChanged
         .pipe(debounceTime(500))
         .subscribe(model => {
-          var user = this.sanitize(this.loginForm.value['username']);
-          var passw = this.sanitize(this.loginForm.value['password']);
-          var updateRfid = this.encodeURL(this.sanitize(this.loginForm.value['rfid']));
+          var user = this.appComponent.sanitize(this.loginForm.value['username']);
+          var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+          var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
 
           var headers = new HttpHeaders();
           var params = new HttpParams();
@@ -57,17 +57,6 @@ export class RfidPruefenComponent implements OnInit {
             console.warn("error fetching users: ", error);
           });
         });
-  }
-
-  sanitize(arg:string):string {
-    if (arg == undefined || arg == null) {
-      return "";
-    }
-    return arg;
-  }
-
-  encodeURL(param:string):string {
-    return encodeURI(param+"");
   }
 
   findUser() {

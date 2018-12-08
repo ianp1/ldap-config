@@ -37,9 +37,9 @@ export class RfidEintragenComponent implements OnInit {
           .pipe(debounceTime(500))
           .subscribe(
             model => {
-              var user = this.sanitize(this.loginForm.value['username']);
-              var passw = this.sanitize(this.loginForm.value['password']);
-              var searchTerm = this.encodeURL(this.sanitize(this.loginForm.value['eingewiesener']));
+              var user = this.appComponent.sanitize(this.loginForm.value['username']);
+              var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+              var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['eingewiesener']));
 
               if (searchTerm != "") {
                 this.searching = true;
@@ -65,26 +65,15 @@ export class RfidEintragenComponent implements OnInit {
           );
   }
 
-  sanitize(arg:string):string {
-    if (arg == undefined || arg == null) {
-      return "";
-    }
-    return arg;
-  }
-
-  encodeURL(param:string):string {
-    return encodeURI(param+"");
-  }
-
   fetchUsers() {
     this.userQueryChanged.next('');
   }
 
   enterRfid() {
-    var user = this.sanitize(this.loginForm.value['username']);
-    var passw = this.sanitize(this.loginForm.value['password']);
-    var updateUser = this.encodeURL(this.sanitize(this.loginForm.value['eingewiesener']));
-    var updateRfid = this.encodeURL(this.sanitize(this.loginForm.value['rfid']));
+    var user = this.appComponent.sanitize(this.loginForm.value['username']);
+    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['eingewiesener']));
+    var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
 
     var headers = new HttpHeaders();
     var params = new HttpParams();

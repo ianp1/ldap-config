@@ -21,4 +21,15 @@ export class AppComponent {
     }
     return false;
   }
+
+  encodeURL(param:string):string {
+    return encodeURI(param+"");
+  }
+
+  sanitize(arg:string):string {
+    if (arg == undefined || arg == null) {
+      return "";
+    }
+    return arg;
+  }
 }

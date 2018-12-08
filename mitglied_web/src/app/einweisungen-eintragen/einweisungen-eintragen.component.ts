@@ -61,9 +61,9 @@ export class EinweisungenEintragenComponent implements OnInit {
           .pipe(debounceTime(500))
           .subscribe(
             model => {
-              var user = this.sanitize(this.loginForm.value['username']);
-              var passw = this.sanitize(this.loginForm.value['password']);
-              var searchTerm = this.encodeURL(this.sanitize(this.einweisungForm.value['eingewiesener']));
+              var user = this.appComponent.sanitize(this.loginForm.value['username']);
+              var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+              var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.einweisungForm.value['eingewiesener']));
 
               if (searchTerm != "") {
                 this.searching = true;
@@ -101,14 +101,14 @@ export class EinweisungenEintragenComponent implements OnInit {
   }
 
   enterEinweisung() {
-    var user = this.sanitize(this.loginForm.value['username']);
-    var passw = this.sanitize(this.loginForm.value['password']);
-    var requestUser = this.encodeURL(this.sanitize(this.einweisungForm.value['eingewiesener']));
-    var machine = this.encodeURL(this.sanitize(this.einweisungForm.value['maschine']));
+    var user = this.appComponent.sanitize(this.loginForm.value['username']);
+    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var requestUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.einweisungForm.value['eingewiesener']));
+    var machine = this.appComponent.encodeURL(this.appComponent.sanitize(this.einweisungForm.value['maschine']));
 
     var date = this.appComponent.formatLDAPDate(new Date());
     if (!this.einweisungForm.value['useCurrentDate']) {
-      var dateValue = this.sanitize(this.einweisungForm.value['date']);
+      var dateValue = this.appComponent.sanitize(this.einweisungForm.value['date']);
       if (dateValue == '') {
         //TODO: Build warning for empty date
         return ;
@@ -131,10 +131,5 @@ export class EinweisungenEintragenComponent implements OnInit {
     }, error => {
       console.log("fetched error: ", error);
     });
-  }
-
-
-  encodeURL(param:string):string {
-    return encodeURI(param+"");
   }
 }
