@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
     this.userQueryChanged
         .pipe(debounceTime(500))
         .subscribe(model => {
-          console.log(this.formGroup.value);
+          this.validating = true;
           var user = this.sanitize(this.formGroup.value[this.usernameControl]);
           var passw = this.sanitize(this.formGroup.value[this.passwordControl]);
           var headers = new HttpHeaders();
@@ -60,7 +60,6 @@ export class LoginComponent implements OnInit {
   }
 
   changed() {
-    this.validating = true;
     this.valid= false;
     this.validLogin.emit(false);
     this.userQueryChanged.next('');
