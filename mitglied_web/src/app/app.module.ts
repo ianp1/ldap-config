@@ -55,7 +55,7 @@ import { EinweisungenEintragenComponent } from './einweisungen-eintragen/einweis
 import { MitgliedEintragenComponent } from './mitglied-eintragen/mitglied-eintragen.component';
 
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SicherheitsbelehrungEintragenComponent, DialogUserExisting } from './sicherheitsbelehrung-eintragen/sicherheitsbelehrung-eintragen.component';
 
 import localeDe from '@angular/common/locales/de';
@@ -65,6 +65,9 @@ import { RfidEintragenComponent, DialogRfidExisting } from './rfid-eintragen/rfi
 import { RfidPruefenComponent } from './rfid-pruefen/rfid-pruefen.component';
 import { LoginComponent } from './login/login.component';
 import { UserSearchComponent } from './user-search/user-search.component';
+
+import { ErrorInterceptor, ErrorDialog } from './error-interceptor/error.interceptor';
+
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -87,6 +90,7 @@ registerLocaleData(localeDe, 'de');
 		MitgliedEintragenComponent,
 		SicherheitsbelehrungEintragenComponent,
     DialogUserExisting,
+    ErrorDialog,
     DialogRfidExisting,
     LdapDatePipe,
     RfidEintragenComponent,
@@ -140,13 +144,20 @@ registerLocaleData(localeDe, 'de');
     MatTreeModule,
 		RouterModule.forRoot(appRoutes)
 	],
-	providers: [],
+	providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true
+    }
+  ],
 	exports: [
 		CustomNavComponent
 	],
   entryComponents: [
     DialogUserExisting,
-    DialogRfidExisting
+    DialogRfidExisting,
+    ErrorDialog
   ],
 	bootstrap: [AppComponent]
 })
