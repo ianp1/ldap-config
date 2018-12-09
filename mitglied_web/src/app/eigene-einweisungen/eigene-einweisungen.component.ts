@@ -21,7 +21,7 @@ export class EigeneEinweisungenComponent implements OnInit {
 
   users:any = [];
 
-  einweisungen:any = [];
+  einweisungen:any = null;
 
   columnsToDisplay = ['geraet', 'datum'];
 
@@ -61,12 +61,10 @@ export class EigeneEinweisungenComponent implements OnInit {
                 headers: headers,
                 params: params
               }).subscribe(data => {
-                console.log("Suche erfolgreich: ", data);
                 this.users=data;
                 this.searching = false;
               }, error => {
                 this.searching = false;
-                console.log("fetched error: ", error);
               });
             }
           }

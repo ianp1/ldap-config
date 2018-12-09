@@ -11,23 +11,6 @@
           (validLogin)="validLogin=$event"
           >
       </login>
-      <!--
-      <mat-form-field>
-        <input
-            matInput
-            placeholder="Nutzername"
-            value=""
-            formControlName="username">
-      </mat-form-field>
-      <mat-form-field>
-        <input
-            matInput
-            placeholder="Passwort"
-            type="password"
-            value=""
-            formControlName="password">
-      </mat-form-field>
-      -->
       <br>
       <br>
       <mat-checkbox
@@ -37,29 +20,30 @@
       </mat-checkbox>
       <br><br>
       <div *ngIf="!loginControls.ownUser.value" class="">
-
-        <mat-form-field>
-          <input
-              matInput
-              placeholder="Nutzername zum Anzeigen"
-              value=""
-              [matAutocomplete]="auto"
-              (input)='fetchUsers()'
-              [(ngModel)]="this.showUser"
-              formControlName="showUser">
-        </mat-form-field>
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let user of users" [value]="user.dn">
-            {{user.vorname}} {{user.nachname}}
-          </mat-option>
-        </mat-autocomplete>
+        <user-search
+            [usernameControl]="'username'"
+            [passwordControl]="'password'"
+            [eingewiesenerControl]="'showUser'"
+            [formGroup]="loginForm"
+        >
+        </user-search>
       </div>
 
       <button mat-raised-button color="accent" (click)="showEinweisungen()">
         Einweisungen abfragen
       </button>
     </form>
-    <div *ngIf="einweisungen.length != 0">
+    <div *ngIf="einweisungen !== null && einweisungen.length === 0">
+      <br><br>
+      <p>
+        Für diesen Nutzer wurden keine Einweisungen gefunden
+      </p>
+    </div>
+    <div *ngIf="einweisungen !== null && einweisungen.length !== 0">
+      <br><br>
+      <p>
+        Der Nutzer hat die folgenden Einweisungen:
+      </p>
       <table mat-table [dataSource]="einweisungen" class="mat-elevation-z8">
         <ng-container matColumnDef="geraet">
           <th mat-header-cell *matHeaderCellDef>
