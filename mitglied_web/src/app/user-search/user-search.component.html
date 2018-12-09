@@ -6,7 +6,7 @@
         value=""
         [matAutocomplete]="auto"
         (input)='fetchUsers()'
-        formControlName="eingewiesener"
+        formControlName="{{eingewiesenerControl}}"
 
     >
     <mat-autocomplete #auto="matAutocomplete">

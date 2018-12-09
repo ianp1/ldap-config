@@ -36,9 +36,9 @@ export class UserSearchComponent implements OnInit {
         .pipe(debounceTime(500))
         .subscribe(
           model => {
-            var user = this.appComponent.sanitize(this.formGroup.value['username']);
-            var passw = this.appComponent.sanitize(this.formGroup.value['password']);
-            var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.formGroup.value['eingewiesener']));
+            var user = this.appComponent.sanitize(this.formGroup.value[this.usernameControl]);
+            var passw = this.appComponent.sanitize(this.formGroup.value[this.passwordControl]);
+            var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.formGroup.value[this.eingewiesenerControl]));
 
             if (searchTerm != "") {
               this.searching = true;
