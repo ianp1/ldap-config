@@ -2,3 +2,57 @@
   margin-left: 15px;
   display: inline;
 }
+
+
+@mixin inputColor($color) {
+  color:$color;
+
+  ::ng-deep .mat-form-field-underline {
+    background-color:$color;
+  }
+
+  ::ng-deep input {
+    caret-color:$color;
+  }
+
+  &.mat-focused ::ng-deep .mat-form-field-ripple {
+    background-color:$color;
+  }
+
+  ::ng-deep .mat-form-field-label {
+    color:$color;
+  }
+}
+
+.mat-form-field {
+  &.invalid {
+    @include inputColor(red);
+  }
+}
+
+.mat-form-field {
+  &.valid {
+    @include inputColor(green);
+  }
+}
+/*
+.mat-form-field {
+  &.invalid {
+    color:red;
+    ::ng-deep .mat-form-field-underline {
+      background-color:red;
+    }
+
+    ::ng-deep input {
+      caret-color:red;
+    }
+
+    &.mat-focused ::ng-deep .mat-form-field-ripple {
+      background-color:red;
+    }
+    ::ng-deep .mat-form-field-label {
+      color:red;
+    }
+  }
+}
+*/

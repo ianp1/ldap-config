@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
   validating : boolean = false;
   valid : boolean = false;
+  pending : boolean = false;
 
   @Input()
   formGroup : FormGroup;
@@ -51,11 +52,13 @@ export class LoginComponent implements OnInit {
               this.validating = false;
               this.valid = true;
               this.validLogin.emit(true);
+              this.pending = false;
             },
             error => {
               console.log("fetched error: ", error);
               this.validating = false;
               this.validLogin.emit(false);
+              this.pending = false;
             });
           });
   }
@@ -64,6 +67,7 @@ export class LoginComponent implements OnInit {
     this.valid= false;
     this.validLogin.emit(false);
     this.userQueryChanged.next('');
+    this.pending = true;
   }
 
   sanitize(arg:string):string {
@@ -71,6 +75,13 @@ export class LoginComponent implements OnInit {
       return "";
     }
     return arg;
+  }
+
+  get isEmpty() {
+    console.warn("isEmpty: ");
+    console.warn(this.formGroup[this.usernameControl]);
+    console.warn(this.formGroup[this.passwordControl]);
+    return this.formGroup.value[this.usernameControl] === '' && this.formGroup.value[this.passwordControl] === '';
   }
 
 }
