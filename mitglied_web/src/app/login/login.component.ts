@@ -78,9 +78,6 @@ export class LoginComponent implements OnInit {
   }
 
   get isEmpty() {
-    console.warn("isEmpty: ");
-    console.warn(this.formGroup[this.usernameControl]);
-    console.warn(this.formGroup[this.passwordControl]);
     return this.formGroup.value[this.usernameControl] === '' && this.formGroup.value[this.passwordControl] === '';
   }
 
