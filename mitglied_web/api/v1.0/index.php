@@ -59,6 +59,10 @@
 		return $response;
 	});
 
+	$app -> post('Mitglied/{RequestUser}', function (Request $request, Response $response, array $args) {
+
+	});
+
 	/**
 	* $RequestRfid : RFID-Token das verknüpft werden soll
 	* $RequestUser : DN des zu verknüpfenden Benutzers

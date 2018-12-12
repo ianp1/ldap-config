@@ -25,10 +25,12 @@ export class ErrorInterceptor implements HttpInterceptor {
       x.subscribe(data => {
         observer.next(data);
       }, error => {
-        if (error.code !== 404 && error.code !== 401) {
+        if (error.status !== 404 && error.status !== 401) {
           console.log("ERROR CAUGHT IN ErrorInterceptor: ", error);
 
           const dialogRef = this.dialog.open(ErrorDialog);
+        } else {
+          observer.error(error);
         }
       });
     });
