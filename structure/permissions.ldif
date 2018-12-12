@@ -15,15 +15,15 @@ olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" attrs=c
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,uid,rfid by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #finanzen
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=mitgliedsart,mitgliedsnummer,cn,sn,beginn,ende,beitrag,aktiv,kontoinhaber,entry,objectClass,uid by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=mitgliedsart,mitgliedsnummer,cn,sn,beginn,ende,aktiv,kontoinhaber,entry,objectClass,uid,iban,bic,anrede,title,ermaessigung,ermaessigtBis by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="ou=users,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #mitgliederverwaltung
-olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=bemerkungMitglied,beginn,ende,aktiv,entry,uid,objectClass,cn,sn,givenName,mail,mitgliedsnummer,mitgliedsart,beitrag,geburtstag by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn,beginn,ende,aktiv,entry,uid,objectClass,givenName,mail,mitgliedsnummer,mitgliedsart,ermaessigung,ermaessigtBis,geburtstag,anrede,plz,ort,strasse,notfallkontakt,iban,bic,kontoinhaber,description,title,mail,telephoneNumber by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 #einweisungen
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=entry,cn,sn,uid,geburtstag,objectClass,rfid by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=uid,entry,cn,sn,uid,geburtstag,objectClass,rfid by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.regex="^([^,]+),geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" by dnattr=eingewiesener read by * break
 olcAccess: to dn.regex="^geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" attrs=children by group.expand="geraetname=$1,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" write by * break
 olcAccess: to dn.regex="^geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" by group.expand="geraetname=$1,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" read by * break
