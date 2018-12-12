@@ -28,8 +28,6 @@
 		$request = $request -> withAttribute("ldapconn", $ldapconn);
 		$request = $request -> withAttribute("ldap_base_dn", $ldap_base_dn);
 
-		return $response -> withStatus(500);
-
 		ldap_set_option($ldapconn,LDAP_OPT_PROTOCOL_VERSION,3);
 		ldap_start_tls($ldapconn);
 
