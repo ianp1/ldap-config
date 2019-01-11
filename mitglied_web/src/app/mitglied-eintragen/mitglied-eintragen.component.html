@@ -1,3 +1,169 @@
-<p>
-  mitglied-eintragen works!
-</p>
+<div>
+  Bitte gib hier deine Fablab-Zugangsdaten ein um ein neues Vereinsmitglied einzutragen:
+
+  <br>
+  <div class="input-mask">
+    <form [formGroup]="loginForm">
+        <login
+            [usernameControl]="'username'"
+            [passwordControl]="'password'"
+            [formGroup]="loginForm"
+            (validLogin)="valid=$event"
+            >
+        </login>
+
+        <div *ngIf="valid">
+          Mitgliedsinformationen:
+          <user-search
+            [usernameControl]="'username'"
+            [passwordControl]="'password'"
+            [eingewiesenerControl]="'neuesMitglied'"
+            [formGroup]="loginForm"
+          >
+          </user-search>
+          <br>
+          Art der Mitgliedschaft:
+          <mat-form-field>
+            <mat-select
+                formControlName="mitgliedschaft"
+            >
+              <mat-option value="ehrenmitgliedschaft" selected>
+                Ehrenmitgliedschaft
+              </mat-option>
+              <mat-option value="fördermitgliedschaft">
+                Fördermitgliedschaft
+              </mat-option>
+              <mat-option value="fördermitgliedschaft (familie)">
+                Fördermitgliedschaft (Familie)
+              </mat-option>
+              <mat-option value="fördermitgliedschaft (firma)">
+                Fördermitgliedschaft (Firma)
+              </mat-option>
+              <mat-option value="ordentliche mitgliedschaft">
+                Ordentliche Mitgliedschaft
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="personendaten">
+            <mat-form-field>
+              <input matInput
+                  placeholder="Anrede"
+                  value=""
+                  formControlName="anrede"
+              >
+            </mat-form-field>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Titel"
+                  formControlName="titel"
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Vorname"
+                  formControlName="vorname"
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="Nachname"
+                  formControlName="nachname"
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Geburtsdatum"
+                  formControlName="geburtsdatum"
+              >
+            </mat-form-field>
+          </div>
+          <div class="wohninfos">
+            Wohnort des neuen Mitglieds:<br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="PLZ"
+                  formControlName="plz"
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Ort"
+                  formControlName="ort"
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Straße"
+                  formControlName="straße"
+              >
+            </mat-form-field>
+          </div>
+          <div class="erreichbarkeit">
+            Kontaktinformationen:<br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Emailadresse"
+                  formControlName="email"
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="Telefon"
+                  formControlName="telefon"
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <textarea matInput
+                  placeholder="Notfallkontakt"
+                  formControlName="notfallkontakt"
+              ></textarea>
+            </mat-form-field>
+          </div>
+          <div class="kontoinformation">
+            <mat-form-field>
+              <input matInput
+                  placeholder="IBAN"
+                  formControlName="iban"
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="BIC"
+                  formControlName="bic"
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="Kontoinhaber"
+                  formControlName="kontoinhaber"
+              >
+            </mat-form-field>
+          </div>
+          <div class="reduzierung">
+            <mat-form-field>
+              <input matInput
+                  placeholder="Beitragsreduzierung"
+                  formControlName="beitragsreduzierung"
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="Enddatum der Reduzierung"
+                  formControlName="ermaessigtBis"
+              >
+            </mat-form-field>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>
