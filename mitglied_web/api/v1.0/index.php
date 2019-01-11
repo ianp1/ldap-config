@@ -336,7 +336,19 @@
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 
 		$dn = "ou=user,".$ldap_base_dn;
-		$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
+		$sts = explode(" ", $st);
+		$x = var_export($sts, true);
+
+		$term = "(&(objectClass=inetOrgPerson)(|";
+		foreach ($sts as $searchterm) {
+			if ($searchterm != "") {
+				$term = $term."(cn=*$searchterm*)(sn=*$searchterm*)(uid=*$searchterm*)";
+			}
+		}
+		$term = $term."))";
+		//$response -> getBody() -> write($term);
+		//return $response;
+		//$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
 
 		$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid", "dn"));
 		$results = ldap_get_entries($ldapconn, $erg);
