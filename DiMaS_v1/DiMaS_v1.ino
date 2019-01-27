@@ -22,16 +22,12 @@
 #include <power_mgt.h>
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
-#define NUM_LEDS  10
+#define NUM_LEDS  5
 #define DATA_PIN  8
 
 #define RST_PIN 20 // RST-PIN for RC522 - RFID - SPI - Module GPIO15 
 #define SS_PIN  2  // SDA-PIN for RC522 - RFID - SPI - Module GPIO2
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
-
-//#define BlueLed 15
-//#define GreenLed 0
-//#define RedLed 3
 
 CRGB leds[NUM_LEDS];
 
