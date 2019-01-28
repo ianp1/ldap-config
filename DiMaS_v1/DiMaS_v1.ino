@@ -22,7 +22,7 @@
 #include <power_mgt.h>
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
-#define NUM_LEDS  5
+#define NUM_LEDS  4
 #define DATA_PIN  8
 
 #define RST_PIN 20 // RST-PIN for RC522 - RFID - SPI - Module GPIO15 
