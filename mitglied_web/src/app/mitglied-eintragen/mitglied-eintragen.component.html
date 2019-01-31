@@ -21,6 +21,7 @@
             [passwordControl]="'password'"
             [eingewiesenerControl]="'neuesMitglied'"
             [formGroup]="loginForm"
+            (userSelected)="prefillMitglied($event)"
           >
           </user-search>
           <br>

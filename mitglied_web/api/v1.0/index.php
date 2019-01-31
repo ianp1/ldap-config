@@ -339,7 +339,7 @@
 		$sts = explode(" ", $st);
 		$x = var_export($sts, true);
 
-		$term = "(&(objectClass=inetOrgPerson)(|";
+		$term = "(&(objectClass=fablabPerson)(|";
 		foreach ($sts as $searchterm) {
 			if ($searchterm != "") {
 				$term = $term."(cn=*$searchterm*)(sn=*$searchterm*)(uid=*$searchterm*)";
@@ -350,7 +350,7 @@
 		//return $response;
 		//$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
 
-		$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid", "dn"));
+		$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid", "dn", "geburtstag"));
 		$results = ldap_get_entries($ldapconn, $erg);
 		$ar = array();
 		for ($i = 0; $i < $results['count']; $i++) {
@@ -358,7 +358,8 @@
 				"vorname"=>$results[$i]["cn"][0],
 				"nachname"=>$results[$i]["sn"][0],
 				"uid"=>$results[$i]["uid"][0],
-				"dn"=>$results[$i]["dn"]
+				"dn"=>$results[$i]["dn"],
+				"geburtstag"=>$results[$i]["geburtstag"][0]
 			));
 		}
 		return $response -> withJson($ar, 201);

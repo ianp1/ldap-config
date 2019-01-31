@@ -9,7 +9,9 @@
         formControlName="{{eingewiesenerControl}}"
 
     >
-    <mat-autocomplete #auto="matAutocomplete">
+    <mat-autocomplete #auto="matAutocomplete"
+      (optionSelected)="userSelected.emit(getUserByDN($event.option.value))"
+    >
       <mat-option *ngFor="let user of users" [value]="user.dn">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}})</mat-option>
     </mat-autocomplete>
   </mat-form-field>

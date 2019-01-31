@@ -25,6 +25,10 @@ export class UserSearchComponent implements OnInit {
   @Input()
   eingewiesenerControl : string;
 
+
+  @Output()
+  userSelected = new EventEmitter<any>();
+
   searching : boolean;
 
   users : any;
@@ -63,6 +67,16 @@ export class UserSearchComponent implements OnInit {
           }
         );
 
+  }
+
+  getUserByDN(dn:string) {
+    console.log("getUserByDN: ", dn);
+    for (let user of this.users) {
+      console.log(user.dn);
+      if (user.dn == dn) {
+        return user;
+      }
+    }
   }
 
 

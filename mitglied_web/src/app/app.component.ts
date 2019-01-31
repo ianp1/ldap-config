@@ -15,6 +15,10 @@ export class AppComponent {
     return formatDate(date, 'yyyyMMdd', 'de-DE')+'000000Z'
   }
 
+  reformatLDAPDate(date:string):string {
+    return date.substring(0, 4)+"-"+date.substring(4,6)+"-"+date.substring(6,8)+"T00:00:00.000Z";//"2016-01-05T09:05:05.035Z"
+  }
+
   compareLDAPDates(date1:string, date2:string):boolean {
     for (var i = 0; i < 8; i++) {
       if (parseInt(date1[i]) > parseInt(date2[i])) {

@@ -51,4 +51,12 @@ export class MitgliedEintragenComponent implements OnInit {
     });
   }
 
+  prefillMitglied(val) {
+    console.log("prefillMitglied:", val);
+    this.loginForm.patchValue({
+      vorname:val['vorname'],
+      nachname:val['nachname'],
+      geburtsdatum: this.appComponent.reformatLDAPDate(val['geburtstag']),
+    });
+  }
 }
