@@ -28,9 +28,9 @@ export class MitgliedEintragenComponent implements OnInit {
        mitgliedschaft: ['ehrenmitgliedschaft'],
        anrede: [''],
        titel: [''],
-       vorname: [''],//TODO:prefill
-       nachname: [''],//TODO:prefill
-       geburtsdatum: [''],//TODO:prefill
+       vorname: [''],
+       nachname: [''],
+       geburtsdatum: [''],
        //
        plz: [''],
        ort: [''],
@@ -47,7 +47,8 @@ export class MitgliedEintragenComponent implements OnInit {
        beitragsreduzierung: [''],
        ermaessigtBis: [''],
        //Nur bei geteilter Mitgliedschaft
-       teilVon: ['']
+       teilVon: [''],//TODO
+       beginnMitgliedschaft: ['']
     });
   }
 
@@ -57,6 +58,33 @@ export class MitgliedEintragenComponent implements OnInit {
       vorname:val['vorname'],
       nachname:val['nachname'],
       geburtsdatum: this.appComponent.reformatLDAPDate(val['geburtstag']),
+    });
+  }
+
+  mitgliedEintragen() {
+    var user = this.appComponent.sanitize(this.loginForm.value['username']);
+    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+
+    var dn = this.appComponent.sanitize(this.loginForm.value['neuesMitglied']);
+
+    var values = {};
+    Object.keys(this.loginForm.controls).forEach(key=> {
+      var value = this.appComponent.sanitize(this.loginForm.value[key]);
+      if (key == "geburtsdatum" || key == "ermaessigtBis" || key == "beginnMitgliedschaft") {
+        if (value != "") {
+          value = this.appComponent.formatLDAPDate(value);
+        }
+      }
+
+      if (key != "neuesMitglied" && key != "username" && key != "password"){
+        values[key]=value;
+      }
+    });
+    values["author_user"] = user;
+    values["author_password"] = passw;
+
+    this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Mitglied/'+dn, values).subscribe(data=>{
+      console.log("posted mitglied:", data);
     });
   }
 }

@@ -59,8 +59,59 @@
 		return $response;
 	});
 
-	$app -> post('Mitglied/{RequestUser}', function (Request $request, Response $response, array $args) {
+	$app -> post('/Mitglied/{RequestUser}', function (Request $request, Response $response, array $args) {
+		$userDn = $args['RequestUser'];
+		$ldapconn = $request -> getAttribute('ldapconn');
 
+		$vals = $request -> getParsedBody();
+
+		$user = ldap_read($ldapconn, $userDn, "(objectClass=fablabPerson)");
+		$userResult = ldap_get_entries($ldapconn, $user);
+
+		$newClasses = array();
+		foreach ($userResult[0]["objectclass"] as $key => $cl) {
+			if ($key !== "count" && $cl != "fablabPerson") {
+				array_push($newClasses, $cl);
+			}
+		}
+		array_push($newClasses, "fablabMitglied");
+		if (!in_array("inetOrgPerson", $newClasses)) {
+			array_push($newClasses, "inetOrgPerson");
+		}
+
+		$newValues = array(
+			"objectClass"=> $newClasses,
+			"anrede"=> $vals["anrede"],
+			"ermaessigung"=> $vals["beitragsreduzierung"],
+			"bic"=> $vals["bic"],
+			"mail"=> $vals['email'],
+			"ermaessigtBis"=>$vals["ermaessigtBis"],
+			"geburtstag"=>$vals["geburtsdatum"],
+			"iban"=>$vals["iban"],
+			"kontoinhaber"=>$vals["kontoinhaber"],
+			"mitgliedsart"=>$vals["mitgliedschaft"],
+			"sn"=>$vals["nachname"],
+			"notfallkontakt"=>$vals["notfallkontakt"],
+			"ort"=>$vals["ort"],
+			"plz"=>$vals["plz"],
+			"strasse"=>$vals["straße"],
+			"homePhone"=>$vals["telefon"],
+			"title"=>$vals["titel"],
+			"cn"=>$vals["vorname"],
+			"beginn"=>$vals["beginnMitgliedschaft"]
+		);
+
+		foreach($newValues as $key=>$val) {
+			if ($val === '') {
+				$newValues[$key] = array();
+			}
+		}
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		ldap_mod_replace($ldapconn, $userDn, $newValues);
+
+		return $response;
 	});
 
 	/**
