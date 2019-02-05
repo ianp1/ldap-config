@@ -480,13 +480,13 @@
 		$dn = "ou=einweisung,".$ldap_base_dn;
 		$filter = "(objectClass=geraet)";
 
-		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn"));
+		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn", "cn"));
 
 		$result = ldap_get_entries($ldapconn, $sr);
 		$ar = array();
 
 		for ($i = 0; $i < $result['count']; $i++) {
-			array_push($ar, array("name"=>$result[$i]["geraetname"][0], "dn"=>$result[$i]["dn"]));
+			array_push($ar, array("name"=>$result[$i]["geraetname"][0], "dn"=>$result[$i]["dn"], "cn"=>$result[$i]["cn"][0]));
 		}
 
 		return $response -> withJson($ar, 201);
