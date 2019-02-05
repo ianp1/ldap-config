@@ -29,6 +29,7 @@
               placeholder="Gerät"
               [(ngModel)]="this.maschine"
               formControlName="maschine"
+              required
           >
             <mat-option *ngFor="let maschine of maschinen" [value]="maschine.dn">
               {{maschine.cn}}
@@ -49,6 +50,7 @@
                 value=""
                 formControlName="date"
                 [matDatepicker]="einweisungsdatumPicker"
+                required
             >
             <mat-datepicker #einweisungsdatumPicker>
             </mat-datepicker>

@@ -303,7 +303,6 @@
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 
-		//TODO: Sanitycheck inputs!
 		$existDN = $RequestMachine;
 		$existFilter = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 		$einweisungErg = ldap_search($ldapconn, $existDN, $existFilter, array("dn", "einweisungsdatum"));
@@ -361,8 +360,6 @@
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
-
-		//TODO: Sanitycheck inputs!
 
 		$entry = array();
 		$entry["objectClass"][0] = "inetOrgPerson";

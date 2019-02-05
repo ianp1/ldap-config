@@ -7,7 +7,7 @@
         [matAutocomplete]="auto"
         (input)='fetchUsers()'
         formControlName="{{eingewiesenerControl}}"
-
+        required
     >
     <mat-autocomplete #auto="matAutocomplete"
       (optionSelected)="userSelected.emit(getUserByDN($event.option.value))"

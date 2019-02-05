@@ -121,7 +121,6 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var nachname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['nachname']));
     var geburtsdatum = this.appComponent.sanitize(this.sicherheitForm.value['geburtsdatum']);
 
-    //TODO:Validate Date
     geburtsdatum = this.appComponent.formatLDAPDate(geburtsdatum);
 
     console.warn("creating user ", vorname, nachname, geburtsdatum);
