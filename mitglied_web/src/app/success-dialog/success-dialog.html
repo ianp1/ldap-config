@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>Erfolg</h2>
+<mat-dialog-content class="mat-typography">
+  Die Anfrage wurde erfolgreich bearbeitet.
+  <div *ngIf="showCustomText">
+    {{customText}}
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>OK</button>
+</mat-dialog-actions>

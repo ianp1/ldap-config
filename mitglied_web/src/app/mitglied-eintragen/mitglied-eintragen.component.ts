@@ -5,6 +5,10 @@ import { debounceTime, map } from 'rxjs/operators';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
+import { SuccessDialog } from '../success-dialog/success-dialog';
+
 @Component({
   selector: 'app-mitglied-eintragen',
   templateUrl: './mitglied-eintragen.component.html',
@@ -12,13 +16,11 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 })
 export class MitgliedEintragenComponent implements OnInit {
 
-  constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder) { }
+  constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder, public dialog:MatDialog) { }
 
   loginForm: FormGroup;
 
-  ngOnInit() {
-    this.appComponent.title = "Neues Mitglied eintragen";
-
+  initForm() {
     this.loginForm = this.formBuilder.group({
        username: [''],
        password: [''],
@@ -50,6 +52,11 @@ export class MitgliedEintragenComponent implements OnInit {
        teilVon: [''],//TODO
        beginnMitgliedschaft: ['']
     });
+  }
+
+  ngOnInit() {
+    this.appComponent.title = "Neues Mitglied eintragen";
+    this.initForm();
   }
 
   prefillMitglied(val) {
@@ -84,7 +91,12 @@ export class MitgliedEintragenComponent implements OnInit {
     values["author_password"] = passw;
 
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Mitglied/'+dn, values).subscribe(data=>{
-      console.log("posted mitglied:", data);
+      if (data) {
+        const dialogRef = this.dialog.open(SuccessDialog);
+        dialogRef.afterClosed().subscribe(data => {
+          this.initForm();
+        });
+      }
     });
   }
 }

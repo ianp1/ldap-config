@@ -109,7 +109,11 @@
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 
-		ldap_mod_replace($ldapconn, $userDn, $newValues);
+		if (ldap_mod_replace($ldapconn, $userDn, $newValues)) {
+			return $response -> withJson(true, 201);
+		} else {
+			return $response -> withStatus(500);
+		}
 
 		return $response;
 	});
@@ -144,8 +148,11 @@
 		//Neue Verknüpfung anlegen
 		$user = ldap_read($ldapconn, $RequestUser, "(objectClass=fablabPerson)", array("rfid"));
 		$userResult = ldap_get_entries($ldapconn, $user);
-
-		return $response -> withJson(ldap_mod_replace($ldapconn, $userResult[0]["dn"], array("rfid"=>$RequestRfid)), 201);
+		$response -> getBody() -> write($userResult[0]["dn"].$RequestRfid);
+		if (ldap_mod_replace($ldapconn, $userResult[0]["dn"], array("rfid"=>$RequestRfid))) {
+			return $response -> withJson(true, 201);
+		}
+		return $response -> withStatus(500);
 	});
 
 	$app -> get('/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
@@ -272,7 +279,10 @@
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$entry["sicherheitsbelehrung"] = $RequestDate;
-		return $response -> withJson(ldap_mod_replace($ldapconn, $RequestUser, $entry), 201);
+		if (ldap_mod_replace($ldapconn, $RequestUser, $entry)) {
+			return $response -> withJson(true, 201);
+		}
+		return $response -> withStatus(500);
 	});
 
 	/**
@@ -310,11 +320,15 @@
 			if (compareLDAPDates($RequestDate, $currentDate)) {
 				//Aktuell ist neuer,
 				//Nichts tun
-				return $response -> withJson("not updating", 201);
+				return $response -> withJson("not updating", 304);
 			} else {
 				$entry = array();
 				$entry["einweisungsdatum"]=$RequestDate;
-				return $response -> withJson(ldap_mod_replace($ldapconn, $DN, $entry));
+				if (ldap_mod_replace($ldapconn, $DN, $entry)) {
+					return $response -> withJson(true, 200);
+				} else {
+					return $response -> withStatus(500);
+				}
 			}
 		} else {
 			$entry = array();
@@ -323,8 +337,11 @@
 			$entry["einweisungsdatum"] = $RequestDate;
 			$entry["distinctname"] = uniqid("e_");
 
-			return $response -> withJson(ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry), 201);
-
+			if (ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry)) {
+				return $response -> withJson(true, 201);
+			} else {
+				return $response -> withStatus(500);
+			}
 		}
 	});
 
@@ -376,13 +393,9 @@
 		}
 
 		if (ldap_add($ldapconn, $dn, $entry)) {
-			return $response -> withJson($dn, 201);
+			return $response -> withJson($entry["uid"], 201);
 		} else {
-			$response -> getBody() -> write(ldap_error($ldapconn));
-			ldap_get_option($ldapconn, LDAP_OPT_DIAGNOSTIC_MESSAGE, $err);
-			$response -> getBody() -> write("ldap_get_option: ".$err);
-			return $response;
-			return $response -> withJson("false", 201);
+			return $response -> withStatus(500);
 		}
 	});
 
@@ -497,7 +510,7 @@
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 
-			return $response -> withJson(true, 201);
+		return $response -> withJson(true, 201);
 	});
 
 	$app -> run();

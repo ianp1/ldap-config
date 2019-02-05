@@ -68,6 +68,8 @@ import { UserSearchComponent } from './user-search/user-search.component';
 
 import { ErrorInterceptor, ErrorDialog } from './error-interceptor/error.interceptor';
 
+import { SuccessDialog } from './success-dialog/success-dialog';
+
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -91,6 +93,7 @@ registerLocaleData(localeDe, 'de');
 		SicherheitsbelehrungEintragenComponent,
     DialogUserExisting,
     ErrorDialog,
+    SuccessDialog,
     DialogRfidExisting,
     LdapDatePipe,
     RfidEintragenComponent,
@@ -157,7 +160,8 @@ registerLocaleData(localeDe, 'de');
   entryComponents: [
     DialogUserExisting,
     DialogRfidExisting,
-    ErrorDialog
+    ErrorDialog,
+    SuccessDialog
   ],
 	bootstrap: [AppComponent]
 })

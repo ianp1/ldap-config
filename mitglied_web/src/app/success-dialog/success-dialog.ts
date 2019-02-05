@@ -3,12 +3,18 @@ import { Injectable, Component, Inject } from '@angular/core';
 
 
 @Component({
-  selector: 'error-dialog',
-  templateUrl: 'error-dialog.html',
-  styleUrls: ['./error-dialog.scss']
+  selector: 'success-dialog',
+  templateUrl: 'success-dialog.html',
+  styleUrls: ['./success-dialog.scss']
 })
-export class ErrorDialog {
-  constructor (public dialogRef: MatDialogRef<ErrorDialog>,
-        @Inject(MAT_DIALOG_DATA) public dialogData: ErrorDialog) {
+export class SuccessDialog {
+  showCustomText : boolean = false;
+  customText  = "";
+  constructor (public dialogRef: MatDialogRef<SuccessDialog>,
+        @Inject(MAT_DIALOG_DATA) public dialogData: any) {
+    if (dialogData != null && typeof dialogData.uid !== 'undefined') {
+      this.showCustomText = true;
+      this.customText = "Die ID des neuen Benutzers ist "+dialogData.uid+".";
+    }
   }
 }

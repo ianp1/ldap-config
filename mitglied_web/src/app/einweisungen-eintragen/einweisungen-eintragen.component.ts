@@ -5,6 +5,9 @@ import { debounceTime, map } from 'rxjs/operators';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
+import { SuccessDialog } from '../success-dialog/success-dialog';
 
 @Component({
   selector: 'app-einweisungen-eintragen',
@@ -26,14 +29,12 @@ export class EinweisungenEintragenComponent implements OnInit {
   loginForm: FormGroup;
 
 
-  constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder) { }
+  constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder, public dialog:MatDialog) { }
 
 
   get loginControls() { return this.loginForm.controls; }
 
-  ngOnInit() {
-    this.appComponent.title = "Neue Einweisungen eintragen"
-
+  initForm() {
     this.loginForm = this.formBuilder.group({
        username: [''],
        password: [''],
@@ -42,6 +43,12 @@ export class EinweisungenEintragenComponent implements OnInit {
        useCurrentDate: [true],
        date: [new Date()]
     });
+  }
+
+  ngOnInit() {
+    this.appComponent.title = "Neue Einweisungen eintragen"
+
+    this.initForm();
 
     console.log(this.loginForm);
 
@@ -116,9 +123,11 @@ export class EinweisungenEintragenComponent implements OnInit {
       params
     ).subscribe(data => {
       if (data) {
-        console.log("successfully posted einweisung: ", data);
-      } else {
-        console.log("error posting einweisung");
+
+        const dialogRef = this.dialog.open(SuccessDialog);
+        dialogRef.afterClosed().subscribe(data => {
+          this.initForm();
+        });
       }
     }, error => {
       console.log("fetched error: ", error);

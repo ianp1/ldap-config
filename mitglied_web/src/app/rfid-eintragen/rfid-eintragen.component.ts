@@ -5,9 +5,11 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
+import { SuccessDialog } from '../success-dialog/success-dialog';
 
 @Component({
   selector: 'app-rfid-eintragen',
@@ -15,23 +17,29 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./rfid-eintragen.component.scss']
 })
 export class RfidEintragenComponent implements OnInit {
-  loginForm: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl(''),
-    eingewiesener: new FormControl(''),
-    rfid: new FormControl('')
-  });
+  loginForm: FormGroup;
   validating:boolean = false;
   valid:boolean = false;
 
   searching:boolean = false;
   users:any = [];
 
-  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient) { }
+  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient, private formBuilder: FormBuilder) { }
+
+  initForm() {
+    this.loginForm = this.formBuilder.group({
+      username: [''],
+      password: [''],
+      eingewiesener: [''],
+      rfid: ['']
+    });
+  }
 
   ngOnInit() {
     this.appComponent.title="RFID-Karte vergeben";
-        }
+
+    this.initForm();
+  }
 
   enterRfid() {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
@@ -79,10 +87,12 @@ export class RfidEintragenComponent implements OnInit {
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid+'/'+updateUser, params)
       .subscribe(data => {
         console.log("rfid update successfull: ", data);
-        //TODO:Bestägigung einbauen
+        const dialogRef = this.dialog.open(SuccessDialog);
+        dialogRef.afterClosed().subscribe(data => {
+          this.initForm();
+        });
       }, error => {
         console.warn("rfid update error: ", error);
-        //TODO: Fehlermeldung einbauen
       });
   }
 }

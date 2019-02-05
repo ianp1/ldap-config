@@ -5,9 +5,12 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
+import { SuccessDialog } from '../success-dialog/success-dialog';
+
 
 @Component({
   selector: 'app-sicherheitsbelehrung-eintragen',
@@ -18,21 +21,29 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   validating: boolean = false;
   valid: boolean = false;
 
-  loginForm: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl('')
-  });
+  loginForm: FormGroup;
 
-  sicherheitForm: FormGroup = new FormGroup({
-    vorname: new FormControl(''),
-    nachname: new FormControl(''),
-    geburtsdatum: new FormControl('')
-  })
+  sicherheitForm: FormGroup;
 
-  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient) { }
+  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient, private formBuilder : FormBuilder) { }
+
+  initForm() {
+    this.loginForm = this.formBuilder.group({
+      username: [''],
+      password: ['']
+    });
+
+    this.sicherheitForm = this.formBuilder.group({
+      vorname: [''],
+      nachname: [''],
+      geburtsdatum: ['']
+    });
+  }
 
   ngOnInit() {
     this.appComponent.title="Neue Sicherheitsbelehrungen eintragen";
+
+    this.initForm();
   }
 
   checkExistance() {
@@ -55,7 +66,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
         headers: headers,
         params: params
       })
-        .subscribe(data => {
+      .subscribe(data => {
         var ar = data as Array<any>;
         if (ar.length != 0) {
           let pickDialog = this.dialog.open(DialogUserExisting, {
@@ -91,9 +102,10 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
       author_password : passw,
       new_date : date
     }).subscribe(data=>{
-      console.log("updated user ", DN, "with response ", data);
-    }, error => {
-      console.log("error updating user: ", error);
+      const dialogRef = this.dialog.open(SuccessDialog);
+      dialogRef.afterClosed().subscribe(data => {
+        this.initForm();
+      });
     });
   }
 
@@ -120,7 +132,12 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
         author_password: passw
       })
       .subscribe(data => {
-        console.log("added user with response: ", data);
+        const dialogRef = this.dialog.open(SuccessDialog, {data:{
+          uid:data
+        }});
+        dialogRef.afterClosed().subscribe(data => {
+          this.initForm();
+        });
       }, error => {
         console.warn("got error while creating user: ", error);
       }
