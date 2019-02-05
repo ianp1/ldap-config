@@ -21,9 +21,17 @@ export class MitgliedEintragenComponent implements OnInit {
   loginForm: FormGroup;
 
   initForm() {
+    var username = "";
+    var password = "";
+    if (typeof this.loginForm !== 'undefined') {
+      username = this.loginForm.value["username"];
+    }
+    if (typeof this.loginForm !== 'undefined') {
+      password = this.loginForm.value["password"];
+    }
     this.loginForm = this.formBuilder.group({
-       username: [''],
-       password: [''],
+       username: [username],
+       password: [password],
        //
        neuesMitglied: [''],
        //

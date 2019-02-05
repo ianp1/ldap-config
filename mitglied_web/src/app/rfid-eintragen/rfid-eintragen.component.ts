@@ -27,9 +27,17 @@ export class RfidEintragenComponent implements OnInit {
   constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient, private formBuilder: FormBuilder) { }
 
   initForm() {
+    var username = "";
+    var password = "";
+    if (typeof this.loginForm !== 'undefined') {
+      username = this.loginForm.value["username"];
+    }
+    if (typeof this.loginForm !== 'undefined') {
+      password = this.loginForm.value["password"];
+    }
     this.loginForm = this.formBuilder.group({
-      username: [''],
-      password: [''],
+      username: [username],
+      password: [password],
       eingewiesener: [''],
       rfid: ['']
     });

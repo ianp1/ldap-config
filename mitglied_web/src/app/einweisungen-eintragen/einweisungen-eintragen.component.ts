@@ -35,9 +35,18 @@ export class EinweisungenEintragenComponent implements OnInit {
   get loginControls() { return this.loginForm.controls; }
 
   initForm() {
+    var username = "";
+    var password = "";
+    if (typeof this.loginForm !== 'undefined') {
+      username = this.loginForm.value["username"];
+    }
+    if (typeof this.loginForm !== 'undefined') {
+      password = this.loginForm.value["password"];
+    }
+
     this.loginForm = this.formBuilder.group({
-       username: [''],
-       password: [''],
+       username: [username],
+       password: [password],
        eingewiesener: [''],
        maschine: [''],
        useCurrentDate: [true],
