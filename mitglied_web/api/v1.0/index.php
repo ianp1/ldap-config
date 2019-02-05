@@ -331,8 +331,6 @@
 	$app -> post('/User/{Vorname}/{Nachname}/{Geburtstag}/{Sicherheitsbelehrung}', function(Request $request, Response $response, array $args) {
 		$RequestVornamen = explode(" ", $args['Vorname']);
 		$RequestNachnamen = explode(" ", $args['Nachname']);
-		$test = var_export($RequestVornamen, true).var_export($RequestNachnamen, true);
-		$response -> getBody() -> write($test);
 		$RequestVorname = strtoupper(substr(normalizeUtf8String($RequestVornamen[0]), 0, 1)).strtolower(substr(normalizeUtf8String($RequestVornamen[0]), 1));
 		$RequestNachname = "";
 		foreach ($RequestNachnamen as $nachname) {
@@ -376,9 +374,6 @@
 		if ($i != 0) {
 			$entry["uid"] = $entry["uid"].$i;
 		}
-
-		$test = var_export($entry, true);
-		$response -> getBody() -> write($test);
 
 		if (ldap_add($ldapconn, $dn, $entry)) {
 			return $response -> withJson($dn, 201);
