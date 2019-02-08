@@ -12,9 +12,9 @@ export class SuccessDialog {
   customText  = "";
   constructor (public dialogRef: MatDialogRef<SuccessDialog>,
         @Inject(MAT_DIALOG_DATA) public dialogData: any) {
-    if (dialogData != null && typeof dialogData.uid !== 'undefined') {
+    if (dialogData != null && typeof dialogData.customText !== 'undefined') {
       this.showCustomText = true;
-      this.customText = "Die ID des neuen Benutzers ist "+dialogData.uid+".";
+      this.customText = dialogData.customText;
     }
   }
 }

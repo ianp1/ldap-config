@@ -140,7 +140,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
       })
       .subscribe(data => {
         const dialogRef = this.dialog.open(SuccessDialog, {data:{
-          uid:data
+          uid:"Die ID des neuen Benutzers ist "+data+"."
         }});
         dialogRef.afterClosed().subscribe(data => {
           this.initForm();

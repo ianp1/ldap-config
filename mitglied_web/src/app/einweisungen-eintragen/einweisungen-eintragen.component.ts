@@ -131,8 +131,18 @@ export class EinweisungenEintragenComponent implements OnInit {
       params
     ).subscribe(data => {
       if (data) {
-
-        const dialogRef = this.dialog.open(SuccessDialog);
+        console.log("data: ", data);
+        var dialogRef;
+        if (data !== "not updating") {
+          dialogRef = this.dialog.open(SuccessDialog);
+        } else {
+          dialogRef = this.dialog.open(SuccessDialog, {
+            data : {
+              customText : "Es ist bereits eine neuere Einweisung vorhanden, "
+                  + "es wurde nichts geändert."
+            }
+          });
+        }
         dialogRef.afterClosed().subscribe(data => {
           this.initForm();
         });

@@ -319,7 +319,7 @@
 			if (compareLDAPDates($RequestDate, $currentDate)) {
 				//Aktuell ist neuer,
 				//Nichts tun
-				return $response -> withJson("not updating", 304);
+				return $response -> withJson("not updating", 202);
 			} else {
 				$entry = array();
 				$entry["einweisungsdatum"]=$RequestDate;
@@ -517,7 +517,9 @@
 	*/
 	function compareLDAPDates($date1, $date2) {
 		for ($i = 0; $i < 8; $i++) {
-			if (intval($date1[$i]) < intval($date2[$i])) {
+			if (intval($date1[$i]) > intval($date2[$i])) {
+				return false;
+			} else if (intval($date1[$i]) < intval($date2[$i])) {
 				return true;
 			}
 		}
