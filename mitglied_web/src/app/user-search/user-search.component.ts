@@ -69,6 +69,14 @@ export class UserSearchComponent implements OnInit {
 
   }
 
+  getUserByID(id:string) {
+    for (let user of this.users) {
+      if (user.uid === id) {
+        return user;
+      }
+    }
+  }
+
   getUserByDN(dn:string) {
     console.log("getUserByDN: ", dn);
     for (let user of this.users) {
