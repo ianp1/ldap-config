@@ -20,6 +20,7 @@
           [passwordControl]="'password'"
           [eingewiesenerControl]="'eingewiesener'"
           [formGroup]="loginForm"
+          (userSelected)="this.userSelected=$event"
         >
         </user-search>
         <mat-form-field>

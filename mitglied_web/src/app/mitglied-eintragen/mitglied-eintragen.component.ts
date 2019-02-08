@@ -19,6 +19,7 @@ export class MitgliedEintragenComponent implements OnInit {
   constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder, public dialog:MatDialog) { }
 
   loginForm: FormGroup;
+  userSelected: any;
 
   initForm() {
     var username = "";
@@ -69,6 +70,7 @@ export class MitgliedEintragenComponent implements OnInit {
 
   prefillMitglied(val) {
     console.log("prefillMitglied:", val);
+    this.userSelected = val;
     this.loginForm.patchValue({
       vorname:val['vorname'],
       nachname:val['nachname'],
@@ -80,7 +82,7 @@ export class MitgliedEintragenComponent implements OnInit {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
 
-    var dn = this.appComponent.sanitize(this.loginForm.value['neuesMitglied']);
+    var dn = this.appComponent.sanitize(this.userSelected.dn);
 
     var values = {};
     Object.keys(this.loginForm.controls).forEach(key=> {

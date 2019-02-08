@@ -21,6 +21,8 @@ export class RfidEintragenComponent implements OnInit {
   validating:boolean = false;
   valid:boolean = false;
 
+  userSelected : any;
+
   searching:boolean = false;
   users:any = [];
 
@@ -52,7 +54,7 @@ export class RfidEintragenComponent implements OnInit {
   enterRfid() {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
-    var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['eingewiesener']));
+    var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
     var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
 
     var headers = new HttpHeaders();

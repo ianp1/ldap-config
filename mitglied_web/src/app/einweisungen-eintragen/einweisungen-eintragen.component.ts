@@ -26,6 +26,8 @@ export class EinweisungenEintragenComponent implements OnInit {
   maschinen:any = [];
   users:any = [];
 
+  userSelected: any;
+
   loginForm: FormGroup;
 
 
@@ -111,7 +113,7 @@ export class EinweisungenEintragenComponent implements OnInit {
   enterEinweisung() {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
-    var requestUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['eingewiesener']));
+    var requestUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
     var machine = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['maschine']));
 
     var date = this.appComponent.formatLDAPDate(new Date());

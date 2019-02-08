@@ -335,7 +335,8 @@
 			$entry["eingewiesener"] = $RequestUser;
 			$entry["einweisungsdatum"] = $RequestDate;
 			$entry["distinctname"] = uniqid("e_");
-
+			$test = var_export($entry, true);
+			$response -> getBody() -> write($test);
 			if (ldap_add($ldapconn, "distinctname=".$entry['distinctname'].",".$RequestMachine, $entry)) {
 				return $response -> withJson(true, 201);
 			} else {
