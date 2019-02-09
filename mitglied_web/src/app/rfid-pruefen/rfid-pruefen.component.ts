@@ -27,6 +27,7 @@ export class RfidPruefenComponent implements OnInit {
   searching:boolean = false;
 
   found_users:any;
+  noUsersFound:boolean = false;
 
   constructor(public appComponent:AppComponent, private http:HttpClient) { }
 
@@ -52,12 +53,13 @@ export class RfidPruefenComponent implements OnInit {
             params: params
           }).subscribe(data => {
             this.found_users = data;
-
+            this.noUsersFound = false;
             this.searching = false;
 
             console.log("found users: ", this.found_users);
           }, error => {
             this.found_users = null;
+            this.noUsersFound = true;
             this.searching = false;
             console.warn("error fetching users: ", error);
           });
