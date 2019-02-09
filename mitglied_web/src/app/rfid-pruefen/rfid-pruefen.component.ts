@@ -58,6 +58,7 @@ export class RfidPruefenComponent implements OnInit {
             console.log("found users: ", this.found_users);
           }, error => {
             this.found_users = null;
+            this.searching = false;
             console.warn("error fetching users: ", error);
           });
         });
