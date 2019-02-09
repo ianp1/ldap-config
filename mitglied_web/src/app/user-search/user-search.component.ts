@@ -38,6 +38,9 @@ export class UserSearchComponent implements OnInit {
   constructor(public appComponent:AppComponent, public http:HttpClient) { }
 
   ngOnInit() {
+    this.userQueryChanged.subscribe(model=>{
+      this.validUser=false;
+    });
     this.userQueryChanged
         .pipe(debounceTime(500))
         .subscribe(
@@ -74,16 +77,6 @@ export class UserSearchComponent implements OnInit {
   getUserByID(id:string) {
     for (let user of this.users) {
       if (user.uid === id) {
-        return user;
-      }
-    }
-  }
-
-  getUserByDN(dn:string) {
-    console.log("getUserByDN: ", dn);
-    for (let user of this.users) {
-      console.log(user.dn);
-      if (user.dn == dn) {
         this.validUser = true;
         return user;
       }

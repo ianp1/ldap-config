@@ -1,5 +1,5 @@
 <div [formGroup]="formGroup" class="search-mask">
-  <mat-form-field class="userSearchField">
+  <mat-form-field class="userSearchField" [ngClass]="validUser ? 'validUser' : 'invalidUser'">
     <input
         matInput
         placeholder="Name oder ID"
@@ -7,8 +7,6 @@
         [matAutocomplete]="auto"
         (input)='fetchUsers()'
         formControlName="{{eingewiesenerControl}}"
-        required
-        [class]="validUser ? 'validUser' : 'invalidUser'"
     >
     <mat-autocomplete #auto="matAutocomplete"
       (optionSelected)="userSelected.emit(getUserByID($event.option.value))"
