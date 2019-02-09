@@ -367,11 +367,12 @@
 		$entry["objectClass"][1] = "fablabPerson";
 		$entry["uid"] = $RequestVorname.$RequestNachname;
 		$entry["cn"] = array();
-		$entry["sn"] = array();
+		$entry["sn"] = "";
 		foreach ($RequestVornamen as $vorname) {
 			array_push($entry["cn"], $vorname);
 		}
 		foreach ($RequestNachnamen as $nachname) {
+			$entry["sn"] = $entry["sn"]." ".$nachname;
 			array_push($entry["sn"], $nachname);
 		}
 		$entry["geburtstag"] = $RequestGeburtstag;
