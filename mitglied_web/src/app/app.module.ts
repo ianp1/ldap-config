@@ -43,7 +43,9 @@ import {
   MatToolbarModule,
   MatTooltipModule,
   MatTreeModule,
+  MAT_DATE_LOCALE,
 } from '@angular/material';
+
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CustomNavComponent } from './custom-nav/custom-nav.component';
@@ -69,7 +71,6 @@ import { UserSearchComponent } from './user-search/user-search.component';
 import { ErrorInterceptor, ErrorDialog } from './error-interceptor/error.interceptor';
 
 import { SuccessDialog } from './success-dialog/success-dialog';
-
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -152,7 +153,8 @@ registerLocaleData(localeDe, 'de');
       provide: HTTP_INTERCEPTORS,
       useClass: ErrorInterceptor,
       multi: true
-    }
+    },
+    { provide: MAT_DATE_LOCALE, useValue: 'de-DE' }
   ],
 	exports: [
 		CustomNavComponent
