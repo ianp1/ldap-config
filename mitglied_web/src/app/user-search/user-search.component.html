@@ -10,6 +10,7 @@
     >
     <mat-autocomplete #auto="matAutocomplete"
       (optionSelected)="userSelected.emit(getUserByID($event.option.value))"
+      autoActiveFirstOption
     >
       <mat-option *ngFor="let user of users" [value]="user.uid">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}})</mat-option>
     </mat-autocomplete>
