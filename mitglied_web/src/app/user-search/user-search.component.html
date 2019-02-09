@@ -12,7 +12,7 @@
       (optionSelected)="userSelected.emit(getUserByID($event.option.value))"
       autoActiveFirstOption
     >
-      <mat-option *ngFor="let user of users" [value]="user.uid">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}})</mat-option>
+      <mat-option *ngFor="let user of users" [value]="user.uid">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}}, {{appComponent.reformatLDAPDate(user.geburtstag) | date}})</mat-option>
     </mat-autocomplete>
   </mat-form-field>
 
