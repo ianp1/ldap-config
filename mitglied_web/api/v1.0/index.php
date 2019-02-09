@@ -483,8 +483,12 @@
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$ldapconn = $request -> getAttribute("ldapconn");
 
+
+		$AuthorUser = $params["author_user"];
+		$user = "uid=".$AuthorUser.",ou=user,".$ldap_base_dn;
+
 		$dn = "ou=einweisung,".$ldap_base_dn;
-		$filter = "(objectClass=geraet)";
+		$filter = "(&(objectClass=geraet)(geraetementor=$user))";
 
 		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn", "cn"));
 
