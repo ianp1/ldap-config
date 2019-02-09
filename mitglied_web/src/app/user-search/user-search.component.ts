@@ -33,6 +33,8 @@ export class UserSearchComponent implements OnInit {
 
   users : any;
 
+  validUser : boolean;
+
   constructor(public appComponent:AppComponent, public http:HttpClient) { }
 
   ngOnInit() {
@@ -82,6 +84,7 @@ export class UserSearchComponent implements OnInit {
     for (let user of this.users) {
       console.log(user.dn);
       if (user.dn == dn) {
+        this.validUser = true;
         return user;
       }
     }

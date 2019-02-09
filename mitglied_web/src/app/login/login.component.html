@@ -1,5 +1,5 @@
 <div [formGroup]="formGroup" class="login-mask">
-  <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (valid ? 'valid' : 'invalid')">
+  <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (loginValid ? 'valid' : 'invalid')">
     <input
         matInput
         placeholder="Nutzername"
@@ -8,7 +8,7 @@
         (input)="changed()"
         required>
   </mat-form-field>
-  <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (valid ? 'valid' : 'invalid')">
+  <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (loginValid ? 'valid' : 'invalid')">
     <input
         matInput
         placeholder="Passwort"

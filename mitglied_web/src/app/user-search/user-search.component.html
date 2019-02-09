@@ -8,6 +8,7 @@
         (input)='fetchUsers()'
         formControlName="{{eingewiesenerControl}}"
         required
+        [class]="validUser ? 'validUser' : 'invalidUser'"
     >
     <mat-autocomplete #auto="matAutocomplete"
       (optionSelected)="userSelected.emit(getUserByID($event.option.value))"

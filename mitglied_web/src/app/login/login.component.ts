@@ -15,7 +15,7 @@ import { debounceTime, map } from 'rxjs/operators';
 export class LoginComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
   validating : boolean = false;
-  valid : boolean = false;
+  loginValid : boolean = false;
   pending : boolean = false;
 
   @Input()
@@ -50,7 +50,7 @@ export class LoginComponent implements OnInit {
           }).subscribe(data =>{
               console.log("Authentifizierung erfolgreich: "+data);
               this.validating = false;
-              this.valid = true;
+              this.loginValid = true;
               this.validLogin.emit(true);
               this.pending = false;
             },
@@ -64,7 +64,8 @@ export class LoginComponent implements OnInit {
   }
 
   changed() {
-    this.valid= false;
+    console.log("changed");
+    this.loginValid= false;
     this.validLogin.emit(false);
     this.userQueryChanged.next('');
     this.pending = true;
