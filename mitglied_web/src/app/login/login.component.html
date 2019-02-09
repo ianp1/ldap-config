@@ -6,7 +6,7 @@
         value=""
         formControlName="{{usernameControl}}"
         (input)="changed()"
-        required>
+        >
   </mat-form-field>
   <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (loginValid ? 'valid' : 'invalid')">
     <input
@@ -16,7 +16,7 @@
         value=""
         formControlName="{{passwordControl}}"
         (input)="changed()"
-        required>
+        >
   </mat-form-field>
 
   <span [class]="validating ? '' : 'hidden'">
