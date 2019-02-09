@@ -47,6 +47,27 @@
 
         <mat-datepicker-toggle matSuffix [for]="geburtsdatumPicker"></mat-datepicker-toggle>
       </mat-form-field>
+      <br><br>
+      <mat-checkbox
+        formControlName="useCurrentDate"
+      >
+        Für aktuelles Datum eintragen
+      </mat-checkbox>
+      <div *ngIf="!sicherheitControls.useCurrentDate.value" class="einweisungsdatumPicker">
+        <mat-form-field >
+          <input matInput
+              placeholder="Datum der Belehrung"
+              value=""
+              formControlName="selectedDate"
+              [matDatepicker]="einweisungsdatumPicker"
+              required
+          >
+          <mat-datepicker #einweisungsdatumPicker>
+          </mat-datepicker>
+
+          <mat-datepicker-toggle matSuffix [for]="einweisungsdatumPicker"></mat-datepicker-toggle>
+        </mat-form-field>
+      </div>
     </form>
     <br><br>
 

@@ -25,6 +25,9 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
   sicherheitForm: FormGroup;
 
+
+  get sicherheitControls() { return this.sicherheitForm.controls; }
+
   constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient, private formBuilder : FormBuilder) { }
 
   initForm() {
@@ -44,7 +47,9 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     this.sicherheitForm = this.formBuilder.group({
       vorname: [''],
       nachname: [''],
-      geburtsdatum: ['']
+      geburtsdatum: [''],
+      useCurrentDate: [true],
+      selectedDate: ['']
     });
   }
 
@@ -99,11 +104,19 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     }
   }
 
+  getSelectedDate() {
+    if (!this.sicherheitForm.value["useCurrentDate"]) {
+      return this.appComponent.formatLDAPDate(this.sicherheitForm.value['selectedDate'])
+    } else {
+      return this.appComponent.formatLDAPDate(new Date());
+    }
+  }
+
   updateSicherheitsbelehrung(DN:string) {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
 
-    var date = this.appComponent.formatLDAPDate(new Date());
+    var date = this.getSelectedDate();
 
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Sicherheitsbelehrung/'+this.appComponent.encodeURL(DN)+'/'+this.appComponent.encodeURL(date), {
       author_user: user,
@@ -121,9 +134,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
 
-    console.log("unformatted date: ", new Date());
-    var date = this.appComponent.formatLDAPDate(new Date());
-    console.log("current date: ", date);
+    var date = this.getSelectedDate();
 
     var vorname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['vorname']));
     var nachname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['nachname']));
@@ -140,7 +151,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
       })
       .subscribe(data => {
         const dialogRef = this.dialog.open(SuccessDialog, {data:{
-          uid:"Die ID des neuen Benutzers ist "+data+"."
+          customText:"Die ID des neuen Benutzers ist "+data+"."
         }});
         dialogRef.afterClosed().subscribe(data => {
           this.initForm();
