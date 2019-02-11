@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 
 import { AppComponent } from '../app.component';
 
+
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Injectable()
@@ -43,6 +44,7 @@ export class ErrorInterceptor implements HttpInterceptor {
   styleUrls: ['./error-dialog.scss']
 })
 export class ErrorDialog {
+
   constructor (public dialogRef: MatDialogRef<ErrorDialog>,
         @Inject(MAT_DIALOG_DATA) public dialogData: ErrorDialog) {
   }
