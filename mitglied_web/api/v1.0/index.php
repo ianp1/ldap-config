@@ -462,7 +462,7 @@
 
 		$dn = "ou=user,".$ldap_base_dn;
 
-		$erg = ldap_search($ldapconn, $dn, $searchTerm, array("cn", "sn", "uid", "dn"));
+		$erg = ldap_search($ldapconn, $dn, $searchTerm, array("cn", "sn", "uid", "dn", "sicherheitsbelehrung"));
 		$results = ldap_get_entries($ldapconn, $erg);
 		$ar = array();
 		for ($i = 0; $i < $results['count']; $i++) {
@@ -470,7 +470,8 @@
 				"vorname"=>$results[$i]["cn"][0],
 				"nachname"=>$results[$i]["sn"][0],
 				"uid"=>$results[$i]["uid"][0],
-				"dn"=>$results[$i]["dn"]
+				"dn"=>$results[$i]["dn"],
+				"sicherheitsbelehrung"=>$results[$i]["sicherheitsbelehrung"][0]
 			));
 		}
 

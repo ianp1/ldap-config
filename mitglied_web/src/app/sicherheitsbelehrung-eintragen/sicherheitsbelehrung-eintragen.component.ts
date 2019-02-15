@@ -83,7 +83,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
         var ar = data as Array<any>;
         if (ar.length != 0) {
           let pickDialog = this.dialog.open(DialogUserExisting, {
-            data : {users:ar}
+            data : {users:ar, appComponent:this.appComponent}
           })
           pickDialog.afterClosed().subscribe(result => {
             if (result) {
@@ -166,6 +166,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
 export interface DialogUserExistingData {
   users:any[];
+  appComponent: AppComponent;
 }
 
 export interface DialogUserExistingColumn {
@@ -173,6 +174,7 @@ export interface DialogUserExistingColumn {
   nachname: string;
   uid: string;
   dn: string;
+  sicherheitsbelehrung: string;
 }
 
 @Component({
@@ -181,7 +183,7 @@ export interface DialogUserExistingColumn {
   styleUrls: ['./dialog-user-existing.scss']
 })
 export class DialogUserExisting {
-  displayedColumns: string[] = ['Name', 'UID', 'DN'];
+  displayedColumns: string[] = ['Name', 'UID', 'Sicherheitsbelehrung', 'DN'];
   dataArray: any[];
   interfacestring: DialogUserExistingColumn[];
   constructor (public dialogRef: MatDialogRef<DialogUserExisting>,
@@ -195,6 +197,7 @@ export class DialogUserExisting {
         nachname:obj.nachname,
         uid:obj.uid,
         dn:obj.dn,
+        sicherheitsbelehrung: obj.sicherheitsbelehrung
       };
     });
   }
