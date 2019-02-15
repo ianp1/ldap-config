@@ -135,22 +135,36 @@ export class EinweisungenEintragenComponent implements OnInit {
       if (data) {
         console.log("data: ", data);
         var dialogRef;
-        if (data !== "not updating") {
+        if (typeof(data['status'] === 'undefined') && data['status'] !== "not updating") {
           dialogRef = this.dialog.open(SuccessDialog);
+          dialogRef.afterClosed().subscribe(data => {
+            this.initForm();
+          });
         } else {
           dialogRef = this.dialog.open(SuccessDialog, {
             data : {
               icon:"warning",
               icon_class: "iconWarning",
-              customText : "Es ist bereits eine neuere Einweisung vorhanden, "
-                  + "es wurde nichts geändert.",
-              title: "Achtung"
+              customText : "Es ist bereits eine Einweisung vorhanden. Soll diese überschrieben werden?",
+              title: "Achtung",
+              confirm: true
+            }
+          });
+          dialogRef.afterClosed().subscribe(data => {
+            if (data) {
+              params["force"]=true;
+              this.http.post(this.appComponent.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/"+date,
+                params
+              ).subscribe(postData => {
+                dialogRef = this.dialog.open(SuccessDialog);
+                dialogRef.afterClosed().subscribe(data => {
+                  this.initForm();
+                });
+              });
             }
           });
         }
-        dialogRef.afterClosed().subscribe(data => {
-          this.initForm();
-        });
+
       }
     }, error => {
       console.log("fetched error: ", error);

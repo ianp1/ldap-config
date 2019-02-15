@@ -310,17 +310,17 @@
 
 		$debug = var_export($einweisungResult, true);
 
+		$force = false;
+		if (isset($request -> getParsedBody()["force"])) {
+			$force = $request -> getParsedBody()["force"];
+		}
+
 		if ($einweisungResult['count'] > 1) {
 			return $result -> withJson("Einweisungen inkonsistent. Bitte einem Administrator melden", 500);
 		} else if ($einweisungResult['count'] === 1) {
-			$currentDate = $einweisungResult[0]["einweisungsdatum"][0];
-			$DN = $einweisungResult[0]["dn"];
-
-			if (compareLDAPDates($RequestDate, $currentDate)) {
-				//Aktuell ist neuer,
-				//Nichts tun
-				return $response -> withJson("not updating", 202);
-			} else {
+			if ($force) {
+				$currentDate = $einweisungResult[0]["einweisungsdatum"][0];
+				$DN = $einweisungResult[0]["dn"];
 				$entry = array();
 				$entry["einweisungsdatum"]=$RequestDate;
 				if (ldap_mod_replace($ldapconn, $DN, $entry)) {
@@ -329,6 +329,7 @@
 					return $response -> withStatus(500);
 				}
 			}
+			return $response -> withJson(array("status" => "not updating", "date" => $einweisungResult[0]["einweisungsdatum"][0]), 202);
 		} else {
 			$entry = array();
 			$entry["objectClass"] = "einweisung";

@@ -15,5 +15,6 @@
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close>OK</button>
+  <button *ngIf="confirm" mat-button mat-dialog-confirm (click)="override()">Überschreiben</button>
+  <button mat-button mat-dialog-close>{{ok_text}}</button>
 </mat-dialog-actions>

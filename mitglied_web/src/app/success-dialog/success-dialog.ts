@@ -13,21 +13,36 @@ export class SuccessDialog {
   icon = "check";
   icon_class = "";
   title = "Erfolg";
+  confirm = false;
+  ok_text = "OK";
+
   constructor (public dialogRef: MatDialogRef<SuccessDialog>,
         @Inject(MAT_DIALOG_DATA) public dialogData: any) {
     console.log(dialogData);
-    if (dialogData != null && typeof dialogData.customText !== 'undefined') {
-      this.showCustomText = true;
-      this.customText = dialogData.customText;
+    if (dialogData != null) {
+      if (typeof dialogData.customText !== 'undefined') {
+        this.showCustomText = true;
+        this.customText = dialogData.customText;
+      }
+      if (typeof dialogData.icon !== 'undefined') {
+        this.icon = dialogData.icon;
+      }
+      if (typeof dialogData.icon_class !== 'undefined') {
+        this.icon_class = dialogData.icon_class;
+      }
+      if (typeof dialogData.title !== 'undefined') {
+        this.title = dialogData.title;
+      }
+      if (typeof dialogData.confirm !== 'undefined') {
+        this.confirm = dialogData.confirm;
+        if (this.confirm) {
+          this.ok_text = "Abbrechen";
+        }
+      }
     }
-    if (dialogData != null && typeof dialogData.icon !== 'undefined') {
-      this.icon = dialogData.icon;
-    }
-    if (dialogData != null && typeof dialogData.icon_class !== 'undefined') {
-      this.icon_class = dialogData.icon_class;
-    }
-    if (dialogData != null && typeof dialogData.title !== 'undefined') {
-      this.title = dialogData.title;
-    }
+  }
+
+  override() {
+    this.dialogRef.close(true);
   }
 }
