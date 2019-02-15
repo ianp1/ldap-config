@@ -3,10 +3,12 @@
     {{icon}}
   </mat-icon>
 </button>
-<h2 mat-dialog-title id="dialog-title">Erfolg</h2>
+<h2 mat-dialog-title id="dialog-title">{{title}}</h2>
 <mat-dialog-content class="mat-typography">
   <div>
-    Die Anfrage wurde erfolgreich bearbeitet.
+    <div *ngIf="!showCustomText">
+      Die Anfrage wurde erfolgreich bearbeitet.
+    </div>
     <div *ngIf="showCustomText">
       {{customText}}
     </div>

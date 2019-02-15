@@ -12,6 +12,7 @@ export class SuccessDialog {
   customText  = "";
   icon = "check";
   icon_class = "";
+  title = "Erfolg";
   constructor (public dialogRef: MatDialogRef<SuccessDialog>,
         @Inject(MAT_DIALOG_DATA) public dialogData: any) {
     console.log(dialogData);
@@ -24,6 +25,9 @@ export class SuccessDialog {
     }
     if (dialogData != null && typeof dialogData.icon_class !== 'undefined') {
       this.icon_class = dialogData.icon_class;
+    }
+    if (dialogData != null && typeof dialogData.title !== 'undefined') {
+      this.title = dialogData.title;
     }
   }
 }

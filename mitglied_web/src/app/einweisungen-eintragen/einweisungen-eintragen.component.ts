@@ -140,8 +140,11 @@ export class EinweisungenEintragenComponent implements OnInit {
         } else {
           dialogRef = this.dialog.open(SuccessDialog, {
             data : {
+              icon:"warning",
+              icon_class: "iconWarning",
               customText : "Es ist bereits eine neuere Einweisung vorhanden, "
-                  + "es wurde nichts geändert."
+                  + "es wurde nichts geändert.",
+              title: "Achtung"
             }
           });
         }
