@@ -426,7 +426,7 @@
 		//return $response;
 		//$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
 
-		$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid", "dn", "geburtstag"));
+		$erg = ldap_search($ldapconn, $dn, $term, array("cn", "sn", "uid", "dn", "geburtstag", "rfid"));
 		$results = ldap_get_entries($ldapconn, $erg);
 		$ar = array();
 		for ($i = 0; $i < $results['count']; $i++) {
@@ -435,7 +435,8 @@
 				"nachname"=>$results[$i]["sn"][0],
 				"uid"=>$results[$i]["uid"][0],
 				"dn"=>$results[$i]["dn"],
-				"geburtstag"=>$results[$i]["geburtstag"][0]
+				"geburtstag"=>$results[$i]["geburtstag"][0],
+				"rfid"=>$results[$i]["rfid"][0]
 			));
 		}
 		return $response -> withJson($ar, 201);

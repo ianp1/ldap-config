@@ -23,6 +23,8 @@ export class RfidEintragenComponent implements OnInit {
 
   userSelected : any;
 
+  showRfidWarning : boolean = false;
+
   searching:boolean = false;
   users:any = [];
 
@@ -89,6 +91,22 @@ export class RfidEintragenComponent implements OnInit {
     });
   }
 
+  prefillRFID(user:any) {
+    this.userSelected = user;
+    if (typeof user.rfid !== 'undefined' && user.rfid != '' && user.rfid !== null) {
+      this.showRfidWarning = true;
+
+      this.loginForm.patchValue({
+        'rfid':user.rfid
+      });
+    } else {
+      this.showRfidWarning = false;
+      this.loginForm.patchValue({
+        'rfid':''
+      });
+    }
+  }
+
   connectRFID(user:string, passw:string, updateRfid:string, updateUser:string):void {
     var params = {
       'author_user' : user,
@@ -146,7 +164,6 @@ export class DialogRfidExisting {
   }
 
   connectRFID() {
-
     this.dialogRef.close(true);
   }
 
