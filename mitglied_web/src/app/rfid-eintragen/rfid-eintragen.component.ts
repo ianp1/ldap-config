@@ -5,9 +5,11 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
+import { SuccessDialog } from '../success-dialog/success-dialog';
 
 @Component({
   selector: 'app-rfid-eintragen',
@@ -15,28 +17,46 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./rfid-eintragen.component.scss']
 })
 export class RfidEintragenComponent implements OnInit {
-  loginForm: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl(''),
-    eingewiesener: new FormControl(''),
-    rfid: new FormControl('')
-  });
+  loginForm: FormGroup;
   validating:boolean = false;
   valid:boolean = false;
+
+  userSelected : any;
+
+  showRfidWarning : boolean = false;
 
   searching:boolean = false;
   users:any = [];
 
-  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient) { }
+  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient, private formBuilder: FormBuilder) { }
+
+  initForm() {
+    var username = "";
+    var password = "";
+    if (typeof this.loginForm !== 'undefined') {
+      username = this.loginForm.value["username"];
+    }
+    if (typeof this.loginForm !== 'undefined') {
+      password = this.loginForm.value["password"];
+    }
+    this.loginForm = this.formBuilder.group({
+      username: [username],
+      password: [password],
+      eingewiesener: [''],
+      rfid: ['']
+    });
+  }
 
   ngOnInit() {
     this.appComponent.title="RFID-Karte vergeben";
-        }
+
+    this.initForm();
+  }
 
   enterRfid() {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
-    var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['eingewiesener']));
+    var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
     var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
 
     var headers = new HttpHeaders();
@@ -71,6 +91,22 @@ export class RfidEintragenComponent implements OnInit {
     });
   }
 
+  prefillRFID(user:any) {
+    this.userSelected = user;
+    if (typeof user.rfid !== 'undefined' && user.rfid != '' && user.rfid !== null) {
+      this.showRfidWarning = true;
+
+      this.loginForm.patchValue({
+        'rfid':user.rfid
+      });
+    } else {
+      this.showRfidWarning = false;
+      this.loginForm.patchValue({
+        'rfid':''
+      });
+    }
+  }
+
   connectRFID(user:string, passw:string, updateRfid:string, updateUser:string):void {
     var params = {
       'author_user' : user,
@@ -79,10 +115,12 @@ export class RfidEintragenComponent implements OnInit {
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid+'/'+updateUser, params)
       .subscribe(data => {
         console.log("rfid update successfull: ", data);
-        //TODO:Bestägigung einbauen
+        const dialogRef = this.dialog.open(SuccessDialog);
+        dialogRef.afterClosed().subscribe(data => {
+          this.initForm();
+        });
       }, error => {
         console.warn("rfid update error: ", error);
-        //TODO: Fehlermeldung einbauen
       });
   }
 }
@@ -126,7 +164,6 @@ export class DialogRfidExisting {
   }
 
   connectRFID() {
-
     this.dialogRef.close(true);
   }
 

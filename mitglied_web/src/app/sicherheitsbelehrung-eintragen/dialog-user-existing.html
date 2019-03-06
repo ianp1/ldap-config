@@ -20,6 +20,13 @@
         <td mat-cell *matCellDef="let user">{{user.uid}}</td>
       </ng-container>
 
+      <ng-container matColumnDef="Sicherheitsbelehrung">
+        <th mat-header-cell *matHeaderCellDef>
+          Sicherheitsbelehrung
+        </th>
+        <td mat-cell *matCellDef="let user">{{user.sicherheitsbelehrung | ldapDate | date:"dd.MM.yyyy"}}</td>
+      </ng-container>
+
       <ng-container matColumnDef="DN">
         <th mat-header-cell *matHeaderCellDef>
           Sicherheitsbelehrung auffrischen?

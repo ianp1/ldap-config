@@ -20,6 +20,7 @@
           [passwordControl]="'password'"
           [eingewiesenerControl]="'eingewiesener'"
           [formGroup]="loginForm"
+          (userSelected)="prefillRFID($event)"
         >
         </user-search>
         <mat-form-field>
@@ -30,6 +31,9 @@
               formControlName="rfid"
           >
         </mat-form-field>
+        <div class="field_warning" *ngIf="showRfidWarning">
+          Vorsicht, beim Ändern wird die alte Karte ungültig gemacht!
+        </div>
 
         <br><br>
         <button mat-raised-button color="primary" (click)="enterRfid()">

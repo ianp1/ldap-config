@@ -5,9 +5,12 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
+import { SuccessDialog } from '../success-dialog/success-dialog';
+
 
 @Component({
   selector: 'app-sicherheitsbelehrung-eintragen',
@@ -18,21 +21,42 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   validating: boolean = false;
   valid: boolean = false;
 
-  loginForm: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl('')
-  });
+  loginForm: FormGroup;
 
-  sicherheitForm: FormGroup = new FormGroup({
-    vorname: new FormControl(''),
-    nachname: new FormControl(''),
-    geburtsdatum: new FormControl('')
-  })
+  sicherheitForm: FormGroup;
 
-  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient) { }
+
+  get sicherheitControls() { return this.sicherheitForm.controls; }
+
+  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient, private formBuilder : FormBuilder) { }
+
+  initForm() {
+    var username = "";
+    var password = "";
+    if (typeof this.loginForm !== 'undefined') {
+      username = this.loginForm.value["username"];
+    }
+    if (typeof this.loginForm !== 'undefined') {
+      password = this.loginForm.value["password"];
+    }
+    this.loginForm = this.formBuilder.group({
+      username: [username],
+      password: [password]
+    });
+
+    this.sicherheitForm = this.formBuilder.group({
+      vorname: [''],
+      nachname: [''],
+      geburtsdatum: [''],
+      useCurrentDate: [true],
+      selectedDate: ['']
+    });
+  }
 
   ngOnInit() {
     this.appComponent.title="Neue Sicherheitsbelehrungen eintragen";
+
+    this.initForm();
   }
 
   checkExistance() {
@@ -55,11 +79,11 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
         headers: headers,
         params: params
       })
-        .subscribe(data => {
+      .subscribe(data => {
         var ar = data as Array<any>;
         if (ar.length != 0) {
           let pickDialog = this.dialog.open(DialogUserExisting, {
-            data : {users:ar}
+            data : {users:ar, appComponent:this.appComponent}
           })
           pickDialog.afterClosed().subscribe(result => {
             if (result) {
@@ -80,20 +104,29 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     }
   }
 
+  getSelectedDate() {
+    if (!this.sicherheitForm.value["useCurrentDate"]) {
+      return this.appComponent.formatLDAPDate(this.sicherheitForm.value['selectedDate'])
+    } else {
+      return this.appComponent.formatLDAPDate(new Date());
+    }
+  }
+
   updateSicherheitsbelehrung(DN:string) {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
 
-    var date = this.appComponent.formatLDAPDate(new Date());
+    var date = this.getSelectedDate();
 
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Sicherheitsbelehrung/'+this.appComponent.encodeURL(DN)+'/'+this.appComponent.encodeURL(date), {
       author_user: user,
       author_password : passw,
       new_date : date
     }).subscribe(data=>{
-      console.log("updated user ", DN, "with response ", data);
-    }, error => {
-      console.log("error updating user: ", error);
+      const dialogRef = this.dialog.open(SuccessDialog);
+      dialogRef.afterClosed().subscribe(data => {
+        this.initForm();
+      });
     });
   }
 
@@ -101,9 +134,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
     var passw = this.appComponent.sanitize(this.loginForm.value['password']);
 
-    console.log("unformatted date: ", new Date());
-    var date = this.appComponent.formatLDAPDate(new Date());
-    console.log("current date: ", date);
+    var date = this.getSelectedDate();
 
     var vorname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['vorname']));
     var nachname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['nachname']));
@@ -119,7 +150,12 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
         author_password: passw
       })
       .subscribe(data => {
-        console.log("added user with response: ", data);
+        const dialogRef = this.dialog.open(SuccessDialog, {data:{
+          customText:"Die ID des neuen Benutzers ist "+data+"."
+        }});
+        dialogRef.afterClosed().subscribe(data => {
+          this.initForm();
+        });
       }, error => {
         console.warn("got error while creating user: ", error);
       }
@@ -130,6 +166,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
 export interface DialogUserExistingData {
   users:any[];
+  appComponent: AppComponent;
 }
 
 export interface DialogUserExistingColumn {
@@ -137,6 +174,7 @@ export interface DialogUserExistingColumn {
   nachname: string;
   uid: string;
   dn: string;
+  sicherheitsbelehrung: string;
 }
 
 @Component({
@@ -145,7 +183,7 @@ export interface DialogUserExistingColumn {
   styleUrls: ['./dialog-user-existing.scss']
 })
 export class DialogUserExisting {
-  displayedColumns: string[] = ['Name', 'UID', 'DN'];
+  displayedColumns: string[] = ['Name', 'UID', 'Sicherheitsbelehrung', 'DN'];
   dataArray: any[];
   interfacestring: DialogUserExistingColumn[];
   constructor (public dialogRef: MatDialogRef<DialogUserExisting>,
@@ -159,6 +197,7 @@ export class DialogUserExisting {
         nachname:obj.nachname,
         uid:obj.uid,
         dn:obj.dn,
+        sicherheitsbelehrung: obj.sicherheitsbelehrung
       };
     });
   }

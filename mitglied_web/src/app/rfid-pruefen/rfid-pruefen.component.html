@@ -32,6 +32,10 @@
             {{user.cn}} {{user.sn}} (Benutzer-ID: {{user.uid}})
           </div>
         </div>
+        <div
+          *ngIf="noUsersFound">
+          Kein Nutzer mit diesem RFID-Tag wurde gefunden.
+        </div>
       </div>
     </form>
   </div>

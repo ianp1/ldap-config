@@ -25,13 +25,22 @@ export class UserSearchComponent implements OnInit {
   @Input()
   eingewiesenerControl : string;
 
+
+  @Output()
+  userSelected = new EventEmitter<any>();
+
   searching : boolean;
 
   users : any;
 
+  validUser : boolean;
+
   constructor(public appComponent:AppComponent, public http:HttpClient) { }
 
   ngOnInit() {
+    this.userQueryChanged.subscribe(model=>{
+      this.validUser=false;
+    });
     this.userQueryChanged
         .pipe(debounceTime(500))
         .subscribe(
@@ -63,6 +72,15 @@ export class UserSearchComponent implements OnInit {
           }
         );
 
+  }
+
+  getUserByID(id:string) {
+    for (let user of this.users) {
+      if (user.uid === id) {
+        this.validUser = true;
+        return user;
+      }
+    }
   }
 
 

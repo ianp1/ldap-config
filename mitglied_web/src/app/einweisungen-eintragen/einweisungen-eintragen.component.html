@@ -21,6 +21,7 @@
           [passwordControl]="'password'"
           [eingewiesenerControl]="'eingewiesener'"
           [formGroup]="loginForm"
+          (userSelected)="this.userSelected=$event"
         >
         </user-search>
 
@@ -29,9 +30,10 @@
               placeholder="Gerät"
               [(ngModel)]="this.maschine"
               formControlName="maschine"
+              required
           >
             <mat-option *ngFor="let maschine of maschinen" [value]="maschine.dn">
-              {{maschine.name}}
+              {{maschine.cn}}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -49,6 +51,7 @@
                 value=""
                 formControlName="date"
                 [matDatepicker]="einweisungsdatumPicker"
+                required
             >
             <mat-datepicker #einweisungsdatumPicker>
             </mat-datepicker>

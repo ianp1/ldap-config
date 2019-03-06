@@ -8,7 +8,7 @@
         Einweisungen
       </h3>
       <a mat-list-item href="/sicherheitsbelehrung-eintragen">Sicherheitsbelehrungen eintragen</a>
-      <a mat-list-item href="/eigene-einweisungen">Eigene Einweisungen einsehen</a>
+      <a mat-list-item href="/eigene-einweisungen">Einweisungen einsehen</a>
       <a mat-list-item href="/einweisungen-eintragen">Einweisungen eintragen</a>
 
       <h3>
@@ -27,12 +27,14 @@
       <button
         type="button"
         aria-label="Toggle sidenav"
-        mat-icon-button
+        mat-button
         (click)="drawer.toggle()"
+        id="menubutton"
         >
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        Menü
       </button>
-      <span>{{this.appComponent.title}}</span>
+      <span id="apptitle">{{this.appComponent.title}}</span>
     </mat-toolbar>
     <mat-card class="page_container">
       <router-outlet></router-outlet>

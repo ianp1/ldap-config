@@ -1,3 +1,236 @@
-<p>
-  mitglied-eintragen works!
-</p>
+<div>
+  Bitte gib hier deine Fablab-Zugangsdaten ein um ein neues Vereinsmitglied einzutragen:
+
+  <br>
+  <div class="input-mask">
+    <form [formGroup]="loginForm">
+        <login
+            [usernameControl]="'username'"
+            [passwordControl]="'password'"
+            [formGroup]="loginForm"
+            (validLogin)="valid=$event"
+            >
+        </login>
+
+        <div *ngIf="valid">
+          <h3>
+            Mitgliedsinformationen:
+          </h3>
+          <user-search
+            [usernameControl]="'username'"
+            [passwordControl]="'password'"
+            [eingewiesenerControl]="'neuesMitglied'"
+            [formGroup]="loginForm"
+            (userSelected)="prefillMitglied($event)"
+          >
+          </user-search>
+          <br>
+          <h3>
+            Art der Mitgliedschaft:
+          </h3>
+          <br>
+          <mat-form-field>
+            <mat-select
+                formControlName="mitgliedschaft"
+            >
+              <mat-option value="ehrenmitgliedschaft" selected>
+                Ehrenmitgliedschaft
+              </mat-option>
+              <mat-option value="fördermitgliedschaft">
+                Fördermitgliedschaft
+              </mat-option>
+              <mat-option value="fördermitgliedschaft (familie)">
+                Fördermitgliedschaft (Familie)
+              </mat-option>
+              <mat-option value="fördermitgliedschaft (firma)">
+                Fördermitgliedschaft (Firma)
+              </mat-option>
+              <mat-option value="ordentliche mitgliedschaft">
+                Ordentliche Mitgliedschaft
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="personendaten">
+            <h3>
+              Persönliche Daten:
+            </h3>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Anrede"
+                  value=""
+                  formControlName="anrede"
+                  required
+              >
+            </mat-form-field>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Titel"
+                  formControlName="titel"
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Vorname"
+                  formControlName="vorname"
+                  required
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="Nachname"
+                  formControlName="nachname"
+                  required
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Geburtsdatum"
+                  formControlName="geburtsdatum"
+                  [matDatepicker]="geburtstagPicker"
+                  required
+              >
+              <mat-datepicker #geburtstagPicker>
+              </mat-datepicker>
+
+              <mat-datepicker-toggle matSuffix [for]="geburtstagPicker"></mat-datepicker-toggle>
+
+            </mat-form-field>
+          </div>
+          <div class="wohninfos">
+            <h3>
+              Wohnort des neuen Mitglieds:
+            </h3>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="PLZ"
+                  formControlName="plz"
+                  required
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Ort"
+                  formControlName="ort"
+                  required
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Straße"
+                  formControlName="straße"
+                  required
+              >
+            </mat-form-field>
+          </div>
+          <div class="erreichbarkeit">
+            <h3>
+              Kontaktinformationen:
+            </h3>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Emailadresse"
+                  formControlName="email"
+                  required
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="Telefon"
+                  formControlName="telefon"
+                  required
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <textarea matInput
+                  placeholder="Notfallkontakt"
+                  formControlName="notfallkontakt"
+              ></textarea>
+            </mat-form-field>
+          </div>
+          <div class="kontoinformation">
+            <h3>
+              Zahlungsinformationen:
+            </h3>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="IBAN"
+                  formControlName="iban"
+                  required
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="BIC"
+                  formControlName="bic"
+                  required
+              >
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Kontoinhaber"
+                  formControlName="kontoinhaber"
+                  required
+              >
+            </mat-form-field>
+          </div>
+          <div class="reduzierung">
+            <h3>
+              Mitgliedsbeitrag:
+            </h3><br>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Beitragsreduzierung"
+                  formControlName="beitragsreduzierung"
+              >
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput
+                  placeholder="Enddatum der Reduzierung"
+                  formControlName="ermaessigtBis"
+                  [matDatepicker]="ermaessigungPicker"
+              >
+              <mat-datepicker #ermaessigungPicker>
+              </mat-datepicker>
+
+              <mat-datepicker-toggle matSuffix [for]="ermaessigungPicker"></mat-datepicker-toggle>
+
+            </mat-form-field>
+          </div>
+          <div class="Mitgliedschaft">
+            <h3>
+              Mitgliedschaft:
+            </h3>
+            <mat-form-field>
+              <input matInput
+                  placeholder="Beginn der Mitgliedschaft"
+                  formControlName="beginnMitgliedschaft"
+                  [matDatepicker]="beginnPicker"
+                  required
+              >
+              <mat-datepicker #beginnPicker>
+              </mat-datepicker>
+
+              <mat-datepicker-toggle matSuffix [for]="beginnPicker"></mat-datepicker-toggle>
+
+            </mat-form-field>
+          </div>
+          <button type="submit" mat-raised-button color="primary" (click)="mitgliedEintragen()">
+            Mitglied Eintragen
+          </button>
+        </div>
+    </form>
+  </div>
+</div>

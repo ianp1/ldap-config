@@ -35,24 +35,3 @@
     @include inputColor(green);
   }
 }
-/*
-.mat-form-field {
-  &.invalid {
-    color:red;
-    ::ng-deep .mat-form-field-underline {
-      background-color:red;
-    }
-
-    ::ng-deep input {
-      caret-color:red;
-    }
-
-    &.mat-focused ::ng-deep .mat-form-field-ripple {
-      background-color:red;
-    }
-    ::ng-deep .mat-form-field-label {
-      color:red;
-    }
-  }
-}
-*/

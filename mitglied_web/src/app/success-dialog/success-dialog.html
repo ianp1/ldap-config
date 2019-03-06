@@ -1,0 +1,20 @@
+<button mat-icon-button id="dialog-icon" [ngClass]="icon_class" disabled>
+  <mat-icon>
+    {{icon}}
+  </mat-icon>
+</button>
+<h2 mat-dialog-title id="dialog-title">{{title}}</h2>
+<mat-dialog-content class="mat-typography">
+  <div>
+    <div *ngIf="!showCustomText">
+      Die Anfrage wurde erfolgreich bearbeitet.
+    </div>
+    <div *ngIf="showCustomText">
+      {{customText}}
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button *ngIf="confirm" mat-button mat-dialog-confirm (click)="override()">Überschreiben</button>
+  <button mat-button mat-dialog-close>{{ok_text}}</button>
+</mat-dialog-actions>

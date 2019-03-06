@@ -1,16 +1,18 @@
 <div [formGroup]="formGroup" class="search-mask">
-  <mat-form-field class="userSearchField">
+  <mat-form-field class="userSearchField" [ngClass]="validUser ? 'validUser' : 'invalidUser'">
     <input
         matInput
-        placeholder="Eingewiesener"
+        placeholder="Name oder ID"
         value=""
         [matAutocomplete]="auto"
         (input)='fetchUsers()'
         formControlName="{{eingewiesenerControl}}"
-
     >
-    <mat-autocomplete #auto="matAutocomplete">
-      <mat-option *ngFor="let user of users" [value]="user.dn">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}})</mat-option>
+    <mat-autocomplete #auto="matAutocomplete"
+      (optionSelected)="userSelected.emit(getUserByID($event.option.value))"
+      autoActiveFirstOption
+    >
+      <mat-option *ngFor="let user of users" [value]="user.uid">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}}, {{appComponent.reformatLDAPDate(user.geburtstag) | date : "dd.MM.yyyy"}})</mat-option>
     </mat-autocomplete>
   </mat-form-field>
 
