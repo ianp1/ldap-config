@@ -6,12 +6,15 @@ olcAccess: to * by dn.base="cn=admin,dc=ldap-provider,dc=fablab-luebeck" manage 
 #Root
 olcAccess: to dn.base="dc=ldap-provider,dc=fablab-luebeck" by * read 
 #passwords
-olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by users read by * break
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by self write by dn.children=ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck read by * break
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" filter=(objectClass=posixAccount) attrs=entry,uid,objectClass,uidNumber,gidNumber,homeDirectory by dn.children=ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by self write by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * auth 
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" filter=(objectClass=posixAccount) attrs=entry,uid,objectClass,uidNumber,gidNumber,homeDirectory,loginShell by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" by self read by * break 
 #bots
+olcAccess: to dn.base="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=posixGroups,ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=posixGroups,ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=bot,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by anonymous auth by * break
+olcAccess: to dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" by anonymous auth by self read by * break
 olcAccess: to dn.children="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
