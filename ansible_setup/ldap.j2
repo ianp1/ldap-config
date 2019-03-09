@@ -1,0 +1,9 @@
+HOST {{ldap_host}}
+BASE {{ldap_base}}
+
+URI ldap://{{ldap_host}}
+
+ssl start_tls
+SASL_MECH LOGIN
+
+TLS_REQCERT NEVER

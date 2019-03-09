@@ -1,0 +1,104 @@
+---
+- name: LDAP Authentication
+  hosts: testing
+  become: yes
+  vars:
+    ldap_base: dc=ldap-provider,dc=fablab-luebeck
+  tasks:
+
+    - name: Install pam_ldap
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+        - libnss-ldapd
+        - libpam-ldap
+        - nscd
+        - portmap
+        - nslcd
+        - vim
+        - sssd
+    - name: write common-auth
+      template:
+        src: common-auth.j2
+        dest: /etc/pam.d/common-auth
+      notify:
+      - restart services
+    - name: write common-account
+      template:
+        src: common-account.j2
+        dest: /etc/pam.d/common-account
+      notify:
+      - restart services
+    - name: write common-password
+      template:
+        src: common-auth.j2
+        dest: /etc/pam.d/common-password
+      notify:
+      - restart services
+    - name: write common-session
+      template:
+        src: common-session.j2
+        dest: /etc/pam.d/common-session
+      notify:
+      - restart services
+    - name: write pam-ldap config
+      template:
+        src: pam_ldap.j2
+        dest: /etc/pam_ldap.conf
+      notify:
+      - restart services
+    - name: secure pam-ldap config
+      file:
+        path: /etc/pam_ldap.conf
+        owner: root
+        group: root
+        mode: 0700
+    - name: configure nss-ldap
+      template:
+        src: pam_ldap.j2
+        dest: /etc/libnss-ldap.conf
+      notify:
+      - restart services
+    - name: configure nss
+      template:
+        src: nsswitch.j2
+        dest: /etc/nsswitch.conf
+      notify:
+      - restart services
+    - name: configure ldap config
+      template:
+        src: ldap.j2
+        dest: /etc/ldap/ldap.conf
+      notify:
+      - restart services
+    - name: configure nslcd config
+      template:
+        src: nslcd.j2
+        dest: /etc/nslcd.conf
+    - name: configure sssd config
+      template:
+        src: sssd.j2
+        dest: /etc/sssd/sssd.conf
+    - name: enable sssd in ssh config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AuthorizedKeysCommand '
+        line: 'AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys'
+    - name: perform sssd as root
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AuthorizedKeysCommandUser '
+        line: 'AuthorizedKeysCommandUser root'
+  handlers:
+    - name: restart services
+      service:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - nscd
+        - portmap
+        - nslcd
+        - sssd
+        - ssh

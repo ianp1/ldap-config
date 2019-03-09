@@ -1,0 +1,12 @@
+uid nslcd
+gid nslcd
+
+uri ldap://{{ldap_host}}
+base {{ldap_base}}
+
+ssl start_tls
+
+tls_reqcert never
+
+binddn {{ldap_bind_dn}}
+bindpw {{ldap_bind_pw}}
