@@ -1,0 +1,13 @@
+[Unit]
+Description=Kamerastream
+
+[Service]
+Type=simple
+Restart=always
+User=root
+Environment=LD_LIBRARY_PATH={{full_path}}
+ExecStart={{full_path}}/mjpg_streamer -o "output_http.so -w {{full_path}}/www" -i "input_uvc.so -d /dev/video0" > /tmp/log.txt 2>&1
+
+
+[Install]
+WantedBy=multi-user.target

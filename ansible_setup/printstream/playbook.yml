@@ -1,0 +1,53 @@
+---
+- name: Printstream setup
+  hosts: testing
+  become: yes
+  vars:
+    path: /root/mjpg-streamer
+    full_path: '{{path}}/mjpg-streamer-experimental'
+  tasks:
+
+    - name: Install dependencies
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - build-essential
+          - git
+          - imagemagick
+          - subversion
+          - libv4l-dev
+          - cmake
+          - libjpeg8-dev
+          - gcc
+          - g++
+    - name: Download software
+      git:
+        repo: 'https://github.com/jacksonliam/mjpg-streamer'
+        dest: '{{ path }}'
+        version: ddb69b7b4f114f3c2ca01adf55712792ca8aed43
+      notify:
+        - "rebuild program"
+    - meta: flush_handlers
+    - name: Install systemd service
+      template:
+        src: stream.service.j2
+        dest: /etc/systemd/system/stream.service
+      notify:
+        - "start stream service"
+  handlers:
+    - name: build program
+      make:
+        chdir: '{{ full_path }}'
+      listen: "rebuild program"
+    - name: install program
+      make:
+        chdir: '{{ full_path }}'
+        target: install
+      listen: "rebuild program"
+    - name: start stream service
+      systemd:
+        name: stream
+        state: started
+        daemon_reload: yes
