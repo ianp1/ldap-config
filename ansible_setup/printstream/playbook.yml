@@ -1,6 +1,6 @@
 ---
 - name: Printstream setup
-  hosts: testing
+  hosts: printstream
   become: yes
   vars:
     path: /root/mjpg-streamer
