@@ -1,0 +1,10 @@
+---
+- name: Setup LDAP-Permissions for campis
+  hosts: printstream
+  become: yes
+  vars:
+  tasks:
+    - name: Enable Custom sudoers rules
+      template:
+        src: ldap-permissions.j2
+        dest: /etc/sudoers.d/ldap-permissions
