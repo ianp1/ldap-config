@@ -19,6 +19,7 @@
         - nslcd
         - vim
         - sssd
+        - libpam-ssh
     - name: write common-auth
       template:
         src: common-auth.j2
@@ -45,7 +46,7 @@
       - restart services
     - name: write pam-ldap config
       template:
-        src: pam_ldap.j2
+        src: ldap.j2
         dest: /etc/pam_ldap.conf
       notify:
       - restart services
@@ -57,7 +58,7 @@
         mode: 0700
     - name: configure nss-ldap
       template:
-        src: pam_ldap.j2
+        src: ldap.j2
         dest: /etc/libnss-ldap.conf
       notify:
       - restart services
@@ -73,6 +74,12 @@
         dest: /etc/ldap/ldap.conf
       notify:
       - restart services
+    - name: to be safe use old config path, too
+      template:
+        src: ldap.j2
+        dest: /etc/ldap/ldap.conf
+      notify:
+      - restart services
     - name: configure nslcd config
       template:
         src: nslcd.j2
@@ -83,6 +90,14 @@
       template:
         src: sssd.j2
         dest: /etc/sssd/sssd.conf
+      notify:
+      - restart services
+    - name: secure sssd config
+      file:
+        path: /etc/sssd/sssd.conf
+        owner: root
+        group: root
+        mode: 0700
       notify:
       - restart services
     - name: enable sssd in ssh config
