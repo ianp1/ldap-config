@@ -7,3 +7,14 @@ ssl start_tls
 SASL_MECH LOGIN
 
 TLS_REQCERT NEVER
+
+ldap_version 3
+
+binddn {{ldap_bind_dn}}
+bindpw {{ldap_bind_pw}}
+
+pam_password exop
+
+nss_base_passwd   ou=user,dc=ldap-provider,dc=fablab-luebeck
+nss_base_shadow   ou=user,dc=ldap-provider,dc=fablab-luebeck
+nss_base_group    ou=posixGroup,ou=group,dc=ldap-provider,dc=fablab-luebeck
