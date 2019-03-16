@@ -1,0 +1,87 @@
+---
+- name: Setup LDAP-Webinterface
+  hosts: ldap-web
+  become: yes
+  vars:
+    dns_target_ip: 192.168.2.201
+    domains:
+# Remember to place a dns rebind protection exception in your router!
+    - login.fablab-luebeck.de
+    - einweisungen.fablab-luebeck.de
+    bind9count: 02
+  tasks:
+    - name: Add apt repositories
+      apt_repository:
+        repo: ppa:ondrej/php
+        state: present
+    - name: Install packages
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+        - apache2
+        - php7.2
+        - libapache2-mod-php7.2
+        - php7.2-mysql
+        - default-jre
+        - tomcat8
+        - maven
+        - bind9
+    - name: Setup custom domains in bind9
+      template:
+        src: bind9.j2
+        dest: /etc/bind/db.{{item}}
+      loop: "{{ domains }}"
+      notify: restart services
+    - name: Install new Zone in bind9
+      template:
+        src: named.conf.local.j2
+        dest: /etc/bind/named.conf.local
+      notify: restart services
+    - name: Ensure DNS forwarding
+      lineinfile:
+        path: /etc/bind/named.conf.options
+        regexp: "^forwarders "
+        insertafter: "options {"
+        #firstmatch: yes
+        line: "forwarders {8.8.8.8;};"
+      notify: restart services
+    - name: Ensure recursive DNS
+      lineinfile:
+        path: /etc/bind/named.conf.options
+        regexp: "^allow-recursion "
+        insertafter: "options {"
+        line: "allow-recursion {any;};"
+      notify: restart services
+    - name: Create script path
+      file:
+        path: /root/scripts
+        owner: root
+        group: root
+        mode: 770
+        state: directory
+    - name: Place certificate download script
+      template:
+        src: downloadCertificates.sh.j2
+        dest: /root/scripts/downloadCertificates.sh
+    - name: Update script permissions
+      file:
+        path: /root/scripts/downloadCertificates.sh
+        mode: 700
+        owner: root
+        group: root
+        state: file
+    - name: Enable certificate downloads
+      cron:
+        name: certificates download
+        minute: 0
+        hour: 0
+        job: "/root/scripts/downloadCertificates.sh > /var/log/downloadCertificate.log 2>&1"
+  handlers:
+    - name: restart services
+      service:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - bind9
