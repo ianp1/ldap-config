@@ -3,12 +3,18 @@
   hosts: ldap-web
   become: yes
   vars:
-    dns_target_ip: 192.168.2.201
     domains:
 # Remember to place a dns rebind protection exception in your router!
-    - login.fablab-luebeck.de
-    - einweisungen.fablab-luebeck.de
-    bind9count: 02
+    - domain: login.fablab-luebeck.de
+      target_ip: 192.168.2.201
+      certificate: yes
+    - domain: einweisungen.fablab-luebeck.de
+      target_ip: 192.168.2.201
+      certificate: yes
+    - domain: robot.fablab-luebeck.de
+      target_ip: 192.168.2.35
+      certificate: no
+    bind9count: 01
   tasks:
     - name: Add apt repositories
       apt_repository:
@@ -31,7 +37,7 @@
     - name: Setup custom domains in bind9
       template:
         src: bind9.j2
-        dest: /etc/bind/db.{{item}}
+        dest: /etc/bind/db.{{item.domain}}
       loop: "{{ domains }}"
       notify: restart services
     - name: Install new Zone in bind9

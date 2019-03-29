@@ -1,7 +1,7 @@
 {% for domain in domains %}
-zone "{{ domain }}" {
+zone "{{ domain.domain }}" {
 type master;
-file "/etc/bind/db.{{ domain }}";
+file "/etc/bind/db.{{ domain.domain }}";
 };
 
 {% endfor %}
