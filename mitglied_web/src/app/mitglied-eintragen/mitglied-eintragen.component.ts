@@ -20,6 +20,7 @@ export class MitgliedEintragenComponent implements OnInit {
 
   loginForm: FormGroup;
   userSelected: any;
+  valid: boolean = false;
 
   initForm() {
     var username = "";

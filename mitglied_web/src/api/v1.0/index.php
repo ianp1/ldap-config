@@ -48,6 +48,8 @@
 			$user = "cn=".$params['author_bot'].",ou=bot,".$ldap_base_dn;
 		}
 
+		$request = $request -> withAttribute("request_user", $user);
+
 		if (!ldap_bind($ldapconn, $user, $AuthorPassword)) {
 			return $response -> withStatus(401);
 		}
@@ -279,6 +281,7 @@
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$entry["sicherheitsbelehrung"] = $RequestDate;
+		$entry["belehrtVon"] = $request -> getAttribute("request_user");
 		if (ldap_mod_replace($ldapconn, $RequestUser, $entry)) {
 			return $response -> withJson(true, 201);
 		}
@@ -323,6 +326,7 @@
 				$DN = $einweisungResult[0]["dn"];
 				$entry = array();
 				$entry["einweisungsdatum"]=$RequestDate;
+				$entry["geraetementor"]=$request -> getAttribute("request_user");
 				if (ldap_mod_replace($ldapconn, $DN, $entry)) {
 					return $response -> withJson(true, 200);
 				} else {
@@ -335,6 +339,7 @@
 			$entry["objectClass"] = "einweisung";
 			$entry["eingewiesener"] = $RequestUser;
 			$entry["einweisungsdatum"] = $RequestDate;
+			$entry["geraetementor"] = $request -> getAttribute("request_user");
 			$entry["distinctname"] = uniqid("e_");
 			$test = var_export($entry, true);
 			$response -> getBody() -> write($test);
@@ -378,6 +383,7 @@
 		}
 		$entry["geburtstag"] = $RequestGeburtstag;
 		$entry["sicherheitsbelehrung"] = $RequestSicherheitsbelehrung;
+		$entry["belehrtVon"] = $request -> getAttribute("request_user");
 
 		$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
 		$test = ldap_read($ldapconn, $dn, "(objectClass=*)");

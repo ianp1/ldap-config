@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { formatDate } from '@angular/common';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,7 @@ import { formatDate } from '@angular/common';
 export class AppComponent {
   title = 'Mitgliederverwaltung';
 
-  url_base: string = 'http://127.0.0.1/mitglied_web/';
+  url_base: string = environment.url_base;
 
   formatLDAPDate(date:any):string {
     return formatDate(date, 'yyyyMMdd', 'de-DE')+'000000Z'
