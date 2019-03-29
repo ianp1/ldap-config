@@ -361,6 +361,7 @@
 				$RequestNachname .= strtoupper(substr(normalizeUtf8String($nachname), 0, 1)).strtolower(substr(normalizeUtf8String($nachname), 1));
 			}
 		}
+		$RequestNachname = trim($RequestNachname);
 		$RequestGeburtstag = $args['Geburtstag'];
 		$RequestSicherheitsbelehrung = $args['Sicherheitsbelehrung'];
 		//$RequestGeburtstag = "19950111183220.733Z";
@@ -375,12 +376,12 @@
 		$entry["cn"] = array();
 		$entry["sn"] = "";
 		foreach ($RequestVornamen as $vorname) {
-			array_push($entry["cn"], $vorname);
+			array_push($entry["cn"], trim($vorname));
 		}
 		foreach ($RequestNachnamen as $nachname) {
 			$entry["sn"] = $entry["sn"]." ".$nachname;
-			array_push($entry["sn"], $nachname);
 		}
+		$entry["sn"] = trim($entry["sn"]);
 		$entry["geburtstag"] = $RequestGeburtstag;
 		$entry["sicherheitsbelehrung"] = $RequestSicherheitsbelehrung;
 		$entry["belehrtVon"] = $request -> getAttribute("request_user");
