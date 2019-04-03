@@ -7,6 +7,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
+import { LdapDatePipe } from '../ldap-date.pipe'
+import { DatePipe } from '@angular/common';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
 @Component({
@@ -158,7 +160,7 @@ export class EinweisungenEintragenComponent implements OnInit {
             data : {
               icon:"warning",
               icon_class: "iconWarning",
-              customText : "Es ist bereits eine Einweisung vorhanden. Soll diese überschrieben werden?",
+              customText : "Es ist bereits eine Einweisung am "+new DatePipe("de-DE").transform(new LdapDatePipe().transform(data['date']))+" vorhanden. Soll diese überschrieben werden?",
               title: "Achtung",
               confirm: true
             }
