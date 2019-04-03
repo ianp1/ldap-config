@@ -491,11 +491,12 @@
 	* Gibt alle vorhandenen Geräte des Fablab zurück
 	*/
 	$app -> get('/Maschinen', function(Request $request, Response $response, array $args) {
+		$userDn = $request -> getAttribute("request_user");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$ldapconn = $request -> getAttribute("ldapconn");
 
 		$dn = "ou=einweisung,".$ldap_base_dn;
-		$filter = "(objectClass=geraet)";
+		$filter = "(&(objectClass=geraet)(member=$userDn))";
 
 		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn", "cn"));
 

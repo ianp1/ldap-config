@@ -8,7 +8,7 @@
           [usernameControl]="'username'"
           [passwordControl]="'password'"
           [formGroup]="loginForm"
-          (validLogin)="valid=$event"
+          (validLogin)="valid=$event;updateMachines();"
           >
       </login>
 

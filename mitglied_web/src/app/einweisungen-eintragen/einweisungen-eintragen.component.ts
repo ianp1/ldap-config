@@ -61,12 +61,6 @@ export class EinweisungenEintragenComponent implements OnInit {
 
     this.initForm();
 
-    console.log(this.loginForm);
-
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Maschinen').subscribe(data => {
-      this.maschinen = data;
-      console.log(this.maschinen);
-    });
     this.userQueryChanged
           .pipe(debounceTime(500))
           .subscribe(
@@ -97,6 +91,25 @@ export class EinweisungenEintragenComponent implements OnInit {
               }
             }
           );
+  }
+
+  updateMachines() {
+    console.log("update machines");
+    var headers = new HttpHeaders();
+    var params = new HttpParams();
+    var user = this.appComponent.sanitize(this.loginForm.value['username']);
+    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+
+    params = params.append('author_user', user);
+    params = params.append('author_password', passw);
+
+    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Maschinen', {
+      headers:headers,
+      params:params
+    }).subscribe(data => {
+      this.maschinen = data;
+      console.log(this.maschinen);
+    });
   }
 
   sanitize(arg:string):string {
