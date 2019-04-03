@@ -90,7 +90,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
               if (result["createUser"]) {
                 this.createUser();
               } else {
-                console.warn("closed modal with ", result);
+
                 this.updateSicherheitsbelehrung(result["UserDN"]);
               }
             }
@@ -99,7 +99,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
           this.createUser();
         }
       }, error=> {
-        console.log("fetched error: ", error);
+
       });
     }
   }
@@ -142,7 +142,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
     geburtsdatum = this.appComponent.formatLDAPDate(geburtsdatum);
 
-    console.warn("creating user ", vorname, nachname, geburtsdatum);
+
 
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'/'+date,
       {
@@ -157,7 +157,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
           this.initForm();
         });
       }, error => {
-        console.warn("got error while creating user: ", error);
+
       }
     );
 
@@ -189,7 +189,7 @@ export class DialogUserExisting {
   constructor (public dialogRef: MatDialogRef<DialogUserExisting>,
         @Inject(MAT_DIALOG_DATA) public data: DialogUserExistingData) {
 
-    console.warn(data);
+
     this.dataArray = data.users as any[];
     this.interfacestring = this.dataArray.map(obj => {
       return {

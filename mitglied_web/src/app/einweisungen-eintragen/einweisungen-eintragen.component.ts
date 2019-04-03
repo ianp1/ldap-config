@@ -81,12 +81,12 @@ export class EinweisungenEintragenComponent implements OnInit {
                   headers: headers,
                   params: params
                 }).subscribe(data => {
-                  console.log("Suche erfolgreich: ", data);
+
                   this.users=data;
                   this.searching = false;
                 }, error => {
                   this.searching = false;
-                  console.log("fetched error: ", error);
+
                 });
               }
             }
@@ -94,7 +94,7 @@ export class EinweisungenEintragenComponent implements OnInit {
   }
 
   updateMachines() {
-    console.log("update machines");
+
     var headers = new HttpHeaders();
     var params = new HttpParams();
     var user = this.appComponent.sanitize(this.loginForm.value['username']);
@@ -108,7 +108,7 @@ export class EinweisungenEintragenComponent implements OnInit {
       params:params
     }).subscribe(data => {
       this.maschinen = data;
-      console.log(this.maschinen);
+
     });
   }
 
@@ -146,7 +146,7 @@ export class EinweisungenEintragenComponent implements OnInit {
       params
     ).subscribe(data => {
       if (data) {
-        console.log("data: ", data);
+
         var dialogRef;
         if (typeof(data['status'] === 'undefined') && data['status'] !== "not updating") {
           dialogRef = this.dialog.open(SuccessDialog);
@@ -180,7 +180,7 @@ export class EinweisungenEintragenComponent implements OnInit {
 
       }
     }, error => {
-      console.log("fetched error: ", error);
+
     });
   }
 }

@@ -18,7 +18,7 @@ export class SuccessDialog {
 
   constructor (public dialogRef: MatDialogRef<SuccessDialog>,
         @Inject(MAT_DIALOG_DATA) public dialogData: any) {
-    console.log(dialogData);
+
     if (dialogData != null) {
       if (typeof dialogData.customText !== 'undefined') {
         this.showCustomText = true;
