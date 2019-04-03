@@ -25,7 +25,8 @@
             "assets": [
               "src/faviconVerwaltung.ico",
               "src/assets",
-              "src/api"
+              "src/api",
+              "src/.htaccess"
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
