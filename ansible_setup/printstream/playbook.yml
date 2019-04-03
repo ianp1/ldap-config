@@ -49,5 +49,5 @@
     - name: start stream service
       systemd:
         name: stream
-        state: started
+        enabled: yes
         daemon_reload: yes
