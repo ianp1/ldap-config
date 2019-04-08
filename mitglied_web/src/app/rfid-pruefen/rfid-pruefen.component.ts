@@ -21,9 +21,6 @@ export class RfidPruefenComponent implements OnInit {
     rfid: new FormControl('')
   });
 
-  validating:boolean = false;
-  valid:boolean = false;
-
   searching:boolean = false;
 
   found_users:any;

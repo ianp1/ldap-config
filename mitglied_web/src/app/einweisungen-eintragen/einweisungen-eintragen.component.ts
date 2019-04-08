@@ -20,9 +20,6 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
 export class EinweisungenEintragenComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
 
-  validating: boolean = false;
-  valid: boolean = false;
-
   searching: boolean = false;
 
   maschinen:any = [];

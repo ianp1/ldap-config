@@ -18,8 +18,6 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
   styleUrls: ['./sicherheitsbelehrung-eintragen.component.scss']
 })
 export class SicherheitsbelehrungEintragenComponent implements OnInit {
-  validating: boolean = false;
-  valid: boolean = false;
 
   loginForm: FormGroup;
   sicherheitForm: FormGroup;

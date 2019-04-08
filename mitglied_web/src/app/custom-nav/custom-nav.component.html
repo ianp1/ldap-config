@@ -45,29 +45,31 @@
         (validLogin)="valid=$event"
       ></login>
       <br>
-      <div *ngIf="entry=='sicherheitsbelehrung'">
-        <sicherheitsbelehrung>
-        </sicherheitsbelehrung>
-      </div>
-      <div *ngIf="entry=='einweisungen-einsehen'">
-        <einweisungen-einsehen>
-        </einweisungen-einsehen>
-      </div>
-      <div *ngIf="entry=='neue-einweisung'">
-        <neue-einweisung>
-        </neue-einweisung>
-      </div>
-      <div *ngIf="entry=='neues-mitglied'">
-        <neues-mitglied>
-        </neues-mitglied>
-      </div>
-      <div *ngIf="entry=='rfid-vergeben'">
-        <rfid-vergeben>
-        </rfid-vergeben>
-      </div>
-      <div *ngIf="entry=='rfid-besitzer-finden'">
-        <rfid-besitzer-finden>
-        </rfid-besitzer-finden>
+      <div *ngIf="valid">
+        <div *ngIf="entry=='sicherheitsbelehrung'">
+          <sicherheitsbelehrung>
+          </sicherheitsbelehrung>
+        </div>
+        <div *ngIf="entry=='einweisungen-einsehen'">
+          <einweisungen-einsehen>
+          </einweisungen-einsehen>
+        </div>
+        <div *ngIf="entry=='neue-einweisung'">
+          <neue-einweisung>
+          </neue-einweisung>
+        </div>
+        <div *ngIf="entry=='neues-mitglied'">
+          <neues-mitglied>
+          </neues-mitglied>
+        </div>
+        <div *ngIf="entry=='rfid-vergeben'">
+          <rfid-vergeben>
+          </rfid-vergeben>
+        </div>
+        <div *ngIf="entry=='rfid-besitzer-finden'">
+          <rfid-besitzer-finden>
+          </rfid-besitzer-finden>
+        </div>
       </div>
     </mat-card>
   </mat-sidenav-content>

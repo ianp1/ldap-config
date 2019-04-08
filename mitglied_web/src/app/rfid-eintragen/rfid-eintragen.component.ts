@@ -18,8 +18,6 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
 })
 export class RfidEintragenComponent implements OnInit {
   loginForm: FormGroup;
-  validating:boolean = false;
-  valid:boolean = false;
 
   userSelected : any;
 
