@@ -203,12 +203,22 @@
 			$RequestUser = "uid=".$RequestUser.",ou=user,".$ldap_base_dn;
 		}
 
+		$ar = array();
+
+		$Sicherheitsbelehrung = ldap_search($ldapconn, $RequestUser, "(objectClass=fablabPerson)", array("sicherheitsbelehrung"));
+		$SicherheitsbelehrungResult = ldap_get_entries($ldapconn, $Sicherheitsbelehrung);
+
+		array_push($ar, array(
+			"sicherheitsbelehrung"=>true,
+			"datum"=>$SicherheitsbelehrungResult[0]["sicherheitsbelehrung"][0]
+		));
+
 		$dn = "ou=einweisung,".$ldap_base_dn;
 		$searchTerm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
 		$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum"));
 		$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
-		$ar = array();
+
 		for ($i = 0; $i < $einweisungenResult["count"]; $i++) {
 			$parent = "";
 			$split = ldap_explode_dn($einweisungenResult[$i]["dn"], 0);

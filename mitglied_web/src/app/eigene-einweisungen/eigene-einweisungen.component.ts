@@ -90,8 +90,6 @@ export class EigeneEinweisungenComponent implements OnInit {
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
-
-
     this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/'+searchTerm, {
       headers: headers,
       params: params
