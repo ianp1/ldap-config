@@ -11,6 +11,8 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
+import { LoginService } from '../login/login.service';
+
 @Component({
   selector: 'rfid-vergeben',
   templateUrl: './rfid-eintragen.component.html',
@@ -26,20 +28,12 @@ export class RfidEintragenComponent implements OnInit {
   searching:boolean = false;
   users:any = [];
 
-  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient, private formBuilder: FormBuilder) { }
+  constructor(public dialog: MatDialog, private appComponent:AppComponent,
+              private http:HttpClient, private formBuilder: FormBuilder,
+              private loginService:LoginService) { }
 
   initForm() {
-    var username = "";
-    var password = "";
-    if (typeof this.loginForm !== 'undefined') {
-      username = this.loginForm.value["username"];
-    }
-    if (typeof this.loginForm !== 'undefined') {
-      password = this.loginForm.value["password"];
-    }
     this.loginForm = this.formBuilder.group({
-      username: [username],
-      password: [password],
       eingewiesener: [''],
       rfid: ['']
     });
@@ -52,8 +46,8 @@ export class RfidEintragenComponent implements OnInit {
   }
 
   enterRfid() {
-    var user = this.appComponent.sanitize(this.loginForm.value['username']);
-    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
     var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
     var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
 

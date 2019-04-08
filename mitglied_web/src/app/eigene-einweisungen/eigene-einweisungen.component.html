@@ -9,8 +9,6 @@
       <br><br>
       <div *ngIf="!loginControls.ownUser.value" class="">
         <user-search
-            [usernameControl]="'username'"
-            [passwordControl]="'password'"
             [eingewiesenerControl]="'showUser'"
             [formGroup]="loginForm"
         >

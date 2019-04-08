@@ -7,6 +7,8 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { debounceTime, map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
+import { LoginService } from '../login/login.service';
+
 @Component({
   selector: 'rfid-besitzer-finden',
   templateUrl: './rfid-pruefen.component.html',
@@ -26,7 +28,8 @@ export class RfidPruefenComponent implements OnInit {
   found_users:any;
   noUsersFound:boolean = false;
 
-  constructor(public appComponent:AppComponent, private http:HttpClient) { }
+  constructor(public appComponent:AppComponent, private http:HttpClient,
+              private loginService:LoginService) { }
 
   ngOnInit() {
     this.appComponent.title = "RFID-Tag überprüfen";
@@ -34,8 +37,8 @@ export class RfidPruefenComponent implements OnInit {
     this.rfidQueryChanged
         .pipe(debounceTime(500))
         .subscribe(model => {
-          var user = this.appComponent.sanitize(this.loginForm.value['username']);
-          var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+          var user = this.appComponent.sanitize(this.loginService.username);
+          var passw = this.appComponent.sanitize(this.loginService.password);
           var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
 
           var headers = new HttpHeaders();

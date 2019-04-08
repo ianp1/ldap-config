@@ -2,6 +2,10 @@ import { Component } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { environment } from '../environments/environment';
 
+import { HostListener } from '@angular/core';
+
+import { LoginService } from './login/login.service';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,6 +15,54 @@ export class AppComponent {
   title = 'Mitgliederverwaltung';
 
   url_base: string = environment.url_base;
+
+  userActivity;
+  userTimeout;
+  userTimeoutCounter = 0;
+  userInactive = true;
+
+  constructor(private loginService:LoginService) {
+    this.setInactivity();
+  }
+
+  setInactivity() {
+    this.userInactive = false;
+    clearTimeout(this.userActivity);
+    clearTimeout(this.userTimeout);
+    this.userActivity = setTimeout(() => {
+      console.info("inactive! ");
+      if (this.loginService.password != '' || this.loginService.username != '') {
+        this.userInactive = true;
+        this.setInactivityTimeout();
+      } else {
+        console.log("nothing set, delaying");
+        this.setInactivity();
+      }
+    }, 30000);
+  }
+
+  setInactivityTimeout() {
+    clearTimeout(this.userActivity);
+    clearTimeout(this.userTimeout);
+    this.userTimeoutCounter = 30;
+    this.userTimeout = setTimeout(()=>this.countTimeout(), 1000);
+  }
+
+  countTimeout() {
+    this.userTimeoutCounter --;
+    if (this.userTimeoutCounter <= 0) {
+      window.location.reload();
+    } else {
+      clearTimeout(this.userTimeout);
+      this.userTimeout = setTimeout(()=>this.countTimeout(), 1000);
+    }
+  }
+
+  @HostListener('window:mousemove') refreshUserState() {
+    clearTimeout(this.userActivity);
+    clearTimeout(this.userTimeout);
+    this.setInactivity();
+  }
 
   formatLDAPDate(date:any):string {
     return formatDate(date, 'yyyyMMdd', 'de-DE')+'000000Z'

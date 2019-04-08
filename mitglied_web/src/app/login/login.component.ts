@@ -7,6 +7,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
+import { LoginService } from './login.service';
+
 @Component({
   selector: 'login',
   templateUrl: './login.component.html',
@@ -23,7 +25,9 @@ export class LoginComponent implements OnInit {
   @Output()
   validLogin = new EventEmitter<boolean>();
 
-  constructor(public appComponent:AppComponent, public http:HttpClient, private formBuilder: FormBuilder) {
+  constructor(public appComponent:AppComponent, public http:HttpClient,
+              private formBuilder: FormBuilder, private loginService: LoginService) {
+
     this.initForm();
   }
 
@@ -66,9 +70,11 @@ export class LoginComponent implements OnInit {
               this.loginValid = true;
               this.validLogin.emit(true);
               this.pending = false;
+
+              this.loginService.password = passw;
+              this.loginService.username = user;
             },
             error => {
-
               this.validating = false;
               this.validLogin.emit(false);
               this.pending = false;
@@ -81,6 +87,9 @@ export class LoginComponent implements OnInit {
     this.validLogin.emit(false);
     this.userQueryChanged.next('');
     this.pending = true;
+
+    this.loginService.password = '';
+    this.loginService.username = '';
   }
 
   sanitize(arg:string):string {

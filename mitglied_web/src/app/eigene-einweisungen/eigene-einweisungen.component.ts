@@ -8,6 +8,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { debounceTime, map } from 'rxjs/operators';
 
+import { LoginService } from '../login/login.service';
+
 @Component({
   selector: 'einweisungen-einsehen',
   templateUrl: './eigene-einweisungen.component.html',
@@ -26,7 +28,10 @@ export class EigeneEinweisungenComponent implements OnInit {
   columnsToDisplay = ['geraet', 'datum'];
 
 
-  constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder) { }
+  constructor(private appComponent:AppComponent, private http:HttpClient,
+              private formBuilder:FormBuilder, private loginService:LoginService) {
+
+  }
 
 
   get loginControls() { return this.loginForm.controls; }
@@ -35,8 +40,6 @@ export class EigeneEinweisungenComponent implements OnInit {
     this.appComponent.title = "Einweisungen einsehen"
 
     this.loginForm = this.formBuilder.group({
-       username: [''],
-       password: [''],
        ownUser: [false],
        showUser: ['']
     });
@@ -45,8 +48,8 @@ export class EigeneEinweisungenComponent implements OnInit {
         .pipe(debounceTime(500))
         .subscribe(
           model => {
-            var user = this.appComponent.sanitize(this.loginForm.value['username']);
-            var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+            var user = this.appComponent.sanitize(this.loginService.username);
+            var passw = this.appComponent.sanitize(this.loginService.password);
             var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
 
             if (searchTerm != "") {
@@ -76,11 +79,11 @@ export class EigeneEinweisungenComponent implements OnInit {
   }
 
   showEinweisungen() {
-    var user = this.appComponent.sanitize(this.loginForm.value['username']);
-    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
     var searchTerm = "";
     if (this.loginForm.value['ownUser']) {
-      searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['username']));
+      searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginService.username));
     } else {
       searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
     }

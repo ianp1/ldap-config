@@ -66,6 +66,8 @@ import { LdapDatePipe } from './ldap-date.pipe';
 import { RfidEintragenComponent, DialogRfidExisting } from './rfid-eintragen/rfid-eintragen.component';
 import { RfidPruefenComponent } from './rfid-pruefen/rfid-pruefen.component';
 import { LoginComponent } from './login/login.component';
+import { LoginService } from './login/login.service';
+
 import { UserSearchComponent } from './user-search/user-search.component';
 
 import { ErrorInterceptor, ErrorDialog } from './error-interceptor/error.interceptor';
@@ -154,7 +156,8 @@ registerLocaleData(localeDe, 'de');
       useClass: ErrorInterceptor,
       multi: true
     },
-    { provide: MAT_DATE_LOCALE, useValue: 'de-DE' }
+    { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
+    LoginService
   ],
 	exports: [
 		CustomNavComponent

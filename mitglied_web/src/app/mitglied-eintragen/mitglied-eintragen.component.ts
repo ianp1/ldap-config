@@ -9,6 +9,8 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
+import { LoginService } from '../login/login.service';
+
 @Component({
   selector: 'neues-mitglied',
   templateUrl: './mitglied-eintragen.component.html',
@@ -16,25 +18,16 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
 })
 export class MitgliedEintragenComponent implements OnInit {
 
-  constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder, public dialog:MatDialog) { }
+  constructor(private appComponent:AppComponent, private http:HttpClient,
+              private formBuilder:FormBuilder, public dialog:MatDialog,
+              private loginService:LoginService) { }
 
   loginForm: FormGroup;
   userSelected: any;
   valid: boolean = false;
 
   initForm() {
-    var username = "";
-    var password = "";
-    if (typeof this.loginForm !== 'undefined') {
-      username = this.loginForm.value["username"];
-    }
-    if (typeof this.loginForm !== 'undefined') {
-      password = this.loginForm.value["password"];
-    }
     this.loginForm = this.formBuilder.group({
-       username: [username],
-       password: [password],
-       //
        neuesMitglied: [''],
        //
        mitgliedschaft: ['ehrenmitgliedschaft'],
@@ -80,8 +73,8 @@ export class MitgliedEintragenComponent implements OnInit {
   }
 
   mitgliedEintragen() {
-    var user = this.appComponent.sanitize(this.loginForm.value['username']);
-    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
 
     var dn = this.appComponent.sanitize(this.userSelected.dn);
 

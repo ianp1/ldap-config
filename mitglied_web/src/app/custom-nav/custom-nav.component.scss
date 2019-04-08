@@ -2,6 +2,15 @@
   font-size:26px;
 }
 
+#timeout {
+  margin-left: inherit;
+  margin-right: 20px;
+  text-align: right;
+  float:right;
+  right: 10px;
+  position: absolute;
+}
+
 .mat-tab-header ::ng-deep {
   display: none !important;
 }

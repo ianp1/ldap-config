@@ -11,6 +11,8 @@ import { LdapDatePipe } from '../ldap-date.pipe'
 import { DatePipe } from '@angular/common';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
+import { LoginService } from '../login/login.service';
+
 @Component({
   selector: 'neue-einweisung',
   templateUrl: './einweisungen-eintragen.component.html',
@@ -18,8 +20,6 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
 })
 
 export class EinweisungenEintragenComponent implements OnInit {
-  userQueryChanged: Subject<string> = new Subject<string>();
-
   searching: boolean = false;
 
   maschinen:any = [];
@@ -30,7 +30,10 @@ export class EinweisungenEintragenComponent implements OnInit {
   loginForm: FormGroup;
 
 
-  constructor(private appComponent:AppComponent, private http:HttpClient, private formBuilder:FormBuilder, public dialog:MatDialog) { }
+  constructor(private appComponent:AppComponent, private http:HttpClient,
+              private formBuilder:FormBuilder, public dialog:MatDialog,
+              private loginService:LoginService ) {
+  }
 
 
   get loginControls() { return this.loginForm.controls; }
@@ -65,44 +68,19 @@ export class EinweisungenEintragenComponent implements OnInit {
 
     this.initForm();
 
-    this.userQueryChanged
-          .pipe(debounceTime(500))
-          .subscribe(
-            model => {
-              var user = this.appComponent.sanitize(this.loginForm.value['username']);
-              var passw = this.appComponent.sanitize(this.loginForm.value['password']);
-              var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['eingewiesener']));
-
-              if (searchTerm != "") {
-                this.searching = true;
-
-                var headers = new HttpHeaders();
-                var params = new HttpParams();
-                params = params.append('author_user', user);
-                params = params.append('author_password', passw);
-
-                this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
-                  headers: headers,
-                  params: params
-                }).subscribe(data => {
-
-                  this.users=data;
-                  this.searching = false;
-                }, error => {
-                  this.searching = false;
-
-                });
-              }
-            }
-          );
+    this.loginService.valuesChanged.subscribe(model => {
+      if (model) {
+        this.updateMachines();
+      }
+    });
   }
 
   updateMachines() {
 
     var headers = new HttpHeaders();
     var params = new HttpParams();
-    var user = this.appComponent.sanitize(this.loginForm.value['username']);
-    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
 
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
@@ -123,13 +101,9 @@ export class EinweisungenEintragenComponent implements OnInit {
     return arg;
   }
 
-  fetchUsers() {
-    this.userQueryChanged.next('');
-  }
-
   enterEinweisung() {
-    var user = this.appComponent.sanitize(this.loginForm.value['username']);
-    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
     var requestUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
     var machine = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['maschine']));
 

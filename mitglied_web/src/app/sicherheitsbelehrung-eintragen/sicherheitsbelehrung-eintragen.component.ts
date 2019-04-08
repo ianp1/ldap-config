@@ -10,6 +10,7 @@ import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
+import { LoginService } from '../login/login.service';
 
 
 @Component({
@@ -18,14 +19,16 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
   styleUrls: ['./sicherheitsbelehrung-eintragen.component.scss']
 })
 export class SicherheitsbelehrungEintragenComponent implements OnInit {
-
-  loginForm: FormGroup;
   sicherheitForm: FormGroup;
 
 
   get sicherheitControls() { return this.sicherheitForm.controls; }
 
-  constructor(public dialog: MatDialog, private appComponent:AppComponent, private http:HttpClient, private formBuilder : FormBuilder) { }
+  constructor(public dialog: MatDialog, private appComponent:AppComponent,
+              private http:HttpClient, private formBuilder : FormBuilder,
+              private loginService:LoginService) {
+
+  }
 
   initForm() {
     var username = "";
@@ -33,20 +36,10 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var useCurrentDate = true;
     var date = new Date();
 
-    if (typeof this.loginForm !== 'undefined') {
-      username = this.loginForm.value["username"];
-      password = this.loginForm.value["password"];
-    }
-
     if (typeof this.sicherheitForm !== 'undefined') {
       useCurrentDate = this.sicherheitForm.value["useCurrentDate"];
       date = this.sicherheitForm.value["selectedDate"];
     }
-
-    this.loginForm = this.formBuilder.group({
-      username: [username],
-      password: [password]
-    });
 
     this.sicherheitForm = this.formBuilder.group({
       vorname: [''],
@@ -64,8 +57,8 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   }
 
   checkExistance() {
-    var user = this.appComponent.sanitize(this.loginForm.value['username']);
-    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
 
     var vorname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['vorname']));
     var nachname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['nachname']));
@@ -117,8 +110,8 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   }
 
   updateSicherheitsbelehrung(DN:string) {
-    var user = this.appComponent.sanitize(this.loginForm.value['username']);
-    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
 
     var date = this.getSelectedDate();
 
@@ -135,8 +128,8 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   }
 
   createUser() {
-    var user = this.appComponent.sanitize(this.loginForm.value['username']);
-    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
 
     var date = this.getSelectedDate();
 

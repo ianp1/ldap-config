@@ -8,6 +8,8 @@ import { debounceTime, map } from 'rxjs/operators';
 
 import { FormGroup, FormControl } from '@angular/forms';
 
+import { LoginService } from '../login/login.service';
+
 @Component({
   selector: 'user-search',
   templateUrl: './user-search.component.html',
@@ -19,12 +21,7 @@ export class UserSearchComponent implements OnInit {
   @Input()
   formGroup : FormGroup;
   @Input()
-  usernameControl : string;
-  @Input()
-  passwordControl : string;
-  @Input()
   eingewiesenerControl : string;
-
 
   @Output()
   userSelected = new EventEmitter<any>();
@@ -35,7 +32,8 @@ export class UserSearchComponent implements OnInit {
 
   validUser : boolean;
 
-  constructor(public appComponent:AppComponent, public http:HttpClient) { }
+  constructor(public appComponent:AppComponent, public http:HttpClient,
+              private loginService:LoginService) { }
 
   ngOnInit() {
     this.userQueryChanged.subscribe(model=>{
@@ -51,8 +49,8 @@ export class UserSearchComponent implements OnInit {
         .pipe(debounceTime(500))
         .subscribe(
           model => {
-            var user = this.appComponent.sanitize(this.formGroup.value[this.usernameControl]);
-            var passw = this.appComponent.sanitize(this.formGroup.value[this.passwordControl]);
+            var user = this.appComponent.sanitize(this.loginService.username);
+            var passw = this.appComponent.sanitize(this.loginService.password);
             var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.formGroup.value[this.eingewiesenerControl]));
 
             if (searchTerm != "") {
