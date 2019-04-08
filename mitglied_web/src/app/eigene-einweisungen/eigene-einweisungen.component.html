@@ -50,7 +50,7 @@
             Gerät
           </th>
           <td mat-cell *matCellDef="let einweisung">
-            {{einweisung.geraet.cn}}
+            {{einweisung.sicherheitsbelehrung ? 'Sicherheitsbelehrung' : einweisung.geraet.cn}}
           </td>
         </ng-container>
 
@@ -62,7 +62,7 @@
             *matCellDef="let einweisung"
             class="einweisung"
             [ngClass]="einweisung.class">
-            {{einweisung.datum|ldapDate|date:"dd.MM.yyyy"}}
+            {{einweisung.mentor ? 'Gerätementor' : einweisung.datum|ldapDate|date:"dd.MM.yyyy"}}
           </td>
         </ng-container>
 

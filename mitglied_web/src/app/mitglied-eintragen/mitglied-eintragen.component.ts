@@ -20,6 +20,7 @@ export class MitgliedEintragenComponent implements OnInit {
 
   loginForm: FormGroup;
   userSelected: any;
+  valid: boolean = false;
 
   initForm() {
     var username = "";
@@ -69,7 +70,7 @@ export class MitgliedEintragenComponent implements OnInit {
   }
 
   prefillMitglied(val) {
-    console.log("prefillMitglied:", val);
+
     this.userSelected = val;
     this.loginForm.patchValue({
       vorname:val['vorname'],

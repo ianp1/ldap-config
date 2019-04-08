@@ -61,12 +61,12 @@ export class UserSearchComponent implements OnInit {
                 headers: headers,
                 params: params
               }).subscribe(data => {
-                console.log("Suche erfolgreich: ", data);
+
                 this.users = data;
                 this.searching = false;
               }, error => {
                 this.searching = false;
-                console.log("fetched error: ", error);
+
               });
             }
           }

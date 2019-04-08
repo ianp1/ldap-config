@@ -48,6 +48,8 @@
 			$user = "cn=".$params['author_bot'].",ou=bot,".$ldap_base_dn;
 		}
 
+		$request = $request -> withAttribute("request_user", $user);
+
 		if (!ldap_bind($ldapconn, $user, $AuthorPassword)) {
 			return $response -> withStatus(401);
 		}
@@ -201,12 +203,22 @@
 			$RequestUser = "uid=".$RequestUser.",ou=user,".$ldap_base_dn;
 		}
 
+		$ar = array();
+
+		$Sicherheitsbelehrung = ldap_search($ldapconn, $RequestUser, "(objectClass=fablabPerson)", array("sicherheitsbelehrung"));
+		$SicherheitsbelehrungResult = ldap_get_entries($ldapconn, $Sicherheitsbelehrung);
+
+		array_push($ar, array(
+			"sicherheitsbelehrung"=>true,
+			"datum"=>$SicherheitsbelehrungResult[0]["sicherheitsbelehrung"][0]
+		));
+
 		$dn = "ou=einweisung,".$ldap_base_dn;
 		$searchTerm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
 		$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum"));
 		$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
-		$ar = array();
+
 		for ($i = 0; $i < $einweisungenResult["count"]; $i++) {
 			$parent = "";
 			$split = ldap_explode_dn($einweisungenResult[$i]["dn"], 0);
@@ -225,6 +237,20 @@
 					"geraetname"=>$geraet[0]["geraetname"][0],
 					"cn"=>$geraet[0]["cn"][0]
 				)
+			));
+		}
+
+		$searchTerm = "(&(objectClass=geraet)(member=$RequestUser))";
+		$mentorenschaft = ldap_search($ldapconn, $dn, $searchTerm, array("geraetname", "cn"));
+		$mentorenschaftResult = ldap_get_entries($ldapconn, $mentorenschaft);
+
+		for ($i = 0; $i < $mentorenschaftResult["count"]; $i++) {
+			array_push($ar, array(
+				"geraet"=>array(
+					"geraetname"=>$mentorenschaftResult[$i]["geraetname"][0],
+					"cn"=>$mentorenschaftResult[$i]["cn"][0]
+				),
+				"mentor"=>true
 			));
 		}
 
@@ -265,6 +291,16 @@
 				$response -> getBody() -> write("true\n");
 				return $response -> withStatus(201);
 			}
+
+			$einweisungterm = "(&(objectClass=geraet)(member=$RequestUser))";
+
+			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
+			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+
+			if ($einweisungResult['count'] === 1) {
+				$response -> getBody() -> write("true\n");
+				return $response -> withStatus(201);
+			}
 		}
 
 		$response -> getBody() -> write("false\n");
@@ -279,6 +315,7 @@
 		$ldapconn = $request -> getAttribute("ldapconn");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$entry["sicherheitsbelehrung"] = $RequestDate;
+		$entry["belehrtVon"] = $request -> getAttribute("request_user");
 		if (ldap_mod_replace($ldapconn, $RequestUser, $entry)) {
 			return $response -> withJson(true, 201);
 		}
@@ -323,6 +360,7 @@
 				$DN = $einweisungResult[0]["dn"];
 				$entry = array();
 				$entry["einweisungsdatum"]=$RequestDate;
+				$entry["geraetementor"]=$request -> getAttribute("request_user");
 				if (ldap_mod_replace($ldapconn, $DN, $entry)) {
 					return $response -> withJson(true, 200);
 				} else {
@@ -335,6 +373,7 @@
 			$entry["objectClass"] = "einweisung";
 			$entry["eingewiesener"] = $RequestUser;
 			$entry["einweisungsdatum"] = $RequestDate;
+			$entry["geraetementor"] = $request -> getAttribute("request_user");
 			$entry["distinctname"] = uniqid("e_");
 			$test = var_export($entry, true);
 			$response -> getBody() -> write($test);
@@ -356,6 +395,7 @@
 				$RequestNachname .= strtoupper(substr(normalizeUtf8String($nachname), 0, 1)).strtolower(substr(normalizeUtf8String($nachname), 1));
 			}
 		}
+		$RequestNachname = trim($RequestNachname);
 		$RequestGeburtstag = $args['Geburtstag'];
 		$RequestSicherheitsbelehrung = $args['Sicherheitsbelehrung'];
 		//$RequestGeburtstag = "19950111183220.733Z";
@@ -370,14 +410,15 @@
 		$entry["cn"] = array();
 		$entry["sn"] = "";
 		foreach ($RequestVornamen as $vorname) {
-			array_push($entry["cn"], $vorname);
+			array_push($entry["cn"], trim($vorname));
 		}
 		foreach ($RequestNachnamen as $nachname) {
 			$entry["sn"] = $entry["sn"]." ".$nachname;
-			array_push($entry["sn"], $nachname);
 		}
+		$entry["sn"] = trim($entry["sn"]);
 		$entry["geburtstag"] = $RequestGeburtstag;
 		$entry["sicherheitsbelehrung"] = $RequestSicherheitsbelehrung;
+		$entry["belehrtVon"] = $request -> getAttribute("request_user");
 
 		$dn = "uid=".$entry["uid"].",ou=user,dc=ldap-provider,dc=fablab-luebeck";
 		$test = ldap_read($ldapconn, $dn, "(objectClass=*)");
@@ -484,11 +525,12 @@
 	* Gibt alle vorhandenen Geräte des Fablab zurück
 	*/
 	$app -> get('/Maschinen', function(Request $request, Response $response, array $args) {
+		$userDn = $request -> getAttribute("request_user");
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 		$ldapconn = $request -> getAttribute("ldapconn");
 
 		$dn = "ou=einweisung,".$ldap_base_dn;
-		$filter = "(objectClass=geraet)";
+		$filter = "(&(objectClass=geraet)(member=$userDn))";
 
 		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn", "cn"));
 
@@ -535,7 +577,7 @@
 	function normalizeUtf8String($s) {
     // Normalizer-class missing!
     if (! class_exists("Normalizer", $autoload = false))
-        return $original_string;
+        return $s;
 
 
     // maps German (umlauts) and other European characters onto two characters before just removing diacritics

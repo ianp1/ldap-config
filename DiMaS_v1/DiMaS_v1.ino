@@ -31,7 +31,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
 
 CRGB leds[NUM_LEDS];
 
-const char* GERAET = "geraetname=Lasercutter,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
+const char* GERAET = "geraetname=UVDrucker,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
 
 int time_buffer = 1000; // amount of time in miliseconds that the relay will remain open
 
@@ -39,11 +39,11 @@ const char* ssid = "fablab";
 const char* password = "fablabfdm";
 
 const char* host = "192.168.2.201";
-const int httpsPort = 446;
+const int httpsPort = 443;
 
 // Use web browser to view and copy
 // SHA1 fingerprint of the certificate
-const char* fingerprint = "83 FE 78 E2 42 46 E2 DF 91 0D 84 50 D9 3D 63 BB 8D FB 92 3F";
+const char* fingerprint = "52:07:0F:7E:47:06:E2:2C:19:44:B3:84:0F:4F:5D:52:A8:4D:71:86";
 
 byte state = 0;
 

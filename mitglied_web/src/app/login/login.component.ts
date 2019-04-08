@@ -48,14 +48,14 @@ export class LoginComponent implements OnInit {
             headers: headers,
             params: params
           }).subscribe(data =>{
-              console.log("Authentifizierung erfolgreich: "+data);
+
               this.validating = false;
               this.loginValid = true;
               this.validLogin.emit(true);
               this.pending = false;
             },
             error => {
-              console.log("fetched error: ", error);
+
               this.validating = false;
               this.validLogin.emit(false);
               this.pending = false;
@@ -64,7 +64,7 @@ export class LoginComponent implements OnInit {
   }
 
   changed() {
-    console.log("changed");
+
     this.loginValid= false;
     this.validLogin.emit(false);
     this.userQueryChanged.next('');

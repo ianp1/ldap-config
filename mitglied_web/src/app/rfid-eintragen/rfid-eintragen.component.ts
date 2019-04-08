@@ -87,7 +87,7 @@ export class RfidEintragenComponent implements OnInit {
         this.connectRFID(user, passw, updateRfid, updateUser);
       }
       this.searching = false;
-      console.warn("fetched error: ", error);
+
     });
   }
 
@@ -114,13 +114,13 @@ export class RfidEintragenComponent implements OnInit {
     };
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid+'/'+updateUser, params)
       .subscribe(data => {
-        console.log("rfid update successfull: ", data);
+
         const dialogRef = this.dialog.open(SuccessDialog);
         dialogRef.afterClosed().subscribe(data => {
           this.initForm();
         });
       }, error => {
-        console.warn("rfid update error: ", error);
+
       });
   }
 }
@@ -150,7 +150,7 @@ export class DialogRfidExisting {
   constructor (public dialogRef: MatDialogRef<DialogRfidExisting>,
         @Inject(MAT_DIALOG_DATA) public data: DialogRfidExistingData) {
 
-    console.warn(data);
+
     this.dataArray = data.users as any[];
     this.interfacestring = this.dataArray.map(obj => {
       return {

@@ -1,0 +1,15 @@
+[sssd]
+config_file_version=2
+services = pam,ssh
+domains = ldap-provider
+
+[domain/ldap-provider]
+id_provider = ldap
+auth_provider = ldap
+ldap_uri = ldap://{{ldap_host}}
+ldap_search_base = {{ldap_base}}
+
+ldap_id_use_start_tls = true
+ldap_tls_reqcert = never
+ldap_default_bind_dn={{ldap_bind_dn}}
+ldap_default_authtok={{ldap_bind_pw}}

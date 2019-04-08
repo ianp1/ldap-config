@@ -33,12 +33,19 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   initForm() {
     var username = "";
     var password = "";
+    var useCurrentDate = true;
+    var date = new Date();
+
     if (typeof this.loginForm !== 'undefined') {
       username = this.loginForm.value["username"];
-    }
-    if (typeof this.loginForm !== 'undefined') {
       password = this.loginForm.value["password"];
     }
+
+    if (typeof this.sicherheitForm !== 'undefined') {
+      useCurrentDate = this.sicherheitForm.value["useCurrentDate"];
+      date = this.sicherheitForm.value["selectedDate"];
+    }
+
     this.loginForm = this.formBuilder.group({
       username: [username],
       password: [password]
@@ -48,8 +55,8 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
       vorname: [''],
       nachname: [''],
       geburtsdatum: [''],
-      useCurrentDate: [true],
-      selectedDate: ['']
+      useCurrentDate: [useCurrentDate],
+      selectedDate: [date]
     });
   }
 
@@ -90,7 +97,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
               if (result["createUser"]) {
                 this.createUser();
               } else {
-                console.warn("closed modal with ", result);
+
                 this.updateSicherheitsbelehrung(result["UserDN"]);
               }
             }
@@ -99,7 +106,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
           this.createUser();
         }
       }, error=> {
-        console.log("fetched error: ", error);
+
       });
     }
   }
@@ -142,7 +149,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
     geburtsdatum = this.appComponent.formatLDAPDate(geburtsdatum);
 
-    console.warn("creating user ", vorname, nachname, geburtsdatum);
+
 
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/User/'+vorname+'/'+nachname+'/'+geburtsdatum+'/'+date,
       {
@@ -157,7 +164,7 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
           this.initForm();
         });
       }, error => {
-        console.warn("got error while creating user: ", error);
+
       }
     );
 
@@ -189,7 +196,7 @@ export class DialogUserExisting {
   constructor (public dialogRef: MatDialogRef<DialogUserExisting>,
         @Inject(MAT_DIALOG_DATA) public data: DialogUserExistingData) {
 
-    console.warn(data);
+
     this.dataArray = data.users as any[];
     this.interfacestring = this.dataArray.map(obj => {
       return {

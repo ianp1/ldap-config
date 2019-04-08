@@ -7,6 +7,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
+import { LdapDatePipe } from '../ldap-date.pipe'
+import { DatePipe } from '@angular/common';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
 @Component({
@@ -39,20 +41,25 @@ export class EinweisungenEintragenComponent implements OnInit {
   initForm() {
     var username = "";
     var password = "";
+    var maschine = "";
+    var date = new Date();
+    var useCurrentDate = true;
+
     if (typeof this.loginForm !== 'undefined') {
       username = this.loginForm.value["username"];
-    }
-    if (typeof this.loginForm !== 'undefined') {
       password = this.loginForm.value["password"];
+      maschine = this.loginForm.value["maschine"];
+      useCurrentDate = this.loginForm.value["useCurrentDate"];
+      date = this.loginForm.value["date"];
     }
 
     this.loginForm = this.formBuilder.group({
        username: [username],
        password: [password],
        eingewiesener: [''],
-       maschine: [''],
-       useCurrentDate: [true],
-       date: [new Date()]
+       maschine: [maschine],
+       useCurrentDate: [useCurrentDate],
+       date: [date]
     });
   }
 
@@ -61,12 +68,6 @@ export class EinweisungenEintragenComponent implements OnInit {
 
     this.initForm();
 
-    console.log(this.loginForm);
-
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Maschinen').subscribe(data => {
-      this.maschinen = data;
-      console.log(this.maschinen);
-    });
     this.userQueryChanged
           .pipe(debounceTime(500))
           .subscribe(
@@ -87,16 +88,35 @@ export class EinweisungenEintragenComponent implements OnInit {
                   headers: headers,
                   params: params
                 }).subscribe(data => {
-                  console.log("Suche erfolgreich: ", data);
+
                   this.users=data;
                   this.searching = false;
                 }, error => {
                   this.searching = false;
-                  console.log("fetched error: ", error);
+
                 });
               }
             }
           );
+  }
+
+  updateMachines() {
+
+    var headers = new HttpHeaders();
+    var params = new HttpParams();
+    var user = this.appComponent.sanitize(this.loginForm.value['username']);
+    var passw = this.appComponent.sanitize(this.loginForm.value['password']);
+
+    params = params.append('author_user', user);
+    params = params.append('author_password', passw);
+
+    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Maschinen', {
+      headers:headers,
+      params:params
+    }).subscribe(data => {
+      this.maschinen = data;
+
+    });
   }
 
   sanitize(arg:string):string {
@@ -133,7 +153,7 @@ export class EinweisungenEintragenComponent implements OnInit {
       params
     ).subscribe(data => {
       if (data) {
-        console.log("data: ", data);
+
         var dialogRef;
         if (typeof(data['status'] === 'undefined') && data['status'] !== "not updating") {
           dialogRef = this.dialog.open(SuccessDialog);
@@ -145,7 +165,7 @@ export class EinweisungenEintragenComponent implements OnInit {
             data : {
               icon:"warning",
               icon_class: "iconWarning",
-              customText : "Es ist bereits eine Einweisung vorhanden. Soll diese überschrieben werden?",
+              customText : "Es ist bereits eine Einweisung am "+new DatePipe("de-DE").transform(new LdapDatePipe().transform(data['date']))+" vorhanden. Soll diese überschrieben werden?",
               title: "Achtung",
               confirm: true
             }
@@ -167,7 +187,7 @@ export class EinweisungenEintragenComponent implements OnInit {
 
       }
     }, error => {
-      console.log("fetched error: ", error);
+
     });
   }
 }

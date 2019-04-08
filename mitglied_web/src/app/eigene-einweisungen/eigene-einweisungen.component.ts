@@ -37,7 +37,7 @@ export class EigeneEinweisungenComponent implements OnInit {
     this.loginForm = this.formBuilder.group({
        username: [''],
        password: [''],
-       ownUser: [true],
+       ownUser: [false],
        showUser: ['']
     });
 
@@ -90,8 +90,6 @@ export class EigeneEinweisungenComponent implements OnInit {
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
-
-
     this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/'+searchTerm, {
       headers: headers,
       params: params
@@ -99,24 +97,25 @@ export class EigeneEinweisungenComponent implements OnInit {
       var requestData = <Array<any>> data;
 
       var einweisung:any;
-      console.log(data);
       for (einweisung of requestData) {
-        console.log("einweisung: ", einweisung);
-        console.log(this.appComponent.reformatLDAPDate(einweisung.datum));
-
-
-        var date = new Date(this.appComponent.reformatLDAPDate(einweisung.datum));
-        console.log("Einweisungsdatum: ", date);
-        date.setFullYear(date.getFullYear() + 1);
-        var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
-        console.log("months left: ", diff);
-
-        if (diff > 3) {
+        console.log(einweisung);
+        console.log(einweisung.mentor);
+        if (einweisung.mentor) {
           einweisung.class = 'valid';
-        } else if (diff >= 0) {
-          einweisung.class = 'warning';
         } else {
-          einweisung.class = 'invalid';
+          var date = new Date(this.appComponent.reformatLDAPDate(einweisung.datum));
+
+          date.setFullYear(date.getFullYear() + 1);
+          var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
+
+
+          if (diff > 3) {
+            einweisung.class = 'valid';
+          } else if (diff >= 0) {
+            einweisung.class = 'warning';
+          } else {
+            einweisung.class = 'invalid';
+          }
         }
       }
       this.einweisungen = data;
