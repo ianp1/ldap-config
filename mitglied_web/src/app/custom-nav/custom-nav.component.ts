@@ -10,6 +10,9 @@ import { AppComponent } from '../app.component'
   styleUrls: ['./custom-nav.component.scss'],
 })
 export class CustomNavComponent {
+  valid = false;
+  entry = "sicherheitsbelehrung";
+
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(

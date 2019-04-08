@@ -1,24 +1,31 @@
-<div [formGroup]="formGroup" class="login-mask">
-  <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (loginValid ? 'valid' : 'invalid')">
-    <input
-        matInput
-        placeholder="Nutzername"
-        value=""
-        formControlName="{{usernameControl}}"
-        (input)="changed()"
-        >
-  </mat-form-field>
-  <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (loginValid ? 'valid' : 'invalid')">
-    <input
-        matInput
-        placeholder="Passwort"
-        type="password"
-        value=""
-        formControlName="{{passwordControl}}"
-        (input)="changed()"
-        >
-  </mat-form-field>
-  <span [class]="validating ? '' : 'hidden'">
+Bitte gib hier deine Fablab-Zugangsdaten ein um eine neue Einweisung einzutragen:
+
+<br>
+<br>
+
+<div class="login-mask">
+  <form [formGroup]="formGroup">
+      <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (loginValid ? 'valid' : 'invalid')">
+        <input
+            matInput
+            placeholder="Nutzername"
+            value=""
+            formControlName="username"
+            (input)="changed()"
+            >
+      </mat-form-field>
+      <mat-form-field [ngClass]="(isEmpty || pending) ? '' : (loginValid ? 'valid' : 'invalid')">
+        <input
+            matInput
+            placeholder="Passwort"
+            type="password"
+            value=""
+            formControlName="password"
+            (input)="changed()"
+            >
+      </mat-form-field>
+  </form>
+  <span [ngClass]="validating ? '' : 'hidden'" class="spinner_container">
     <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
   </span>
   <br>

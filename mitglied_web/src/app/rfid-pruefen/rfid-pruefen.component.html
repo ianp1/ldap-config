@@ -4,13 +4,6 @@
   <br>
   <div class="input-mask">
     <form [formGroup]="loginForm">
-      <login
-          [usernameControl]="'username'"
-          [passwordControl]="'password'"
-          [formGroup]="loginForm"
-          (validLogin)="valid=$event"
-          >
-      </login>
       <br>
       <div *ngIf="valid">
         <mat-form-field>

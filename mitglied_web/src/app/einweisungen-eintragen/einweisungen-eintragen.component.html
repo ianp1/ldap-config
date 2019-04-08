@@ -4,14 +4,6 @@
   <br>
   <div class="input-mask">
     <form [formGroup]="loginForm">
-      <login
-          [usernameControl]="'username'"
-          [passwordControl]="'password'"
-          [formGroup]="loginForm"
-          (validLogin)="valid=$event;updateMachines();"
-          >
-      </login>
-
       <div *ngIf="valid">
         <div>
           Einweisungsdaten:

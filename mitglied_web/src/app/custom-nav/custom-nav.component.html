@@ -11,8 +11,8 @@
       <h3>
         Einweisungen
       </h3>
-      <a mat-list-item href="/sicherheitsbelehrung-eintragen">Neue Sicherheitsbelehrung eintragen</a>
-      <a mat-list-item href="/eigene-einweisungen">Einweisungen abfragen</a>
+      <a mat-list-item (click)="entry='sicherheitsbelehrung'">Neue Sicherheitsbelehrung eintragen</a>
+      <a mat-list-item (click)="entry='einweisungen-einsehen'">Einweisungen abfragen</a>
       <a mat-list-item href="/einweisungen-eintragen">Neue Einweisung eintragen</a>
 
       <h3>
@@ -41,7 +41,18 @@
       <span id="apptitle">{{this.appComponent.title}}</span>
     </mat-toolbar>
     <mat-card class="page_container">
-      <router-outlet></router-outlet>
+      <login
+        (validLogin)="valid=$event"
+      ></login>
+      <br>
+      <div *ngIf="entry=='sicherheitsbelehrung'">
+        <sicherheitsbelehrung>
+        </sicherheitsbelehrung>
+      </div>
+      <div *ngIf="entry=='einweisungen-einsehen'">
+        <einweisungen-einsehen>
+        </einweisungen-einsehen>
+      </div>
     </mat-card>
   </mat-sidenav-content>
 </mat-sidenav-container>

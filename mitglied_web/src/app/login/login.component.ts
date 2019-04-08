@@ -18,27 +18,40 @@ export class LoginComponent implements OnInit {
   loginValid : boolean = false;
   pending : boolean = false;
 
-  @Input()
   formGroup : FormGroup;
-  @Input()
-  passwordControl : string;
-  @Input()
-  usernameControl : string;
 
   @Output()
   validLogin = new EventEmitter<boolean>();
 
-  constructor(public appComponent:AppComponent, public http:HttpClient) {
-
+  constructor(public appComponent:AppComponent, public http:HttpClient, private formBuilder: FormBuilder) {
+    this.initForm();
   }
+
+  initForm() {
+    var username = "";
+    var password = "";
+    var useCurrentDate = true;
+    var date = new Date();
+
+    if (typeof this.formGroup !== 'undefined') {
+      username = this.formGroup.value["username"];
+      password = this.formGroup.value["password"];
+    }
+
+    this.formGroup = this.formBuilder.group({
+      username: [username],
+      password: [password]
+    });
+  }
+
 
   ngOnInit() {
     this.userQueryChanged
         .pipe(debounceTime(500))
         .subscribe(model => {
           this.validating = true;
-          var user = this.appComponent.sanitize(this.formGroup.value[this.usernameControl]);
-          var passw = this.appComponent.sanitize(this.formGroup.value[this.passwordControl]);
+          var user = this.appComponent.sanitize(this.formGroup.value["username"]);
+          var passw = this.appComponent.sanitize(this.formGroup.value["password"]);
           var headers = new HttpHeaders();
           var params = new HttpParams();
           params = params.append('author_user', user);
@@ -64,7 +77,6 @@ export class LoginComponent implements OnInit {
   }
 
   changed() {
-
     this.loginValid= false;
     this.validLogin.emit(false);
     this.userQueryChanged.next('');
@@ -79,7 +91,7 @@ export class LoginComponent implements OnInit {
   }
 
   get isEmpty() {
-    return this.formGroup.value[this.usernameControl] === '' && this.formGroup.value[this.passwordControl] === '';
+    return this.formGroup.value["username"] === '' && this.formGroup.value["password"] === '';
   }
 
 }

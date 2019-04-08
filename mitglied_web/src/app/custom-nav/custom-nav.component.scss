@@ -2,6 +2,10 @@
   font-size:26px;
 }
 
+.mat-tab-header ::ng-deep {
+  display: none !important;
+}
+
 @media only screen and (max-width: 600px) {
   #apptitle {
     font-size: 18px;

@@ -1,18 +1,6 @@
 <div>
-  Bitte gib hier deine Fablab-Zugangsdaten ein um deine Einweisungen einzusehen:
-
-  <br />
   <div class="input-mask">
     <form [formGroup]="loginForm">
-      <login
-          [usernameControl]="'username'"
-          [passwordControl]="'password'"
-          [formGroup]="loginForm"
-          (validLogin)="validLogin=$event"
-          >
-      </login>
-      <br>
-      <br>
       <mat-checkbox
         formControlName="ownUser"
       >

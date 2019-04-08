@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { debounceTime, map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-eigene-einweisungen',
+  selector: 'einweisungen-einsehen',
   templateUrl: './eigene-einweisungen.component.html',
   styleUrls: ['./eigene-einweisungen.component.scss']
 })

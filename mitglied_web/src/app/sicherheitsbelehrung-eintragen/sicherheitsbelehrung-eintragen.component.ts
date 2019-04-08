@@ -13,7 +13,7 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
 
 
 @Component({
-  selector: 'app-sicherheitsbelehrung-eintragen',
+  selector: 'sicherheitsbelehrung',
   templateUrl: './sicherheitsbelehrung-eintragen.component.html',
   styleUrls: ['./sicherheitsbelehrung-eintragen.component.scss']
 })
@@ -22,7 +22,6 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   valid: boolean = false;
 
   loginForm: FormGroup;
-
   sicherheitForm: FormGroup;
 
 

@@ -1,6 +1,7 @@
-.login-mask .mat-spinner {
+.login-mask .mat-spinner, .login-mask form {
   margin-left: 15px;
   display: inline;
+  color: red;
 }
 
 
@@ -22,6 +23,10 @@
   ::ng-deep .mat-form-field-label {
     color:$color;
   }
+}
+
+.mat-form-field {
+  margin-left:15px;
 }
 
 .mat-form-field {
