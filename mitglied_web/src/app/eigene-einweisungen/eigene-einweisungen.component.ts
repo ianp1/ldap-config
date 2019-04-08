@@ -100,22 +100,24 @@ export class EigeneEinweisungenComponent implements OnInit {
 
       var einweisung:any;
       for (einweisung of requestData) {
-
-
-
-
-        var date = new Date(this.appComponent.reformatLDAPDate(einweisung.datum));
-
-        date.setFullYear(date.getFullYear() + 1);
-        var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
-
-
-        if (diff > 3) {
+        console.log(einweisung);
+        console.log(einweisung.mentor);
+        if (einweisung.mentor) {
           einweisung.class = 'valid';
-        } else if (diff >= 0) {
-          einweisung.class = 'warning';
         } else {
-          einweisung.class = 'invalid';
+          var date = new Date(this.appComponent.reformatLDAPDate(einweisung.datum));
+
+          date.setFullYear(date.getFullYear() + 1);
+          var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
+
+
+          if (diff > 3) {
+            einweisung.class = 'valid';
+          } else if (diff >= 0) {
+            einweisung.class = 'warning';
+          } else {
+            einweisung.class = 'invalid';
+          }
         }
       }
       this.einweisungen = data;

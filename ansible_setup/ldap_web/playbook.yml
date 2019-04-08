@@ -14,6 +14,9 @@
     - domain: robot.fablab-luebeck.de
       target_ip: 192.168.2.35
       certificate: no
+    - domain: lumos.fablab-luebeck.de
+      target_ip: 192.168.2.222
+      certificate: no
     bind9count: 01
   tasks:
     - name: Add apt repositories

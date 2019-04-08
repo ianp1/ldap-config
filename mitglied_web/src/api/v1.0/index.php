@@ -230,6 +230,20 @@
 			));
 		}
 
+		$searchTerm = "(&(objectClass=geraet)(member=$RequestUser))";
+		$mentorenschaft = ldap_search($ldapconn, $dn, $searchTerm, array("geraetname", "cn"));
+		$mentorenschaftResult = ldap_get_entries($ldapconn, $mentorenschaft);
+
+		for ($i = 0; $i < $mentorenschaftResult["count"]; $i++) {
+			array_push($ar, array(
+				"geraet"=>array(
+					"geraetname"=>$mentorenschaftResult[$i]["geraetname"][0],
+					"cn"=>$mentorenschaftResult[$i]["cn"][0]
+				),
+				"mentor"=>true
+			));
+		}
+
 		return $response -> withJson($ar, 201);
 	});
 
@@ -259,6 +273,16 @@
 
 			$einweisungdn = $RequestMachine;
 			$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
+
+			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
+			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+
+			if ($einweisungResult['count'] === 1) {
+				$response -> getBody() -> write("true\n");
+				return $response -> withStatus(201);
+			}
+
+			$einweisungterm = "(&(objectClass=geraet)(member=$RequestUser))";
 
 			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
 			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
