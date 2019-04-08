@@ -37,7 +37,7 @@ export class EigeneEinweisungenComponent implements OnInit {
     this.loginForm = this.formBuilder.group({
        username: [''],
        password: [''],
-       ownUser: [true],
+       ownUser: [false],
        showUser: ['']
     });
 
