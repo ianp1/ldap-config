@@ -33,12 +33,19 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   initForm() {
     var username = "";
     var password = "";
+    var useCurrentDate = true;
+    var date = new Date();
+
     if (typeof this.loginForm !== 'undefined') {
       username = this.loginForm.value["username"];
-    }
-    if (typeof this.loginForm !== 'undefined') {
       password = this.loginForm.value["password"];
     }
+
+    if (typeof this.sicherheitForm !== 'undefined') {
+      useCurrentDate = this.sicherheitForm.value["useCurrentDate"];
+      date = this.sicherheitForm.value["selectedDate"];
+    }
+
     this.loginForm = this.formBuilder.group({
       username: [username],
       password: [password]
@@ -48,8 +55,8 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
       vorname: [''],
       nachname: [''],
       geburtsdatum: [''],
-      useCurrentDate: [true],
-      selectedDate: ['']
+      useCurrentDate: [useCurrentDate],
+      selectedDate: [date]
     });
   }
 

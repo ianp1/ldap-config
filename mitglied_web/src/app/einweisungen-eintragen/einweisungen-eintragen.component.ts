@@ -41,20 +41,25 @@ export class EinweisungenEintragenComponent implements OnInit {
   initForm() {
     var username = "";
     var password = "";
+    var maschine = "";
+    var date = new Date();
+    var useCurrentDate = true;
+
     if (typeof this.loginForm !== 'undefined') {
       username = this.loginForm.value["username"];
-    }
-    if (typeof this.loginForm !== 'undefined') {
       password = this.loginForm.value["password"];
+      maschine = this.loginForm.value["maschine"];
+      useCurrentDate = this.loginForm.value["useCurrentDate"];
+      date = this.loginForm.value["date"];
     }
 
     this.loginForm = this.formBuilder.group({
        username: [username],
        password: [password],
        eingewiesener: [''],
-       maschine: [''],
-       useCurrentDate: [true],
-       date: [new Date()]
+       maschine: [maschine],
+       useCurrentDate: [useCurrentDate],
+       date: [date]
     });
   }
 
