@@ -41,6 +41,12 @@ export class UserSearchComponent implements OnInit {
     this.userQueryChanged.subscribe(model=>{
       this.validUser=false;
     });
+    this.userQueryChanged.subscribe(
+      model => {
+        console.log("reset results");
+        this.userSelected.emit(null);
+      }
+    );
     this.userQueryChanged
         .pipe(debounceTime(500))
         .subscribe(
@@ -61,12 +67,10 @@ export class UserSearchComponent implements OnInit {
                 headers: headers,
                 params: params
               }).subscribe(data => {
-
                 this.users = data;
                 this.searching = false;
               }, error => {
                 this.searching = false;
-
               });
             }
           }
