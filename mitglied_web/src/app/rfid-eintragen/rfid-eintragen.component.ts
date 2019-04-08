@@ -12,7 +12,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
 @Component({
-  selector: 'app-rfid-eintragen',
+  selector: 'rfid-vergeben',
   templateUrl: './rfid-eintragen.component.html',
   styleUrls: ['./rfid-eintragen.component.scss']
 })

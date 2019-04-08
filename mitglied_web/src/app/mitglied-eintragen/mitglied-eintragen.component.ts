@@ -10,7 +10,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
 @Component({
-  selector: 'app-mitglied-eintragen',
+  selector: 'neues-mitglied',
   templateUrl: './mitglied-eintragen.component.html',
   styleUrls: ['./mitglied-eintragen.component.scss']
 })

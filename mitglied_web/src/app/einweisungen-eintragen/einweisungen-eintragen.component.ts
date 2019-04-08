@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
 @Component({
-  selector: 'app-einweisungen-eintragen',
+  selector: 'neue-einweisung',
   templateUrl: './einweisungen-eintragen.component.html',
   styleUrls: ['./einweisungen-eintragen.component.scss']
 })

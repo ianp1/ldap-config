@@ -8,7 +8,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 @Component({
-  selector: 'app-rfid-pruefen',
+  selector: 'rfid-besitzer-finden',
   templateUrl: './rfid-pruefen.component.html',
   styleUrls: ['./rfid-pruefen.component.scss']
 })

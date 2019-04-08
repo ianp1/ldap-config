@@ -13,17 +13,17 @@
       </h3>
       <a mat-list-item (click)="entry='sicherheitsbelehrung'">Neue Sicherheitsbelehrung eintragen</a>
       <a mat-list-item (click)="entry='einweisungen-einsehen'">Einweisungen abfragen</a>
-      <a mat-list-item href="/einweisungen-eintragen">Neue Einweisung eintragen</a>
+      <a mat-list-item (click)="entry='neue-einweisung'">Neue Einweisung eintragen</a>
 
       <h3>
         Mitgliedsverwaltung
       </h3>
-      <a mat-list-item href="/mitglied-eintragen">Neues Mitglied eintragen</a>
+      <a mat-list-item (click)="entry='neues-mitglied'">Neues Mitglied eintragen</a>
       <h3>
         RFID-Karten
       </h3>
-      <a mat-list-item href="/rfid-eintragen">RFID-Karte vergeben</a>
-      <a mat-list-item href="/rfid-pruefen">RFID-Kartenbesitzer finden</a>
+      <a mat-list-item (click)="entry='rfid-vergeben'">RFID-Karte vergeben</a>
+      <a mat-list-item (click)="entry='rfid-besitzer-finden'">RFID-Kartenbesitzer finden</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -52,6 +52,22 @@
       <div *ngIf="entry=='einweisungen-einsehen'">
         <einweisungen-einsehen>
         </einweisungen-einsehen>
+      </div>
+      <div *ngIf="entry=='neue-einweisung'">
+        <neue-einweisung>
+        </neue-einweisung>
+      </div>
+      <div *ngIf="entry=='neues-mitglied'">
+        <neues-mitglied>
+        </neues-mitglied>
+      </div>
+      <div *ngIf="entry=='rfid-vergeben'">
+        <rfid-vergeben>
+        </rfid-vergeben>
+      </div>
+      <div *ngIf="entry=='rfid-besitzer-finden'">
+        <rfid-besitzer-finden>
+        </rfid-besitzer-finden>
       </div>
     </mat-card>
   </mat-sidenav-content>
