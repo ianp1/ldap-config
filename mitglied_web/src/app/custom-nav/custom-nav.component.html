@@ -1,8 +1,12 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport="true"
-      [attr.role]="(isHandset$ ) ? 'dialog' : 'navigation'"
-      [mode]="(isHandset$) ? 'over' : 'side'"
+        [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+        [mode]="(isHandset$ | async) ? 'over' : 'side'"
+        [opened]="!(isHandset$ | async)"
       >
+
+    <!--[attr.role]="(isHandset$ ) ? 'navigation' : 'navigation'"
+    [mode]="(isHandset$) ? 'over' : 'side'"-->
     <mat-nav-list>
       <h3>
         Einweisungen

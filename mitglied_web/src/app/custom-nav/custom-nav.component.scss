@@ -1,6 +1,25 @@
 #apptitle {
   font-size:26px;
 }
+
+@media only screen and (max-width: 600px) {
+  #apptitle {
+    font-size: 18px;
+    overflow:hidden;
+  }
+}
+
+@media only screen and (max-width: 470px) {
+  #menubutton {
+    font-size: 0px !important;
+  }
+
+  #apptitle {
+    margin-left: 40px;
+  }
+}
+
+
 #menubutton {
   position: absolute;
   left:0px;
@@ -49,4 +68,8 @@
 
 .sidenav h3 {
   padding-left: 20px;
+}
+
+.mat-list-item {
+  width: auto !important;
 }
