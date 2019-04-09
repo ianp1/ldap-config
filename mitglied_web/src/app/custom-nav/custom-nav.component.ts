@@ -48,13 +48,13 @@ export class CustomNavComponent {
   }
 
 
-    selectEntry(entry: string) {
-      this.entry='sicherheitsbelehrung';
-      this.title = this.titles[entry];
+  selectEntry(entry: string) {
+    this.entry=entry;
+    this.title = this.titles[entry];
 
-      if (this.isHandsetLocal) {
-        this.sidenav.close();
-      }
+    if (this.isHandsetLocal) {
+      this.sidenav.close();
     }
+  }
 
 }
