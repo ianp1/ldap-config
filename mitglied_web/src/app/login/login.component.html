@@ -15,7 +15,7 @@ Bitte gib hier deine Fablab-Zugangsdaten ein um eine neue Einweisung einzutragen
           >
     </mat-form-field>
     <div class="username-help">
-      <i class="material-icons" matTooltipPosition="above" matTooltip="Beispiel: MaxMueller">
+      <i class="material-icons" #tooltip="matTooltip" (click)="tooltip.toggle()" matTooltipPosition="above" matTooltip="Beispiel: MaxMueller">
         help_outline
       </i>
     </div>

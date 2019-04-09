@@ -11,19 +11,19 @@
       <h3>
         Einweisungen
       </h3>
-      <a mat-list-item (click)="entry='sicherheitsbelehrung'">Neue Sicherheitsbelehrung eintragen</a>
-      <a mat-list-item (click)="entry='einweisungen-einsehen'">Einweisungen abfragen</a>
-      <a mat-list-item (click)="entry='neue-einweisung'">Neue Einweisung eintragen</a>
+      <a mat-list-item (click)="selectEntry('sicherheitsbelehrung')">Neue Sicherheitsbelehrung eintragen</a>
+      <a mat-list-item (click)="selectEntry('einweisungen-einsehen')">Einweisungen abfragen</a>
+      <a mat-list-item (click)="selectEntry('neue-einweisung')">Neue Einweisung eintragen</a>
 
       <h3>
         Mitgliedsverwaltung
       </h3>
-      <a mat-list-item (click)="entry='neues-mitglied'">Neues Mitglied eintragen</a>
+      <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
       <h3>
         RFID-Karten
       </h3>
-      <a mat-list-item (click)="entry='rfid-vergeben'">RFID-Karte vergeben</a>
-      <a mat-list-item (click)="entry='rfid-besitzer-finden'">RFID-Kartenbesitzer finden</a>
+      <a mat-list-item (click)="selectEntry('rfid-vergeben')">RFID-Karte vergeben</a>
+      <a mat-list-item (click)="selectEntry('rfid-besitzer-finden')">RFID-Kartenbesitzer finden</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
