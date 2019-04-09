@@ -16,10 +16,11 @@ import { MatSidenav } from '@angular/material/sidenav';
 })
 export class CustomNavComponent {
   valid = false;
-  entry = "sicherheitsbelehrung";
-  title = "Neue Sicherheitsbelehrungen eintragen";
+  entry = "start";
+  title = "Einweisungsverwaltung";
 
   titles = {
+    "start":"Einweisungsverwaltung",
     "sicherheitsbelehrung":"Neue Sicherheitsbelehrungen eintragen",
     "einweisungen-einsehen":"Einweisungen abfragen",
     "neue-einweisung":"Neue Einweisung eintragen",

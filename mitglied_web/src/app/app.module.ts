@@ -73,6 +73,7 @@ import { UserSearchComponent } from './user-search/user-search.component';
 import { ErrorInterceptor, ErrorDialog } from './error-interceptor/error.interceptor';
 
 import { SuccessDialog } from './success-dialog/success-dialog';
+import { StartComponent } from './start/start.component';
 
 const appRoutes:Routes = [
 	{path: '', component: EigeneEinweisungenComponent},
@@ -102,7 +103,8 @@ registerLocaleData(localeDe, 'de');
     RfidEintragenComponent,
     RfidPruefenComponent,
     LoginComponent,
-    UserSearchComponent
+    UserSearchComponent,
+    StartComponent
 	],
 	imports: [
 		BrowserModule,
