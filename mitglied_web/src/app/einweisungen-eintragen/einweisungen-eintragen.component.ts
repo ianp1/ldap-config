@@ -64,8 +64,6 @@ export class EinweisungenEintragenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.appComponent.title = "Neue Einweisungen eintragen"
-
     this.initForm();
 
     this.loginService.valuesChanged.subscribe(model => {

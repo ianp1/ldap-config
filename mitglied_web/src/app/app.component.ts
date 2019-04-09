@@ -12,8 +12,6 @@ import { LoginService } from './login/login.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'Mitgliederverwaltung';
-
   url_base: string = environment.url_base;
 
   userActivity;

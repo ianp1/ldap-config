@@ -32,8 +32,6 @@ export class RfidPruefenComponent implements OnInit {
               private loginService:LoginService) { }
 
   ngOnInit() {
-    this.appComponent.title = "RFID-Tag überprüfen";
-
     this.rfidQueryChanged
         .pipe(debounceTime(500))
         .subscribe(model => {

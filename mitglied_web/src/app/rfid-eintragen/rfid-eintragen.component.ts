@@ -40,8 +40,6 @@ export class RfidEintragenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.appComponent.title="RFID-Karte vergeben";
-
     this.initForm();
   }
 

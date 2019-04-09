@@ -37,8 +37,6 @@ export class EigeneEinweisungenComponent implements OnInit {
   get loginControls() { return this.loginForm.controls; }
 
   ngOnInit() {
-    this.appComponent.title = "Einweisungen einsehen"
-
     this.loginForm = this.formBuilder.group({
        ownUser: [false],
        showUser: ['']

@@ -51,8 +51,6 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.appComponent.title="Neue Sicherheitsbelehrungen eintragen";
-
     this.initForm();
   }
 

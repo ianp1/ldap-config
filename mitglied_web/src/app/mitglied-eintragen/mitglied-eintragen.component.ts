@@ -58,7 +58,6 @@ export class MitgliedEintragenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.appComponent.title = "Neues Mitglied eintragen";
     this.initForm();
   }
 
