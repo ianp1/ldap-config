@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CustomNavComponent } from '../custom-nav/custom-nav.component';
 
 @Component({
   selector: 'start',
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class StartComponent implements OnInit {
 
-  constructor() { }
+  constructor(public customNavComponent:CustomNavComponent) {
+    
+  }
 
   ngOnInit() {
   }

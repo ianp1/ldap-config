@@ -1,3 +1,46 @@
-<p>
-  Start works!
+<p class="start-title">
+  Willkommen zur Einweisungsverwaltung des FabLab Lübeck!
 </p>
+<div class="start">
+  <p>
+    Als Gerätementor kannst Du hier Sicherheitsbelehrungen und Einweisungen eintragen.
+    Wenn Du eine Einweisung durchführst, kannst du dich an diesen Schritten orientieren:
+  </p>
+  <ol>
+    <li>
+      Prüfe zuerst ob alle Teilnehmer eine
+      gültige Sicherheitsbelehrung haben. Die Gültigkeit kannst Du im Menüpunkt
+      <a (click)="this.customNavComponent.selectEntry('einweisungen-einsehen')">
+        Einweisungen einsehen
+      </a>
+      überprüfen.
+    </li>
+    <li>
+      Führe anschließend sofern nötig eine Sicherheitsbelehrung durch und trage diese
+      in
+      <a (click)="this.customNavComponent.selectEntry('sicherheitsbelehrung')">
+        Neue Sicherheitsbelehrung eintragen
+      </a>
+      ein.
+    </li>
+    <li>
+      Für alle, die noch keine RFID-Karte besitzen oder diese verloren haben, kannst
+      Du anschließend eine neue Karte ausstellen. Führe die Karte dafür vor das bereitgestellte
+      Lesegerät und trage die ID im Menüpunkt
+      <a (click)="this.customNavComponent.selectEntry('rfid-vergeben')">
+        RFID-Karte vergeben
+      </a> ein.
+    </li>
+    <li>
+      Nach Abschluss der Einweisung kannst Du diese im Menüpunkt
+      <a (click)="this.customNavComponent.selectEntry('einweisung-eintragen')">
+        Neue Einweisung eintragen
+      </a>
+      dokumentieren.
+    </li>
+    <li>
+      Zum Abschluss sollten alle Eingewiesenen ihre RFID-Karten in das RFID-Terminal
+      am Gerät prüfen.
+    </li>
+  </ol>
+</div>

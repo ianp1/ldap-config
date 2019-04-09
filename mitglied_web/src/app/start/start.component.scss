@@ -1,0 +1,17 @@
+.start {
+  text-align:left;
+  margin-top:45px;
+  font-size: 18px;
+}
+
+.start a {
+  color: blue;
+}
+
+.start-title {
+  font-size: 22px;
+}
+
+.start li:not(:last-child) {
+  padding-bottom:15px;
+}
