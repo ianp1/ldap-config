@@ -17,6 +17,16 @@ import { MatSidenav } from '@angular/material/sidenav';
 export class CustomNavComponent {
   valid = false;
   entry = "sicherheitsbelehrung";
+  title = "Neue Sicherheitsbelehrungen eintragen";
+
+  titles = {
+    "sicherheitsbelehrung":"Neue Sicherheitsbelehrungen eintragen",
+    "einweisungen-einsehen":"Einweisungen abfragen",
+    "neue-einweisung":"Neue Einweisung eintragen",
+    "neues-mitglied":"Neues Mitglied eintragen",
+    "rfid-vergeben":"RFID-Karte vergeben",
+    "rfid-besitzer-finden":"RFID-Kartenbesitzer finden"
+  };
 
   isHandsetLocal:boolean = false;
 
@@ -39,6 +49,7 @@ export class CustomNavComponent {
 
     selectEntry(entry: string) {
       this.entry='sicherheitsbelehrung';
+      this.title = this.titles[entry];
 
       if (this.isHandsetLocal) {
         this.sidenav.close();
