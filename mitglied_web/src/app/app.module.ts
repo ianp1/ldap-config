@@ -74,15 +74,11 @@ import { ErrorInterceptor, ErrorDialog } from './error-interceptor/error.interce
 
 import { SuccessDialog } from './success-dialog/success-dialog';
 import { StartComponent } from './start/start.component';
+import { RedirectComponent } from './redirect/redirect.component';
 
 const appRoutes:Routes = [
-	{path: '', component: EigeneEinweisungenComponent},
-	{path: 'eigene-einweisungen', component: EigeneEinweisungenComponent},
-	{path: 'einweisungen-eintragen', component: EinweisungenEintragenComponent},
-	{path: 'mitglied-eintragen', component: MitgliedEintragenComponent},
-  {path: 'sicherheitsbelehrung-eintragen', component: SicherheitsbelehrungEintragenComponent},
-  {path: 'rfid-eintragen', component: RfidEintragenComponent},
-  {path: 'rfid-pruefen', component: RfidPruefenComponent}
+	{path: '', component: RedirectComponent},
+  {path: 'start', component: CustomNavComponent}
 ];
 
 registerLocaleData(localeDe, 'de');
@@ -104,7 +100,8 @@ registerLocaleData(localeDe, 'de');
     RfidPruefenComponent,
     LoginComponent,
     UserSearchComponent,
-    StartComponent
+    StartComponent,
+    RedirectComponent
 	],
 	imports: [
 		BrowserModule,

@@ -8,6 +8,8 @@ import { ViewChild } from '@angular/core';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
+import { LocationStrategy } from '@angular/common';
+
 
 @Component({
   selector: 'custom-nav',
@@ -41,9 +43,15 @@ export class CustomNavComponent {
 
 
   constructor(private breakpointObserver: BreakpointObserver,
-              public appComponent: AppComponent) {
+              public appComponent: AppComponent, public location:LocationStrategy) {
     this.isHandset$.subscribe(model=> {
       this.isHandsetLocal = model;
+    });
+
+    this.location.onPopState(()=>{
+      console.log("back pressed");
+      this.selectEntry("start");
+      return false;
     });
   }
 
