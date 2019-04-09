@@ -1,9 +1,17 @@
 .login-mask .mat-spinner, .login-mask form {
   margin-left: 15px;
   display: inline;
-  color: red;
 }
 
+.username-help {
+  display: inline;
+  margin-left: 10px;
+  margin-right: 60px;
+}
+
+.username-help i {
+  vertical-align: middle;
+}
 
 @mixin inputColor($color) {
   color:$color;
