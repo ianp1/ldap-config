@@ -4,7 +4,9 @@
         [mode]="(isHandset$ | async) ? 'over' : 'side'"
         [opened]="!(isHandset$ | async)"
       >
-
+    <button mat-icon-button class="close-menu" (click)="drawer.toggle()">
+      <mat-icon aria-label="Closing icon">close</mat-icon>
+    </button>
     <!--[attr.role]="(isHandset$ ) ? 'navigation' : 'navigation'"
     [mode]="(isHandset$) ? 'over' : 'side'"-->
     <mat-nav-list>
