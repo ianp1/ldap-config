@@ -17,16 +17,16 @@
       <a mat-list-item (click)="selectEntry('sicherheitsbelehrung')">Neue Sicherheitsbelehrung eintragen</a>
       <a mat-list-item (click)="selectEntry('einweisungen-einsehen')">Einweisungen abfragen</a>
       <a mat-list-item (click)="selectEntry('neue-einweisung')">Neue Einweisung eintragen</a>
-
-      <h3>
-        Mitgliedsverwaltung
-      </h3>
-      <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
       <h3>
         RFID-Karten
       </h3>
       <a mat-list-item (click)="selectEntry('rfid-vergeben')">RFID-Karte vergeben</a>
       <a mat-list-item (click)="selectEntry('rfid-besitzer-finden')">RFID-Kartenbesitzer finden</a>
+
+      <h3>
+        Mitgliedsverwaltung
+      </h3>
+      <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -37,7 +37,7 @@
         mat-button
         (click)="drawer.toggle()"
         id="menubutton"
-        >
+      >
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         Menü
       </button>
