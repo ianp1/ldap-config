@@ -257,6 +257,23 @@
 		return $response -> withJson($ar, 201);
 	});
 
+
+	$app -> get('/Mitgliederverwaltung/{RequestUser}', function(Request $request, Response $response, array $args) {
+		$RequestUser = $args['RequestUser'];
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		$usersearch = $request -> getAttribute("request_user");
+		$group = "cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck";
+
+		$search = ldap_search($ldapconn, $group, "(&(objectClass=groupOfNames)(member=$usersearch))", array("dn"));
+		if ($search && $search["count"] > 0) {
+			return $response -> withStatus(201);
+		}
+		return $response -> withStatus(401);
+	});
+
 	/**
 	* $RequestToken : RFID-Token des Abgefragten Nutzers
 	* $RequestMachine : DN der Angefragten Maschine

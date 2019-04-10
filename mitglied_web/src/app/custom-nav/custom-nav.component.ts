@@ -10,6 +10,8 @@ import { MatSidenav } from '@angular/material/sidenav';
 
 import { LocationStrategy } from '@angular/common';
 
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { LoginService } from '../login/login.service';
 
 @Component({
   selector: 'custom-nav',
@@ -20,6 +22,8 @@ export class CustomNavComponent {
   valid = false;
   entry = "start";
   title = "Einweisungsverwaltung";
+
+  showMemberMenu = false;
 
   titles = {
     "start":"Einweisungsverwaltung",
@@ -43,7 +47,9 @@ export class CustomNavComponent {
 
 
   constructor(private breakpointObserver: BreakpointObserver,
-              public appComponent: AppComponent, public location:LocationStrategy) {
+              public appComponent: AppComponent,
+              public location:LocationStrategy, public http:HttpClient,
+              public loginService: LoginService) {
     this.isHandset$.subscribe(model=> {
       this.isHandsetLocal = model;
     });
@@ -63,6 +69,31 @@ export class CustomNavComponent {
     if (this.isHandsetLocal) {
       this.sidenav.close();
     }
+  }
+
+  updateMenuEntries() {
+    if (!this.valid) {
+      this.showMemberMenu = false;
+      return;
+    }
+
+    var headers = new HttpHeaders();
+    var params = new HttpParams();
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
+    params = params.append('author_user', user);
+    params = params.append('author_password', passw);
+
+    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Authentifizierung', {
+      headers: headers,
+      params: params
+    }).subscribe(data =>{
+      console.log("menu entries request successfull");
+      this.showMemberMenu = true;
+    }, error => {
+      console.log("menu entries request permission denied");
+      this.showMemberMenu = false;
+    });
   }
 
 }

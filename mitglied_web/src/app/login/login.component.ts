@@ -65,14 +65,12 @@ export class LoginComponent implements OnInit {
             headers: headers,
             params: params
           }).subscribe(data =>{
-
+              this.loginService.password = passw;
+              this.loginService.username = user;
               this.validating = false;
               this.loginValid = true;
               this.validLogin.emit(true);
               this.pending = false;
-
-              this.loginService.password = passw;
-              this.loginService.username = user;
             },
             error => {
               this.validating = false;

@@ -22,11 +22,12 @@
       </h3>
       <a mat-list-item (click)="selectEntry('rfid-vergeben')">RFID-Karte vergeben</a>
       <a mat-list-item (click)="selectEntry('rfid-besitzer-finden')">RFID-Kartenbesitzer finden</a>
-
-      <h3>
-        Mitgliedsverwaltung
-      </h3>
-      <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
+      <div *ngIf="showMemberMenu">
+        <h3>
+          Mitgliedsverwaltung
+        </h3>
+        <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
+      </div>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -47,7 +48,7 @@
     <mat-card class="page_container">
       <div *ngIf="entry!='start'">
         <login
-          (validLogin)="valid=$event"
+          (validLogin)="valid=$event;updateMenuEntries()"
         ></login>
         <br>
         <div *ngIf="valid">
