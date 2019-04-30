@@ -76,6 +76,7 @@ import { SuccessDialog } from './success-dialog/success-dialog';
 import { StartComponent } from './start/start.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { ReviewBannerComponent } from './review-banner/review-banner.component';
+import { SummaryPageComponent } from './summary-page/summary-page.component';
 
 const appRoutes:Routes = [
 	{path: '', component: RedirectComponent},
@@ -103,7 +104,8 @@ registerLocaleData(localeDe, 'de');
     UserSearchComponent,
     StartComponent,
     RedirectComponent,
-    ReviewBannerComponent
+    ReviewBannerComponent,
+    SummaryPageComponent
 	],
 	imports: [
 		BrowserModule,
