@@ -1,0 +1,21 @@
+#review-banner {
+  position:absolute;
+  bottom: 0px;
+  z-index: 1001;
+  width: 100%;
+  text-align: center;
+  background-color: #334d5c;
+  color: white;
+  overflow:hidden;
+  padding-top: 5px;
+  padding-bottom: 7px;
+}
+
+#review-banner a {
+  color: #45B29D;
+}
+
+#review-banner mat-icon {
+  position: absolute;
+  right: 0px;
+}

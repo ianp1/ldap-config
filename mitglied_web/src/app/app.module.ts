@@ -75,6 +75,7 @@ import { ErrorInterceptor, ErrorDialog } from './error-interceptor/error.interce
 import { SuccessDialog } from './success-dialog/success-dialog';
 import { StartComponent } from './start/start.component';
 import { RedirectComponent } from './redirect/redirect.component';
+import { ReviewBannerComponent } from './review-banner/review-banner.component';
 
 const appRoutes:Routes = [
 	{path: '', component: RedirectComponent},
@@ -101,7 +102,8 @@ registerLocaleData(localeDe, 'de');
     LoginComponent,
     UserSearchComponent,
     StartComponent,
-    RedirectComponent
+    RedirectComponent,
+    ReviewBannerComponent
 	],
 	imports: [
 		BrowserModule,
