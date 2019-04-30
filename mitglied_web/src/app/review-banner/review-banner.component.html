@@ -1,6 +1,6 @@
-<div id="review-banner">
+<div id="review-banner" *ngIf="showBanner">
   Rückmeldungen und Fehlermeldungen bitte an <a href="mailto:it@fablab-luebeck.de">das IT-Team</a> schicken
-  <mat-icon>
+  <mat-icon (click)="showBanner=false" class="closeButton">
     close
   </mat-icon>
 </div>

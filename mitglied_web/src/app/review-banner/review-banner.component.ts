@@ -7,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ReviewBannerComponent implements OnInit {
 
+  showBanner : boolean = true;
+
   constructor() { }
 
   ngOnInit() {

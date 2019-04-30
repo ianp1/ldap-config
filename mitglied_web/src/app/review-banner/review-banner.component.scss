@@ -15,7 +15,9 @@
   color: #45B29D;
 }
 
-#review-banner mat-icon {
+#review-banner .closeButton {
+  color: white;
   position: absolute;
   right: 0px;
+  cursor: pointer;
 }
