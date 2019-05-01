@@ -121,6 +121,82 @@
 	});
 
 	/**
+	* author_user : DN des anfragenden Nutzers
+	* author_password : Passwort des anfragenden Nutzers
+	*
+	* Gibt die Einweisungen der letzten 24 Stunden des gegebenen Nutzers zurueck
+	*/
+	$app -> get('/Einweisungen/Recent', function(Request $request, Response $response, array $args) {
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		$date = date("YmdHis", time() - 60 * 60 * 24)."Z";
+		$dn = "ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
+		$timeFilter = "(|(modifyTimestamp>=$date)(createTimestamp>=$date))";
+		$filter = "(&(objectClass=einweisung)$timeFilter)";
+
+		$einweisungen = ldap_search($ldapconn, $dn, $filter, array("einweisungsdatum", "dn", "eingewiesener"));
+		$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
+
+		//return $response -> withJson($einweisungenResult, 201);
+
+		$ar = array();
+		for ($i = 0; $i < $einweisungenResult["count"]; $i ++) {
+			$parent = "";
+			$split = ldap_explode_dn($einweisungenResult[$i]["dn"], 0);
+			for ($j = 1; $j < $split["count"]; $j++) {
+				if ($j != 1) {
+					$parent = $parent.",";
+				}
+				$parent = $parent.$split[$j];
+			}
+
+			$eingewiesener = ldap_get_entries($ldapconn, ldap_search($ldapconn,
+							$einweisungenResult[$i]["eingewiesener"][0], "(objectClass=fablabPerson)",
+							array("dn", "uid", "sn", "cn", "geburtstag")));
+			$geraet = ldap_get_entries($ldapconn, ldap_search($ldapconn,
+							$parent, "(objectClass=geraet)",
+							array("geraetname", "cn")));
+
+			//return $response -> withJson($eingewiesener, 201);
+			unset($eingewiesener[0]["sn"]["count"]);
+			unset($eingewiesener[0]["cn"]["count"]);
+			array_push($ar, array(
+				"datum" => $einweisungenResult[$i]["einweisungsdatum"][0],
+				"geraet" => array(
+					"geraetname"=>$geraet[0]["geraetname"][0],
+					"cn"=>$geraet[0]["cn"][0]
+				),
+				"eingewiesener" => array(
+					"dn"=>$eingewiesener[0]["dn"][0],
+					"uid"=>$eingewiesener[0]["uid"][0],
+					"sn"=>implode(" ", $eingewiesener[0]["sn"]),
+					"cn"=>implode(" ", $eingewiesener[0]["cn"]),
+					"geburtstag"=>$eingewiesener[0]["geburtstag"][0]
+				)
+			));
+		}
+
+		$belehrungen = array();
+		$sicherheitsbelehrungen = ldap_get_entries($ldapconn, ldap_search($ldapconn,
+						"ou=user,dc=ldap-provider,dc=fablab-luebeck", $timeFilter, array("cn", "sn",
+								"geburtstag", "sicherheitsbelehrung")));
+
+		for ($i = 0; $i < $sicherheitsbelehrungen["count"]; $i++) {
+			unset($sicherheitsbelehrungen[$i]["cn"]["count"]);
+			unset($sicherheitsbelehrungen[$i]["sn"]["count"]);
+			array_push($belehrungen, array(
+				"cn"=>implode(" ", $sicherheitsbelehrungen[$i]["cn"]),
+				"sn"=>implode(" ", $sicherheitsbelehrungen[$i]["sn"]),
+				"geburtstag"=>$sicherheitsbelehrungen[$i]["geburtstag"][0],
+				"sicherheitsbelehrung"=>$sicherheitsbelehrungen[$i]["sicherheitsbelehrung"][0]
+			));
+		}
+
+		return $response -> withJson(array("einweisungen"=>$ar, "sicherheitsbelehrung"=>$belehrungen), 201);
+	});
+
+	/**
 	* $RequestRfid : RFID-Token das verknüpft werden soll
 	* $RequestUser : DN des zu verknüpfenden Benutzers
 	* author_user : UID des anfragenden Nutzers

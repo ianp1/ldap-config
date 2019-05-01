@@ -28,6 +28,10 @@
         </h3>
         <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
       </div>
+      <h3>
+        Überprüfen
+      </h3>
+      <a mat-list-item (click)="selectEntry('summary-page')">Änderungsliste</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -75,6 +79,10 @@
           <div *ngIf="entry=='rfid-besitzer-finden'">
             <rfid-besitzer-finden>
             </rfid-besitzer-finden>
+          </div>
+          <div *ngIf="entry=='summary-page'">
+            <summary-page>
+            </summary-page>
           </div>
         </div>
       </div>

@@ -32,7 +32,8 @@ export class CustomNavComponent {
     "neue-einweisung":"Neue Einweisung eintragen",
     "neues-mitglied":"Neues Mitglied eintragen",
     "rfid-vergeben":"RFID-Karte vergeben",
-    "rfid-besitzer-finden":"RFID-Kartenbesitzer finden"
+    "rfid-besitzer-finden":"RFID-Kartenbesitzer finden",
+    "summary-page":"Aktuelle Änderungen"
   };
 
   isHandsetLocal:boolean = false;
