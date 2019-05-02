@@ -78,6 +78,11 @@ import { RedirectComponent } from './redirect/redirect.component';
 import { ReviewBannerComponent } from './review-banner/review-banner.component';
 import { SummaryPageComponent } from './summary-page/summary-page.component';
 
+import { DateAdapter } from '@angular/material';
+import { GermanDateAdapter } from './GermanDateAdapter';
+
+import {Platform, PlatformModule} from '@angular/cdk/platform';
+
 const appRoutes:Routes = [
 	{path: '', component: RedirectComponent},
   {path: 'start', component: CustomNavComponent}
@@ -108,6 +113,7 @@ registerLocaleData(localeDe, 'de');
     SummaryPageComponent
 	],
 	imports: [
+    PlatformModule,
 		BrowserModule,
 		HttpClientModule,
 		AppRoutingModule,
@@ -160,10 +166,12 @@ registerLocaleData(localeDe, 'de');
       multi: true
     },
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
+    { provide: DateAdapter, useClass: GermanDateAdapter, deps: [MAT_DATE_LOCALE, Platform] },
     LoginService
   ],
 	exports: [
-		CustomNavComponent
+		CustomNavComponent,
+    PlatformModule
 	],
   entryComponents: [
     DialogUserExisting,
