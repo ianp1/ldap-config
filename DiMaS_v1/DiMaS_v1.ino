@@ -58,6 +58,7 @@ byte state = 0;
 long lastCardReadTime = 0;
 String lastCardRead = "";
 const long cardReadTimeout = 2000;
+
 bool LEDWifiShine = true;
 
 //ReadValues
@@ -230,7 +231,9 @@ void LEDWifi() {
 }
 
 void LEDOff() {
+  FastLED.setBrightness(BRIGHTNESS_VALID);
   fill_solid(leds, NUM_LEDS, CRGB::Black);
+  leds[0] = CRGB::Green;
 }
 
 void LEDFalse() {
