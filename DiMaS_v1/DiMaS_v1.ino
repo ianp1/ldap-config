@@ -10,6 +10,7 @@
  *  Created by Ivan Grokhotkov, 2015.
  *  This example is in public domain.
  */
+#include <ArduinoJson.h>
 #include <SPI.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
@@ -27,13 +28,19 @@
 
 #define RST_PIN 20 // RST-PIN for RC522 - RFID - SPI - Module GPIO15 
 #define SS_PIN  2  // SDA-PIN for RC522 - RFID - SPI - Module GPIO2
+
+#define COLOR_SICHERHEIT CRGB::Blue
+#define COLOR_EINWEISUNG CRGB::White
+#define COLOR_COUNTDOWN CRGB::Orange
+
+#define BRIGHTNESS_VALID 100
+#define BRIGHTNESS_INVALID 255
+
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
 
 CRGB leds[NUM_LEDS];
 
 const char* GERAET = "geraetname=UVDrucker,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
-
-int time_buffer = 1000; // amount of time in miliseconds that the relay will remain open
 
 const char* ssid = "fablab";
 const char* password = "fablabfdm";
@@ -47,13 +54,17 @@ const char* fingerprint = "52:07:0F:7E:47:06:E2:2C:19:44:B3:84:0F:4F:5D:52:A8:4D
 
 byte state = 0;
 
-//TIMING////////////////////////////////////////////////////////////////////////////////////
-long previousMillisBlink = 0,
-     blinkInterval = 500;
+// Timing
+long lastCardReadTime = 0;
+String lastCardRead = "";
+const long cardReadTimeout = 2000;
+bool LEDWifiShine = true;
 
-//LED////////////////////////////
-bool light = false;
-int counter = 0;
+//ReadValues
+int einweisung = 0;
+int sicherheitsbelehrung = 0;
+
+
 
 void setup() {
   // sanity check delay - allows reprogramming if accidently blowing power w/leds
@@ -64,36 +75,19 @@ void setup() {
   mfrc522.PCD_Init();    // Init MFRC522
   
   Serial.begin(115200);
-  Serial.println();
-  Serial.print("connecting to ");
-  Serial.println(ssid);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
 }
 
 void reject() {
-  Serial.println("not authorized");
   state = 1;
 }
 
 void authorize() {
-  Serial.println("authorized"); 
   state = 2;
 }
 
-// Helper routine to dump a byte array as hex values to Serial
-void dump_byte_array(byte *buffer, byte bufferSize) {
-  for (byte i = 0; i < bufferSize; i++) {
-    Serial.print(buffer[i] < 0x10 ? " 0" : " ");
-    Serial.print(buffer[i], HEX);
-  }
+void clearState() {
+  state = 0;
 }
 
 bool ServerRequest(String rfid){
@@ -121,17 +115,39 @@ bool ServerRequest(String rfid){
   Serial.println("request sent");
   while (client.connected()) {
     if (client.available()) {
-      String line = client.readStringUntil('\n');
-      Serial.println(line);
-      
-      if(line=="true"){
-        Serial.println("hier1");
-        client.stop();
-        Serial.println("hier2");
-        return true;
-      } else if (line == "false") {
-        client.stop();
-        return false;
+      String answer = client.readStringUntil('\n');
+      if (answer[0] == '{') {
+        const int capacity = JSON_OBJECT_SIZE(2) + 64;
+        DynamicJsonDocument doc(capacity);
+  
+        DeserializationError err = deserializeJson(doc, answer);
+  
+        if (err) {
+          Serial.print("JSON-Serialization failed with code ");
+          Serial.println(err.c_str());
+          Serial.print("Http response was");
+          Serial.println(answer);
+        } else {
+          Serial.println(doc["einweisung"].as<String>());
+          Serial.println(doc["sicherheitsbelehrung"].as<String>());
+          if (doc["einweisung"].is<bool>()) {
+            Serial.println("Einweisung nicht vorhanden");
+            return false;
+          } else if (doc["sicherheitsbelehrung"].is<bool>()) {
+            Serial.println("Sicherheitsbelehrung nicht vorhanden");
+            return false;
+          } else {
+            einweisung = doc["einweisung"];
+            sicherheitsbelehrung = doc["sicherheitsbelehrung"];
+            
+            Serial.print("Verbleibend: ");
+            Serial.print(einweisung);
+            Serial.print(" ");
+            Serial.println(sicherheitsbelehrung);
+
+            return true;
+          }
+        }
       }
     }
   }
@@ -142,83 +158,102 @@ bool ServerRequest(String rfid){
 }
 
 void loop() {
+  while (WiFi.status() != WL_CONNECTED) {
+    LEDWifi();
+    FastLED.show();
+    delay(500);
+  }
+  
+  if (state == 0) {
+    LEDOff();
+  }
+  
   if(state == 1){
     LEDFalse();
   }
+  
   if(state == 2){
     LEDTrue();
   }
   FastLED.show();
-  
-  if ( ! mfrc522.PICC_IsNewCardPresent()) {   
-    delay(50);
-    return;
-  }
-  // Select one of the cards
-  if ( ! mfrc522.PICC_ReadCardSerial()) {   
-    delay(50);
-    return;
-  }
-  String content= "";
-  for (byte i = 0; i < mfrc522.uid.size; i++) 
-  {
-    if (i != 0) {
-     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? "_0" : "_"));
-    }
-     content.concat(String(mfrc522.uid.uidByte[i], HEX));
-  }
-  content.toUpperCase();
 
-  if (content != "") {
+  if ( mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {  
+    String content= "";
+    for (byte i = 0; i < mfrc522.uid.size; i++) 
+    {
+      if (i != 0) {
+       content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? "_0" : "_"));
+      }
+      content.concat(String(mfrc522.uid.uidByte[i], HEX));
+    }
+    content.toUpperCase();
     Serial.println("Card read:" + content);
-    if (ServerRequest(content)) {
-      authorize();
-    } else {
-      reject();
+  
+    if (content != "") {
+      if (lastCardRead != "" && content == lastCardRead) {
+        Serial.println("refreshing state");
+        lastCardReadTime = millis();
+      } else {
+        Serial.println("sending new request");
+        lastCardRead = content;
+        lastCardReadTime = millis();
+        if (ServerRequest(content)) {
+          authorize();
+        } else {
+          reject();
+        }
+      }
     }
   }
-  delay(10);
 
-}
-
-void LEDFalse(){
-  unsigned long currentMillis = millis();
-  if(currentMillis - previousMillisBlink > blinkInterval) {
-    previousMillisBlink = currentMillis;
-    if(light == false){
-      counter++;
-      fill_solid(leds,NUM_LEDS,CRGB::Black);
-      //Serial.println("PUFF!");
-    }
-    else if(light == true){
-      fill_solid(leds,NUM_LEDS,CRGB::Red);      //Serial.println("PENG!");
-    }
-    light = !light;
-    if(counter > 3){
-      fill_solid(leds,NUM_LEDS,CRGB::Black);
-      counter = 0;
-      state = 0;
-    }
+  if (millis() - lastCardReadTime > cardReadTimeout) {
+    Serial.println("clearing state");
+    clearState();
+    lastCardRead = "";
+    lastCardReadTime = 0;
   }
+  delay(10); 
+  
 }
 
-void LEDTrue(){
-  unsigned long currentMillis = millis();
-  if(currentMillis - previousMillisBlink > blinkInterval) {
-    previousMillisBlink = currentMillis;
-    if(light == false){
-      counter++;
-      fill_solid(leds,NUM_LEDS,CRGB::Black);
-      //Serial.println("PUFF!");
-    }
-    else if(light == true){
-      fill_solid(leds,NUM_LEDS,CRGB::Green);      //Serial.println("PENG!");
-    }
-    light = !light;
-    if(counter > 3){
-      fill_solid(leds,NUM_LEDS,CRGB::Black);
-      counter = 0;
-      state = 0;
+void LEDWifi() {
+  fill_solid(leds, NUM_LEDS, CRGB::Black);
+  if (LEDWifiShine) {
+    leds[1] = CRGB::Yellow;
+    leds[2] = CRGB::Yellow;
+  } else {
+    leds[0] = CRGB::Yellow;
+    leds[3] = CRGB::Yellow;
+  }
+  
+  LEDWifiShine = !LEDWifiShine;
+}
+
+void LEDOff() {
+  fill_solid(leds, NUM_LEDS, CRGB::Black);
+}
+
+void LEDFalse() {
+  FastLED.setBrightness(BRIGHTNESS_INVALID);
+  fill_solid(leds, NUM_LEDS, CRGB::Red);
+}
+
+void LEDTrue() {
+  FastLED.setBrightness(BRIGHTNESS_VALID);
+  fill_solid(leds, NUM_LEDS, CRGB::Black);
+  int countdown = 0;
+  if (einweisung > 3 && sicherheitsbelehrung > 3) {
+    fill_solid(leds, NUM_LEDS, CRGB::Green);  
+  } else if (einweisung <= 3) {
+    leds[0] = COLOR_EINWEISUNG;
+    countdown = einweisung;
+  } else {
+    leds[0] = COLOR_SICHERHEIT;
+    countdown = sicherheitsbelehrung;
+  }
+  if (countdown != 0) {
+    for (int i = 0; i < countdown; i++) {
+      leds[NUM_LEDS - i - 1] = COLOR_COUNTDOWN;
     }
   }
 }
