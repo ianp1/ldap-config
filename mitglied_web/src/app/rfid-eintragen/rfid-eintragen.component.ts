@@ -65,7 +65,7 @@ export class RfidEintragenComponent implements OnInit {
       })
       pickDialog.afterClosed().subscribe(result => {
         if (result) {
-          this.connectRFID(user, passw, updateRfid, updateUser);
+          this.connectRFID(user, passw, updateRfid, this.userSelected);
         }
       });
 
@@ -74,7 +74,7 @@ export class RfidEintragenComponent implements OnInit {
       //404: Kein Nutzer mit diesem RFID
       //Sonst: Anderer Fehler
       if (error.status === 404) {
-        this.connectRFID(user, passw, updateRfid, updateUser);
+        this.connectRFID(user, passw, updateRfid, this.userSelected);
       }
       this.searching = false;
 
@@ -97,15 +97,24 @@ export class RfidEintragenComponent implements OnInit {
     }
   }
 
-  connectRFID(user:string, passw:string, updateRfid:string, updateUser:string):void {
+  connectRFID(user:string, passw:string, updateRfid:string, updateUser:Object):void {
     var params = {
       'author_user' : user,
       'author_password' : passw
     };
-    this.http.post(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid+'/'+updateUser, params)
+    var updateDN = this.appComponent.encodeURL(this.appComponent.sanitize(updateUser["dn"]));
+    this.http.post(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid+'/'+updateDN, params)
       .subscribe(data => {
-
-        const dialogRef = this.dialog.open(SuccessDialog);
+        const dialogRef = this.dialog.open(SuccessDialog, {
+          data : {
+            customText : "Der neue Besitzer wurde eingetragen. Bitte trage jetzt<br/>"+
+            "<ul>"+
+              "<li>Name ("+updateUser["vorname"]+" "+updateUser["nachname"]+")</li>"+
+              "<li>und ID ("+updateUser["uid"]+")</li>"+
+            "</ul>"+
+            "in der neuen Karte ein und werfe den <b>Pfand (5€)</b> in die vorgesehene Kasse",
+          }
+        });
         dialogRef.afterClosed().subscribe(data => {
           this.initForm();
         });
