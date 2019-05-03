@@ -65,6 +65,16 @@ export class UserSearchComponent implements OnInit {
                 headers: headers,
                 params: params
               }).subscribe(data => {
+                console.log("changing rfid codes: ", data);
+                for (var j = 0; j < (<Array<any>>data).length; j++) {
+                  var cUser = data[j];
+                  if (cUser["rfid"] != null) {
+                    console.log("user is ", cUser);
+                    for (var i = 2; i < cUser["rfid"].length; i+= 3) {
+                      cUser["rfid"] = cUser["rfid"].substr(0, i)+"_"+cUser["rfid"].substr(i);
+                    }
+                  }
+                }
                 this.users = data;
                 this.searching = false;
               }, error => {

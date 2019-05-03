@@ -205,7 +205,7 @@
 	* Löscht alte Verknüpfungen
 	*/
 	$app -> post('/RFID/{RequestRfid}/{RequestUser}', function(Request $request, Response $response, array $args) {
-		$RequestRfid = $args['RequestRfid'];
+		$RequestRfid = preg_replace('/(?![0-9A-F])./', "", $args['RequestRfid']);
 		$RequestUser = $args['RequestUser'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
@@ -233,7 +233,7 @@
 	});
 
 	$app -> get('/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
-		$RequestRfid = $args['RequestRfid'];
+		$RequestRfid = preg_replace('/(?![0-9A-F])./', "", $args['RequestRfid']);
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
@@ -360,7 +360,7 @@
 	* Sicherheitsbelehrung noch aktuell sind
 	*/
 	$app -> get('/Einweisung/{RequestToken}/{RequestMachine}', function (Request $request, Response $response, array $args) {
-		$RequestToken = $args['RequestToken'];
+		$RequestToken = preg_replace('/(?![0-9A-F])./', "", $args['RequestToken']);
 		$RequestMachine = $args['RequestMachine'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
@@ -368,17 +368,6 @@
 
 		$dn = "ou=user,".$ldap_base_dn;
 		$userterm = "(&(objectClass=fablabPerson)(rfid=$RequestToken))";
-
-		//check mentorships of the given user
-		$einweisungterm = "(&(objectClass=geraet)(member=$RequestUser))";
-
-		$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
-		$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
-
-		if ($einweisungResult['count'] === 1) {
-			$response -> getBody() -> write("12\n");
-			return $response -> withStatus(201);
-		}
 
 		//check einweisung
 		$RequestUserErg = ldap_search($ldapconn, $dn, $userterm, array("dn", "sicherheitsbelehrung"));
@@ -394,9 +383,10 @@
 										array("dn", "einweisungsdatum"));
 			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
 
+			$duedate = time() - 60 * 60 * 24 * 365; // 1 Jahr Dauer
+			
 			if ($einweisungResult['count'] === 1) {
 				$einweisungsdate = ldapToUnixTimestamp($einweisungResult[0]["einweisungsdatum"][0]);
-				$duedate = time() - 60 * 60 * 24 * 365; // 1 Jahr Dauer
 
 				if ($einweisungsdate < time()) {
 					$datediff = $einweisungsdate - $duedate;
@@ -416,6 +406,16 @@
 					$sicherheitMonthsdiff = ceil($datediff / (60.0 * 60.0 * 24.0 * 30.0));
 				}
 			}
+		}
+
+		//check mentorships of the given user
+		$mentorterm = "(&(objectClass=geraet)(member=$RequestUser))";
+
+		$mentorErg = ldap_search($ldapconn, $einweisungdn, $mentorterm, array("dn"));
+		$mentorResult = ldap_get_entries($ldapconn, $mentorErg);
+
+		if ($mentorResult['count'] === 1) {
+			$einweisungMonthsdiff = 12;
 		}
 
 
