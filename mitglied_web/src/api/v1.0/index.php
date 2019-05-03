@@ -57,7 +57,6 @@
 		$response = $next($request, $response);
 
 		ldap_close($ldapconn);
-
 		return $response;
 	});
 
@@ -356,7 +355,9 @@
 	* author_user : UID des anfragenden Nutzers
 	* author_password : Passwort des anfragenden Nutzers
 	*
-	* Prüft ob Einweisung in Gerät für Nutzer vorhanden ist
+	* Prüft ob Einweisung in Gerät für Nutzer vorhanden ist.
+	* Gibt die Anzahl der Monate zurück, in denen Einweisung und
+	* Sicherheitsbelehrung noch aktuell sind
 	*/
 	$app -> get('/Einweisung/{RequestToken}/{RequestMachine}', function (Request $request, Response $response, array $args) {
 		$RequestToken = $args['RequestToken'];
@@ -368,7 +369,19 @@
 		$dn = "ou=user,".$ldap_base_dn;
 		$userterm = "(&(objectClass=fablabPerson)(rfid=$RequestToken))";
 
-		$RequestUserErg = ldap_search($ldapconn, $dn, $userterm, array("dn"));
+		//check mentorships of the given user
+		$einweisungterm = "(&(objectClass=geraet)(member=$RequestUser))";
+
+		$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
+		$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+
+		if ($einweisungResult['count'] === 1) {
+			$response -> getBody() -> write("12\n");
+			return $response -> withStatus(201);
+		}
+
+		//check einweisung
+		$RequestUserErg = ldap_search($ldapconn, $dn, $userterm, array("dn", "sicherheitsbelehrung"));
 		$RequestUserResults = ldap_get_entries($ldapconn, $RequestUserErg);
 
 		if ($RequestUserResults["count"] === 1) {
@@ -377,27 +390,56 @@
 			$einweisungdn = $RequestMachine;
 			$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
-			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
+			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm,
+										array("dn", "einweisungsdatum"));
 			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
 
 			if ($einweisungResult['count'] === 1) {
-				$response -> getBody() -> write("true\n");
-				return $response -> withStatus(201);
+				$einweisungsdate = ldapToUnixTimestamp($einweisungResult[0]["einweisungsdatum"][0]);
+				$duedate = time() - 60 * 60 * 24 * 365; // 1 Jahr Dauer
+
+				if ($einweisungsdate < time()) {
+					$datediff = $einweisungsdate - $duedate;
+
+					if ($datediff > 0) {
+						$einweisungMonthsdiff = ceil($datediff / (60.0 * 60.0 * 24.0 * 30.0));
+					}
+				}
 			}
 
-			$einweisungterm = "(&(objectClass=geraet)(member=$RequestUser))";
+			$sicherheitsdate = ldapToUnixTimestamp($RequestUserResults[0]["sicherheitsbelehrung"][0]);
 
-			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm, array("dn"));
-			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
+			if ($sicherheitsdate < time()) {
+				$datediff = $sicherheitsdate - $duedate;
 
-			if ($einweisungResult['count'] === 1) {
-				$response -> getBody() -> write("true\n");
-				return $response -> withStatus(201);
+				if ($datediff > 0) {
+					$sicherheitMonthsdiff = ceil($datediff / (60.0 * 60.0 * 24.0 * 30.0));
+				}
 			}
 		}
 
-		$response -> getBody() -> write("false\n");
-		return $response -> withStatus(201);
+
+		if (isset($einweisungMonthsdiff, $sicherheitMonthsdiff)) {
+			$response = $response -> withJson(array(
+				"einweisung" => $einweisungMonthsdiff,
+				"sicherheitsbelehrung" => $sicherheitMonthsdiff
+			), 201);
+		} else if (!isset($einweisungMonthsdiff)) {
+			$response = $response -> withJson(array(
+				"einweisung" => false
+			), 201);
+		} else if (!isset($sicherheitMonthsdiff)) {
+			$response = $response -> withJson(array(
+				"sicherheitsbelehrung" => false
+			), 201);
+		} else {
+			$response -> getBody() -> write("false\n");
+			return $response -> withStatus(201);
+		}
+
+		//needed for compatibility with esp wifi library
+		$response -> getBody() -> write("\n");
+		return $response;
 	});
 
 
@@ -651,6 +693,14 @@
 	});
 
 	$app -> run();
+
+	/**
+	* Converts ldap timestamp to unix
+	*/
+	function ldapToUnixTimestamp($ldapdate) {
+		return strtotime(substr($ldapdate, 4, 2).'/'.substr($ldapdate, 6, 2)
+											.'/'.substr($ldapdate, 0, 4));
+	}
 
 	/**
 	*	Compares LDAP-Dates, does NOT care for times
