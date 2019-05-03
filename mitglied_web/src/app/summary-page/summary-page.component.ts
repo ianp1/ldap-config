@@ -11,7 +11,7 @@ import { AppComponent } from '../app.component';
 })
 export class SummaryPageComponent implements OnInit {
 
-  changes = [];
+  changes:{"einweisungen":any, "sicherheitsbelehrungen":any};
   columnsEinweisungen = ['geraet', 'eingewiesener', 'einweisungsdatum'];
 
   columnsSicherheitsbelehrungen = ['eingewiesener', 'einweisungsdatum'];
