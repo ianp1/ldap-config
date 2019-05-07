@@ -11,7 +11,7 @@ Bitte gib hier deine Fablab-Zugangsdaten ein um eine neue Einweisung einzutragen
           placeholder="Nutzername"
           value=""
           formControlName="username"
-          (input)="changed()"
+          (keyup.enter)="changed()"
           >
     </mat-form-field>
     <div class="username-help">
@@ -26,15 +26,22 @@ Bitte gib hier deine Fablab-Zugangsdaten ein um eine neue Einweisung einzutragen
           type="password"
           value=""
           formControlName="password"
-          (input)="changed()"
+          (keyup.enter)="changed()"
           >
     </mat-form-field>
   </form>
   <span [ngClass]="validating ? '' : 'hidden'" class="spinner_container">
     <mat-spinner [diameter]="25" aria-label="test"></mat-spinner>
   </span>
-  <br>
-  <a href="https://login.fablab-luebeck.de">
+  <a href="https://login.fablab-luebeck.de" class="link_reset_pw">
     Passwort vergessen?
   </a>
+  <br>
+  <button
+        mat-raised-button
+        color="primary"
+        class="button_login"
+        (click)="changed()">
+    Einloggen
+  </button>
 </div>
