@@ -44,9 +44,10 @@ export class SummaryPageComponent implements OnInit {
       console.log(data);
 
       //this.changes = <Array<any>>data;
-      this.changes["einweisungen"] = <Array<any>>data["einweisungen"];
-      this.changes["sicherheitsbelehrungen"] =
-                          <Array<any>>data["sicherheitsbelehrung"];
+      this.changes = {
+        "einweisungen":<Array<any>>data["einweisungen"],
+        "sicherheitsbelehrungen":<Array<any>>data["sicherheitsbelehrung"]
+      };
       console.log(this.changes);
     });
   }
