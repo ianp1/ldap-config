@@ -40,7 +40,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
 
 CRGB leds[NUM_LEDS];
 
-const char* GERAET = "geraetname=UVDrucker,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
+const char* GERAET = "geraetname=Drehbank,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
 
 const char* ssid = "fablab";
 const char* password = "fablabfdm";
