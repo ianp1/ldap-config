@@ -12,7 +12,7 @@ import { AppComponent } from '../app.component';
 export class SummaryPageComponent implements OnInit {
 
   changes:{"einweisungen":any, "sicherheitsbelehrungen":any};
-  columnsEinweisungen = ['geraet', 'eingewiesener', 'einweisungsdatum'];
+  columnsEinweisungen = ['geraet', 'eingewiesener', 'einweisungsdatum', 'edit'];
 
   columnsSicherheitsbelehrungen = ['eingewiesener', 'einweisungsdatum'];
 
@@ -52,4 +52,21 @@ export class SummaryPageComponent implements OnInit {
     });
   }
 
+  widerrufe(dn) {
+    console.log("widerrufe ", dn);
+    var headers = new HttpHeaders();
+    var params = new HttpParams();
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
+
+    params = params.append('author_user', user);
+    params = params.append('author_password', passw);
+
+    this.http.delete(this.appComponent.url_base+'api/v1.0/index.php/Einweisungen/'+dn, {
+      headers: headers,
+      params: params
+    }).subscribe(data => {
+      this.updateSummary();
+    });
+  }
 }
