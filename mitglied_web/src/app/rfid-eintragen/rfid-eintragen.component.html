@@ -19,12 +19,19 @@
               formControlName="rfid"
           >
         </mat-form-field>
+        <div class="hint" [ngClass]="{'hint': !(rfid.invalid && (rfid.touched)), 'hint_error':rfid.invalid && (rfid.touched)}">
+          Bitte gib die ID in Hex-Schreibweise ein, optional mit Unterstrich-Zeichen
+          zwischen jedem 2-er Block.
+          <br>
+          Beispiel:
+          6C_19_86_1F
+        </div>
         <div class="field_warning" *ngIf="showRfidWarning">
           Vorsicht, beim Ändern wird die alte Karte ungültig gemacht!
         </div>
 
         <br><br>
-        <button mat-raised-button color="accent" (click)="enterRfid()">
+        <button mat-raised-button color="accent" (click)="enterRfid()" required>
           RFID vergeben
         </button>
       </div>

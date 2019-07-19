@@ -5,7 +5,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
@@ -35,7 +35,7 @@ export class RfidEintragenComponent implements OnInit {
   initForm() {
     this.loginForm = this.formBuilder.group({
       eingewiesener: [''],
-      rfid: ['']
+      rfid: ['', [Validators.required, this.regexValidator(/^([0-9a-fA-F]{2}[\_][0-9a-fA-F]{2}\_[0-9a-fA-F]{2}\_[0-9a-fA-F]{2}|[0-9a-fA-F]{8})$/im)]]
     });
   }
 
@@ -121,6 +121,18 @@ export class RfidEintragenComponent implements OnInit {
       }, error => {
 
       });
+  }
+
+  get rfid() {
+    return this.loginForm.get('rfid');
+  }
+
+  regexValidator(reg: RegExp): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} | null => {
+      const forbidden = reg.test(control.value);
+      console.log("regex validator: ", forbidden);
+      return forbidden ? null : {'forbiddenName': {value: control.value}};
+    };
   }
 }
 
