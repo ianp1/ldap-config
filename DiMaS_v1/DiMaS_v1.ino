@@ -40,7 +40,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
 
 CRGB leds[NUM_LEDS];
 
-const char* GERAET = "geraetname=Ultimaker3Extended,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
+const char* GERAET = "geraetname=Lasercutter,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
 
 const char* ssid = "fablab";
 const char* password = "fablabfdm";
@@ -76,6 +76,7 @@ void setup() {
   mfrc522.PCD_Init();    // Init MFRC522
   
   Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 }
 

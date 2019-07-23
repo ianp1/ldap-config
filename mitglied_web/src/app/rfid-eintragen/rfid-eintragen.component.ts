@@ -35,7 +35,7 @@ export class RfidEintragenComponent implements OnInit {
   initForm() {
     this.loginForm = this.formBuilder.group({
       eingewiesener: [''],
-      rfid: ['', [Validators.required, this.regexValidator(/^([0-9a-fA-F]{2}[\_][0-9a-fA-F]{2}\_[0-9a-fA-F]{2}\_[0-9a-fA-F]{2}|[0-9a-fA-F]{8})$/im)]]
+      rfid: ['', [Validators.required, this.regexValidator(/^([0-9a-fA-F]{1,2}[\_\ ][0-9a-fA-F]{1,2}[\_\ ][0-9a-fA-F]{1,2}[\_\ ][0-9a-fA-F]{1,2}|[0-9a-fA-F]{4,8})$/im)]]
     });
   }
 
