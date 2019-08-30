@@ -614,7 +614,7 @@
 				$term = $term."(cn=*$searchterm*)(sn=*$searchterm*)(uid=*$searchterm*)";
 			}
 		}
-		$searchtermrfid = cleanRFIDTag($searchterm);
+		$searchtermrfid = cleanRFIDTag($st);
 		$term = $term."(rfid=$searchtermrfid)))";
 		//$response -> getBody() -> write($term);
 		//return $response;
