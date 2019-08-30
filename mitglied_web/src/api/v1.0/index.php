@@ -678,7 +678,7 @@
 		$ldapconn = $request -> getAttribute("ldapconn");
 
 		$dn = "ou=einweisung,".$ldap_base_dn;
-		$filter = "(&(objectClass=geraet)(member=$userDn))";
+		$filter = "(&(objectClass=geraet))";
 
 		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn", "cn"));
 
