@@ -90,7 +90,17 @@ export class CustomNavComponent {
       params: params
     }).subscribe(data =>{
       console.log("menu entries request successfull");
-      this.showMemberMenu = true;
+      var headers = new HttpHeaders();
+      var params = new HttpParams();
+      params = params.append('author_user', user);
+      params = params.append('author_password', passw);
+
+      this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Mitgliederverwaltung', {
+        headers: headers,
+        params: params
+      }).subscribe(data => {
+        this.showMemberMenu = true;
+      });
     }, error => {
       console.log("menu entries request permission denied");
       this.showMemberMenu = false;
