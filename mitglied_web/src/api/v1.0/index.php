@@ -218,7 +218,7 @@
 	* Löscht alte Verknüpfungen
 	*/
 	$app -> post('/RFID/{RequestRfid}/{RequestUser}', function(Request $request, Response $response, array $args) {
-		$RequestRfid = preg_replace('/(?![0-9A-F])./', "", $args['RequestRfid']);
+		$RequestRfid = cleanRFIDTag($args['RequestRfid']);
 		$RequestUser = $args['RequestUser'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
@@ -608,12 +608,14 @@
 		$x = var_export($sts, true);
 
 		$term = "(&(objectClass=fablabPerson)(|";
+
 		foreach ($sts as $searchterm) {
 			if ($searchterm != "") {
 				$term = $term."(cn=*$searchterm*)(sn=*$searchterm*)(uid=*$searchterm*)";
 			}
 		}
-		$term = $term."))";
+		$searchtermrfid = cleanRFIDTag($searchterm);
+		$term = $term."(rfid=$searchtermrfid)))";
 		//$response -> getBody() -> write($term);
 		//return $response;
 		//$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
@@ -708,6 +710,10 @@
 	});
 
 	$app -> run();
+
+	function cleanRFIDTag($tag) {
+		return preg_replace('/(?![0-9A-F])./', "", $tag);
+	}
 
 	/**
 	* Converts ldap timestamp to unix
