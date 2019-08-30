@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
   validating : boolean = false;
   loginValid : boolean = false;
-  pending : boolean = false;
+  pending : boolean = true;
 
   formGroup : FormGroup;
 

@@ -1,7 +1,7 @@
 <div>
   <br>
   <h3>
-    Neu eingetragene Einweisungen
+    Neu eingetragene / veränderte Einweisungen
   </h3>
   <table mat-table [dataSource]="changes.einweisungen" class="mat-elevation-z8">
     <ng-container matColumnDef="geraet">
@@ -31,12 +31,21 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="edit">
+      <th mat-header-cell *matHeaderCellDef>
+        Bearbeiten
+      </th>
+      <td mat-cell *matCellDef="let einweisung">
+        <button mat-raised-button color="warn" (click)="widerrufe(einweisung.dn)">Widerrufen</button>
+      </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="columnsEinweisungen"></tr>
     <tr mat-row *matRowDef="let myRowData; columns: columnsEinweisungen"></tr>
   </table>
   <br>
   <h3>
-    Neue Sicherheitsbelehrungen
+    Neue eingetragene / veränderte Sicherheitsbelehrungen
   </h3>
   <table mat-table [dataSource]="changes.sicherheitsbelehrungen" class="mat-elevation-z8">
     <ng-container matColumnDef="eingewiesener">
@@ -62,6 +71,6 @@
   </table>
   <br>
   <p>
-    Fehleintragungen bitte an <a href="mailto:it@fablab-luebeck.de">das IT-Team</a> melden
+    Falsch eingetragene Sicherheitsbelehrungen bitte an <a href="mailto:it@fablab-luebeck.de">das IT-Team</a> melden
   </p>
 </div>

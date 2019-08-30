@@ -8,7 +8,6 @@
         <input matInput
             placeholder="Vorname"
             value=""
-            [(ngModel)]="this.vorname"
             formControlName="vorname"
         >
       </mat-form-field>
@@ -16,7 +15,6 @@
         <input matInput
             placeholder="Nachname"
             value=""
-            [(ngModel)]="this.nachname"
             formControlName="nachname"
         >
       </mat-form-field><br>
@@ -24,7 +22,6 @@
         <input matInput
             placeholder="Geburtsdatum"
             value=""
-            [(ngModel)]="this.geburtsdatum"
             formControlName="geburtsdatum"
             [matDatepicker]="geburtsdatumPicker"
         >

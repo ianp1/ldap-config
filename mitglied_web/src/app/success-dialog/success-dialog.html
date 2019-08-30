@@ -9,8 +9,7 @@
     <div *ngIf="!showCustomText">
       Die Anfrage wurde erfolgreich bearbeitet.
     </div>
-    <div *ngIf="showCustomText">
-      {{customText}}
+    <div *ngIf="showCustomText" [innerHTML]="customText">
     </div>
   </div>
 </mat-dialog-content>
