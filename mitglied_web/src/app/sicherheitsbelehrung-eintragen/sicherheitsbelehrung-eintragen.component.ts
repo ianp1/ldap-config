@@ -45,6 +45,8 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
       vorname: [''],
       nachname: [''],
       geburtsdatum: [''],
+      refresh: [''],
+      refreshUser: [''],
       useCurrentDate: [useCurrentDate],
       selectedDate: [date]
     });
@@ -123,6 +125,18 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
         this.initForm();
       });
     });
+  }
+
+  prefill(user) {
+    if (user) {
+      console.log(user);
+      console.log(new Date(this.appComponent.reformatLDAPDate(user.geburtstag)));
+      this.sicherheitForm.patchValue({
+        vorname: user.vorname,
+        nachname: user.nachname,
+        geburtsdatum: new Date(this.appComponent.reformatLDAPDate(user.geburtstag))
+      });
+    }
   }
 
   createUser() {

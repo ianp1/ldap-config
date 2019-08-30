@@ -1,9 +1,25 @@
 <div>
   <div class="input-mask">
-    <p>
-      Nutzerdaten:
-    </p>
     <form [formGroup]="sicherheitForm">
+      <mat-checkbox
+        formControlName="refresh"
+      >
+        Sicherheitsbelehrung auffrischen
+      </mat-checkbox>
+      <div
+        *ngIf="sicherheitControls.refresh.value">
+        <br>
+        <user-search
+            [eingewiesenerControl]="'refreshUser'"
+            [formGroup]="sicherheitForm"
+            (userSelected)="this.prefill($event)"
+        >
+        </user-search>
+      </div>
+      <br>
+      <p>
+        Nutzerdaten:
+      </p>
       <mat-form-field>
         <input matInput
             placeholder="Vorname"
