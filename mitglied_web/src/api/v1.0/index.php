@@ -218,7 +218,7 @@
 	* Löscht alte Verknüpfungen
 	*/
 	$app -> post('/RFID/{RequestRfid}/{RequestUser}', function(Request $request, Response $response, array $args) {
-		$RequestRfid = cleanRFIDTag($args['RequestRfid']);
+		$RequestRfid = preg_replace('/(?![0-9A-F])./', "", $args['RequestRfid']);
 		$RequestUser = $args['RequestUser'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
@@ -333,6 +333,16 @@
 		$mentorenschaftResult = ldap_get_entries($ldapconn, $mentorenschaft);
 
 		for ($i = 0; $i < $mentorenschaftResult["count"]; $i++) {
+			for ($j = 0; $j < sizeof($ar); $j++) {
+				if ($ar[$j]["geraet"]["cn"] == $mentorenschaftResult[$i]["cn"][0]) {
+					$delete = $j;
+				}
+			}
+
+			if (isset($delete)) {
+				unset($ar[$delete]);
+				$ar = array_values($ar);
+			}
 			array_push($ar, array(
 				"geraet"=>array(
 					"geraetname"=>$mentorenschaftResult[$i]["geraetname"][0],
@@ -346,7 +356,9 @@
 	});
 
 
-	$app -> get('/Mitgliederverwaltung', function(Request $request, Response $response, array $args) {
+	$app -> get('/Mitgliederverwaltung/{RequestUser}', function(Request $request, Response $response, array $args) {
+		$RequestUser = $args['RequestUser'];
+
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 
@@ -354,12 +366,8 @@
 		$group = "cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck";
 
 		$search = ldap_search($ldapconn, $group, "(&(objectClass=groupOfNames)(member=$usersearch))", array("dn"));
-
-		if ($search) {
-			$res = ldap_get_entries($ldapconn, $search);
-			if ($res['count'] > 0) {
-				return $response -> withStatus(201);
-			}
+		if ($search && $search["count"] > 0) {
+			return $response -> withStatus(201);
 		}
 		return $response -> withStatus(401);
 	});
@@ -608,14 +616,12 @@
 		$x = var_export($sts, true);
 
 		$term = "(&(objectClass=fablabPerson)(|";
-
 		foreach ($sts as $searchterm) {
 			if ($searchterm != "") {
 				$term = $term."(cn=*$searchterm*)(sn=*$searchterm*)(uid=*$searchterm*)";
 			}
 		}
-		$searchtermrfid = cleanRFIDTag($st);
-		$term = $term."(rfid=$searchtermrfid)))";
+		$term = $term."))";
 		//$response -> getBody() -> write($term);
 		//return $response;
 		//$term = "(&(objectClass=inetOrgPerson)(|(cn=*$st*)(sn=*$st*)(uid=*$st*)))";
@@ -682,7 +688,7 @@
 		$ldapconn = $request -> getAttribute("ldapconn");
 
 		$dn = "ou=einweisung,".$ldap_base_dn;
-		$filter = "(&(objectClass=geraet)(member=$userDn))";
+		$filter = "(&(objectClass=geraet))";
 
 		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn", "cn"));
 
@@ -710,10 +716,6 @@
 	});
 
 	$app -> run();
-
-	function cleanRFIDTag($tag) {
-		return preg_replace('/(?![0-9A-F])./', "", $tag);
-	}
 
 	/**
 	* Converts ldap timestamp to unix
