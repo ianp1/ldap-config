@@ -332,15 +332,17 @@
 		$mentorenschaft = ldap_search($ldapconn, $dn, $searchTerm, array("geraetname", "cn"));
 		$mentorenschaftResult = ldap_get_entries($ldapconn, $mentorenschaft);
 
+		$debug = "";
 		for ($i = 0; $i < $mentorenschaftResult["count"]; $i++) {
 			for ($j = 0; $j < sizeof($ar); $j++) {
 				if ($ar[$j]["geraet"]["cn"] == $mentorenschaftResult[$i]["cn"][0]) {
 					$delete = $j;
 				}
 			}
-
+			
 			if (isset($delete)) {
 				unset($ar[$delete]);
+				unset($delete);
 				$ar = array_values($ar);
 			}
 			array_push($ar, array(
