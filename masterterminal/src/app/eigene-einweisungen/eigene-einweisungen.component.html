@@ -1,0 +1,60 @@
+<div>
+  <div class="input-mask">
+    <form [formGroup]="loginForm">
+      <mat-checkbox
+        formControlName="ownUser"
+      >
+        Für eigenen Nutzer anzeigen
+      </mat-checkbox>
+      <br><br>
+      <div *ngIf="!loginControls.ownUser.value" class="">
+        <user-search
+            [eingewiesenerControl]="'showUser'"
+            [formGroup]="loginForm"
+        >
+        </user-search>
+      </div>
+
+      <button mat-raised-button color="accent" (click)="showEinweisungen()">
+        Einweisungen abfragen
+      </button>
+    </form>
+    <div *ngIf="einweisungen !== null && einweisungen.length === 0">
+      <br><br>
+      <p>
+        Für diesen Nutzer wurden keine Einweisungen gefunden
+      </p>
+    </div>
+    <div *ngIf="einweisungen !== null && einweisungen.length !== 0">
+      <br><br>
+      <p>
+        Der Nutzer hat die folgenden Einweisungen:
+      </p>
+      <table mat-table [dataSource]="einweisungen" class="mat-elevation-z8">
+        <ng-container matColumnDef="geraet">
+          <th mat-header-cell *matHeaderCellDef>
+            Gerät
+          </th>
+          <td mat-cell *matCellDef="let einweisung">
+            {{einweisung.sicherheitsbelehrung ? 'Sicherheitsbelehrung' : einweisung.geraet.cn}}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="datum">
+          <th mat-header-cell *matHeaderCellDef>
+            Einweisungsdatum
+          </th>
+          <td mat-cell
+            *matCellDef="let einweisung"
+            class="einweisung"
+            [ngClass]="einweisung.class">
+            {{einweisung.mentor ? 'Gerätementor' : einweisung.datum|ldapDate|date:"dd.MM.yyyy"}}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+      </table>
+    </div>
+  </div>
+</div>

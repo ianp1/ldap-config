@@ -1,0 +1,60 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-button
+        (click)="drawer.toggle()"
+        id="menubutton"
+      >
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        Menü
+      </button>
+      <span id="apptitle">{{this.title}}</span>
+      <span id="timeout" *ngIf="appComponent.userInactive">Abmeldung in {{appComponent.userTimeoutCounter}}s</span>
+    </mat-toolbar>
+    <mat-card class="page_container">
+      <div *ngIf="entry!='start'">
+        <login
+          (validLogin)="valid=$event;updateMenuEntries()"
+        ></login>
+        <br>
+        <div *ngIf="valid">
+          <div *ngIf="entry=='sicherheitsbelehrung'">
+            <sicherheitsbelehrung>
+            </sicherheitsbelehrung>
+          </div>
+          <div *ngIf="entry=='einweisungen-einsehen'">
+            <einweisungen-einsehen>
+            </einweisungen-einsehen>
+          </div>
+          <div *ngIf="entry=='neue-einweisung'">
+            <neue-einweisung>
+            </neue-einweisung>
+          </div>
+          <div *ngIf="entry=='neues-mitglied'">
+            <neues-mitglied>
+            </neues-mitglied>
+          </div>
+          <div *ngIf="entry=='rfid-vergeben'">
+            <rfid-vergeben>
+            </rfid-vergeben>
+          </div>
+          <div *ngIf="entry=='rfid-besitzer-finden'">
+            <rfid-besitzer-finden>
+            </rfid-besitzer-finden>
+          </div>
+          <div *ngIf="entry=='summary-page'">
+            <summary-page>
+            </summary-page>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="entry=='start'">
+        <start>
+        </start>
+      </div>
+    </mat-card>
+  </mat-sidenav-content>
+</mat-sidenav-container>
