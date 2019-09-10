@@ -15,41 +15,9 @@
       <span id="timeout" *ngIf="appComponent.userInactive">Abmeldung in {{appComponent.userTimeoutCounter}}s</span>
     </mat-toolbar>
     <mat-card class="page_container">
-      <div *ngIf="entry!='start'">
-        <login
-          (validLogin)="valid=$event;updateMenuEntries()"
-        ></login>
-        <br>
-        <div *ngIf="valid">
-          <div *ngIf="entry=='sicherheitsbelehrung'">
-            <sicherheitsbelehrung>
-            </sicherheitsbelehrung>
-          </div>
-          <div *ngIf="entry=='einweisungen-einsehen'">
-            <einweisungen-einsehen>
-            </einweisungen-einsehen>
-          </div>
-          <div *ngIf="entry=='neue-einweisung'">
-            <neue-einweisung>
-            </neue-einweisung>
-          </div>
-          <div *ngIf="entry=='neues-mitglied'">
-            <neues-mitglied>
-            </neues-mitglied>
-          </div>
-          <div *ngIf="entry=='rfid-vergeben'">
-            <rfid-vergeben>
-            </rfid-vergeben>
-          </div>
-          <div *ngIf="entry=='rfid-besitzer-finden'">
-            <rfid-besitzer-finden>
-            </rfid-besitzer-finden>
-          </div>
-          <div *ngIf="entry=='summary-page'">
-            <summary-page>
-            </summary-page>
-          </div>
-        </div>
+      <div *ngIf="entry=='einweisungen-einsehen'">
+        <einweisungen-einsehen>
+        </einweisungen-einsehen>
       </div>
       <div *ngIf="entry=='start'">
         <start>

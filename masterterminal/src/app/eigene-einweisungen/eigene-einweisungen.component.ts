@@ -15,7 +15,6 @@ import { debounceTime, map } from 'rxjs/operators';
 })
 export class EigeneEinweisungenComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
-  loginForm: FormGroup;
   searching: boolean;
   validLogin: boolean = false;
 
@@ -31,47 +30,57 @@ export class EigeneEinweisungenComponent implements OnInit {
 
   }
 
-
-  get loginControls() { return this.loginForm.controls; }
-
   ngOnInit() {
-    this.loginForm = this.formBuilder.group({
-       ownUser: [false],
-       showUser: ['']
-    });
+    var connection = new WebSocket('ws://localhost:8765/');
+    connection.onmessage = event => {
+      console.log("received socket message: ", event);
+      var msg = JSON.parse(event.data);
+      var headers = new HttpHeaders();
+      var params = new HttpParams();
+      params = params.append('author_bot', "masterterminal");
+      params = params.append('author_password', "dL45JgsltF7jm5MGvjzc");
 
-    this.userQueryChanged
-        .pipe(debounceTime(500))
-        .subscribe(
-          model => {
-            var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
+      //TODO change route
+      this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/RFID/'+msg.rfid, {
+        headers: headers,
+        params: params
+      }).subscribe(data => {
+        var requestData = <Array<any>> data;
 
-            if (searchTerm != "") {
-              this.searching = true;
+        var einweisung:any;
+        for (einweisung of requestData) {
+          console.log(einweisung);
+          console.log(einweisung.mentor);
+          if (einweisung.mentor) {
+            einweisung.class = 'valid';
+          } else {
+            var date = new Date(this.appComponent.reformatLDAPDate(einweisung.datum));
 
-              var headers = new HttpHeaders();
-              var params = new HttpParams();
+            date.setFullYear(date.getFullYear() + 1);
+            var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
 
-              this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
-                headers: headers,
-                params: params
-              }).subscribe(data => {
-                this.users=data;
-                this.searching = false;
-              }, error => {
-                this.searching = false;
-              });
+
+            if (diff > 3) {
+              einweisung.class = 'valid';
+            } else if (diff >= 0) {
+              einweisung.class = 'warning';
+            } else {
+              einweisung.class = 'invalid';
             }
           }
-        );
+        }
+        this.einweisungen = data;
+      });
+    };
   }
 
   fetchUsers() {
-    this.userQueryChanged.next('');
   }
 
   showEinweisungen() {
     var searchTerm = "";
+
+
 
     var headers = new HttpHeaders();
     var params = new HttpParams();
@@ -79,7 +88,7 @@ export class EigeneEinweisungenComponent implements OnInit {
     params = params.append('author_password', "cde");
 
     //TODO change route
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/'+searchTerm, {
+    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/RFID/'+searchTerm, {
       headers: headers,
       params: params
     }).subscribe(data => {

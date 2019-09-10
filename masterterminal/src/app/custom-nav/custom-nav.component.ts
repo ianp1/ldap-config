@@ -19,7 +19,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 })
 export class CustomNavComponent {
   valid = false;
-  entry = "start";
+  entry = "einweisungen-einsehen";
   title = "Einweisungsverwaltung";
 
   showMemberMenu = false;
@@ -71,7 +71,7 @@ export class CustomNavComponent {
   }
 
   updateMenuEntries() {
-    
+
   }
 
 }

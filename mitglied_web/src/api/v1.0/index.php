@@ -275,6 +275,88 @@
 	});
 
 	/**
+	* $RequestRfid : RFID des zu prüfenden Benutzers
+	* author_bot : cn des anfragenden Bots
+	* author_password : Passwort des anfragenden Bots
+	*
+	* Gibt alle Einweisungen des Nutzers zurück
+	*/
+	$app -> get('/Einweisung/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
+		$RequestRfid = preg_replace('/(?![0-9A-F])./', "", $args['RequestRfid']);
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		$ar = array();
+
+		$Sicherheitsbelehrung = ldap_search($ldapconn, "ou=user,dc=ldap-provider,dc=fablab-luebeck",
+					"(&(objectClass=fablabPerson)(rfid=$RequestRfid))", array("dn", "sicherheitsbelehrung"));
+		$SicherheitsbelehrungResult = ldap_get_entries($ldapconn, $Sicherheitsbelehrung);
+
+		array_push($ar, array(
+			"sicherheitsbelehrung"=>true,
+			"datum"=>$SicherheitsbelehrungResult[0]["sicherheitsbelehrung"][0]
+		));
+		$RequestUser = $SicherheitsbelehrungResult[0]["dn"];
+
+		$dn = "ou=einweisung,".$ldap_base_dn;
+		$searchTerm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
+
+		$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum"));
+		$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
+
+		for ($i = 0; $i < $einweisungenResult["count"]; $i++) {
+			$parent = "";
+			$split = ldap_explode_dn($einweisungenResult[$i]["dn"], 0);
+			for ($j = 1; $j < $split["count"]; $j++) {
+				if ($j != 1) {
+					$parent = $parent.",";
+				}
+				$parent = $parent.$split[$j];
+			}
+
+			$geraet = ldap_get_entries($ldapconn, ldap_read($ldapconn, $parent, "(objectClass=geraet)", array("geraetname","cn")));
+
+			array_push($ar, array(
+				"datum"=>$einweisungenResult[$i]["einweisungsdatum"][0],
+				"geraet"=>array(
+					"geraetname"=>$geraet[0]["geraetname"][0],
+					"cn"=>$geraet[0]["cn"][0]
+				)
+			));
+		}
+
+		$searchTerm = "(&(objectClass=geraet)(member=$RequestUser))";
+		$mentorenschaft = ldap_search($ldapconn, $dn, $searchTerm, array("geraetname", "cn"));
+		$mentorenschaftResult = ldap_get_entries($ldapconn, $mentorenschaft);
+
+		$debug = "";
+		for ($i = 0; $i < $mentorenschaftResult["count"]; $i++) {
+			for ($j = 0; $j < sizeof($ar); $j++) {
+				if ($ar[$j]["geraet"]["cn"] == $mentorenschaftResult[$i]["cn"][0]) {
+					$delete = $j;
+				}
+			}
+
+			if (isset($delete)) {
+				unset($ar[$delete]);
+				unset($delete);
+				$ar = array_values($ar);
+			}
+			array_push($ar, array(
+				"geraet"=>array(
+					"geraetname"=>$mentorenschaftResult[$i]["geraetname"][0],
+					"cn"=>$mentorenschaftResult[$i]["cn"][0]
+				),
+				"mentor"=>true
+			));
+		}
+
+		return $response -> withJson($ar, 201);
+
+	});
+
+	/**
 	* $RequestUser : DN oder uid des zu prüfenden Benutzers
 	* author_user : UID des anfragenden Nutzers
 	* author_password : Passwort des anfragenden Nutzers
@@ -339,7 +421,7 @@
 					$delete = $j;
 				}
 			}
-			
+
 			if (isset($delete)) {
 				unset($ar[$delete]);
 				unset($delete);
