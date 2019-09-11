@@ -292,7 +292,9 @@
 		$Sicherheitsbelehrung = ldap_search($ldapconn, "ou=user,dc=ldap-provider,dc=fablab-luebeck",
 					"(&(objectClass=fablabPerson)(rfid=$RequestRfid))", array("dn", "sicherheitsbelehrung"));
 		$SicherheitsbelehrungResult = ldap_get_entries($ldapconn, $Sicherheitsbelehrung);
-
+		if ($SicherheitsbelehrungResult["count"] === 0) {
+			return $response -> withStatus(404);
+		}
 		array_push($ar, array(
 			"sicherheitsbelehrung"=>true,
 			"datum"=>$SicherheitsbelehrungResult[0]["sicherheitsbelehrung"][0]

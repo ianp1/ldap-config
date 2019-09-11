@@ -1,3 +1,9 @@
+<div *ngIf="!connected">
+  Keine Verbindung
+</div>
+<div *ngIf="connected">
+  Verbunden
+</div>
 <div *ngIf="einweisungen !== null && einweisungen.length !== 0">
   <p>
     Du hast die folgenden Einweisungen:
@@ -27,4 +33,7 @@
     <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
     <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
   </table>
+</div>
+<div *ngIf="einweisungen !== null && einweisungen.length === 0">
+  Keine Einweisungen für diese Karte gefunden
 </div>
