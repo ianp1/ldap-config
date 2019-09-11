@@ -23,6 +23,7 @@ export class EigeneEinweisungenComponent implements OnInit {
   einweisungen:any = null;
 
   columnsToDisplay = ['geraet', 'datum'];
+  connected = false;
 
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
@@ -31,7 +32,24 @@ export class EigeneEinweisungenComponent implements OnInit {
   }
 
   ngOnInit() {
-    var connection = new WebSocket('ws://localhost:8765/');
+
+    this.connect();
+
+  }
+
+  connect() {
+    var connection = new WebSocket('ws://192.168.2.55:8765/');
+    connection.onopen = () => {
+      console.log("connected");
+      this.connected = true;
+    };
+
+    connection.onclose = () => {
+      console.log("connection closed");
+      this.connected = false;
+      this.connect();
+    }
+
     connection.onmessage = event => {
       console.log("received socket message: ", event);
       var msg = JSON.parse(event.data);
@@ -70,6 +88,12 @@ export class EigeneEinweisungenComponent implements OnInit {
           }
         }
         this.einweisungen = data;
+      }, error => {
+        if (error.status == 404) {
+          this.einweisungen = [];
+        } else {
+          this.einweisungen = null;
+        }
       });
     };
   }
