@@ -31,7 +31,7 @@ export class EigeneEinweisungenComponent implements OnInit {
   }
 
   ngOnInit() {
-    var connection = new WebSocket('ws://localhost:8765/');
+    var connection = new WebSocket('ws://192.168.2.55:8765/');
     connection.onmessage = event => {
       console.log("received socket message: ", event);
       var msg = JSON.parse(event.data);

@@ -218,7 +218,7 @@
 	* Löscht alte Verknüpfungen
 	*/
 	$app -> post('/RFID/{RequestRfid}/{RequestUser}', function(Request $request, Response $response, array $args) {
-		$RequestRfid = preg_replace('/(?![0-9A-F])./', "", $args['RequestRfid']);
+		$RequestRfid = strtoupper(preg_replace('/(?![0-9a-fA-F])./', "", $args['RequestRfid']));
 		$RequestUser = $args['RequestUser'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
@@ -246,7 +246,7 @@
 	});
 
 	$app -> get('/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
-		$RequestRfid = preg_replace('/(?![0-9A-F])./', "", $args['RequestRfid']);
+		$RequestRfid = strtoupper(preg_replace('/(?![0-9a-fA-F])./', "", $args['RequestRfid']));
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
@@ -282,7 +282,7 @@
 	* Gibt alle Einweisungen des Nutzers zurück
 	*/
 	$app -> get('/Einweisung/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
-		$RequestRfid = preg_replace('/(?![0-9A-F])./', "", $args['RequestRfid']);
+		$RequestRfid = strtoupper(preg_replace('/(?![0-9a-fA-F])./', "", $args['RequestRfid']));
 
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
@@ -467,7 +467,7 @@
 	* Sicherheitsbelehrung noch aktuell sind
 	*/
 	$app -> get('/Einweisung/{RequestToken}/{RequestMachine}', function (Request $request, Response $response, array $args) {
-		$RequestToken = preg_replace('/(?![0-9A-F])./', "", $args['RequestToken']);
+		$RequestToken = strtoupper(preg_replace('/(?![0-9a-fA-F])./', "", $args['RequestToken']));
 		$RequestMachine = $args['RequestMachine'];
 
 		$ldapconn = $request -> getAttribute('ldapconn');
