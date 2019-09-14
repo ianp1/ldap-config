@@ -1,0 +1,41 @@
+<div class="connection">
+  <div *ngIf="!connected">
+    Keine Verbindung zum Lesegerät
+  </div>
+  <div *ngIf="connected">
+    Verbunden
+  </div>
+</div>
+<div *ngIf="einweisungen !== null && einweisungen.length !== 0">
+  <p>
+    Du hast die folgenden Einweisungen:
+  </p>
+  <table mat-table [dataSource]="einweisungen" class="mat-elevation-z8">
+    <ng-container matColumnDef="geraet">
+      <th mat-header-cell *matHeaderCellDef>
+        Gerät
+      </th>
+      <td mat-cell *matCellDef="let einweisung">
+        {{einweisung.sicherheitsbelehrung ? 'Sicherheitsbelehrung' : einweisung.geraet.cn}}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="datum">
+      <th mat-header-cell *matHeaderCellDef>
+        Einweisungsdatum
+      </th>
+      <td mat-cell
+        *matCellDef="let einweisung"
+        class="einweisung"
+        [ngClass]="einweisung.class">
+        {{einweisung.mentor ? 'Gerätementor' : einweisung.datum|ldapDate|date:"dd.MM.yyyy"}}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+  </table>
+</div>
+<div *ngIf="einweisungen !== null && einweisungen.length === 0">
+  Keine Einweisungen für diese Karte gefunden
+</div>
