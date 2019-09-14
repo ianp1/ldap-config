@@ -708,6 +708,7 @@
 				$term = $term."(cn=*$searchterm*)(sn=*$searchterm*)(uid=*$searchterm*)";
 			}
 		}
+		$term .= "))";
 		$selectedKeys = array("cn", "sn", "uid", "dn", "geburtstag", "rfid");
 
 		$searchtermrfid = "(&(objectClass=fablabPerson)(rfid=".cleanRFIDTag($st)."))";
