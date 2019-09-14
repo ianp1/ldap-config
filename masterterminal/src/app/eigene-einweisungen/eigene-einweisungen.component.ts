@@ -55,7 +55,6 @@ export class EigeneEinweisungenComponent implements OnInit {
     }
 
     interval(1000).subscribe(x => {
-      console.log("interval called", Date.now(), this.lastReceived);
       if (Date.now() - this.lastReceived > 5000) {
         console.log("card removed");
         this.einweisungen = null;
