@@ -34,7 +34,7 @@
       - restart services
     - name: write common-password
       template:
-        src: common-auth.j2
+        src: common-password.j2
         dest: /etc/pam.d/common-password
       notify:
       - restart services
