@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  url_base: 'http://127.0.0.1/mitglied_web/'
+  url_base: 'http://localhost/mitglied_web/',
+  ws_base: 'ws://192.168.2.55:8765/'
 };
 
 /*

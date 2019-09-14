@@ -93,11 +93,15 @@
 
 .page_container {
   width: 80%;
+  height: 80%;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-  margin-top: 2em;
-  margin-bottom: 70px;
+  top: 10%;
+  padding: 0px;
+}
+.page_container_sub {
+  padding: 16px;
 }
 
 .mat-nav-list .mat-list-item {
@@ -110,4 +114,24 @@
 
 .mat-list-item {
   width: auto !important;
+}
+
+
+.rfidcard {
+  position:absolute;
+  top:0px;
+  width: 100%;
+  z-index:10;
+}
+
+.rfidcard div{
+  margin-left:auto;
+  margin-right: auto;
+  width: 200px;
+  position: relative;
+}
+
+.rfidcard div img {
+  width: 100%;
+  opacity: 0.5;
 }

@@ -1,28 +1,22 @@
+<div class="rfidcard" *ngIf="einweisung && einweisung.einweisungen==null">
+  <div>
+    <img src="assets/makercard.png"/>
+  </div>
+</div>
+
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav-content>
-    <mat-toolbar color="primary">
-      <button
-        type="button"
-        aria-label="Toggle sidenav"
-        mat-button
-        (click)="drawer.toggle()"
-        id="menubutton"
-      >
-        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-        Menü
-      </button>
-      <span id="apptitle">{{this.title}}</span>
-      <span id="timeout" *ngIf="appComponent.userInactive">Abmeldung in {{appComponent.userTimeoutCounter}}s</span>
-    </mat-toolbar>
-    <mat-card class="page_container">
-      <div *ngIf="entry=='einweisungen-einsehen'">
-        <einweisungen-einsehen>
-        </einweisungen-einsehen>
+    <div class="page_container">
+      <div class="page_container_sub">
+        <div *ngIf="entry=='einweisungen-einsehen'">
+          <einweisungen-einsehen>
+          </einweisungen-einsehen>
+        </div>
+        <div *ngIf="entry=='start'">
+          <start>
+          </start>
+        </div>
       </div>
-      <div *ngIf="entry=='start'">
-        <start>
-        </start>
-      </div>
-    </mat-card>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -7,6 +7,9 @@ import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { debounceTime, map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'einweisungen-einsehen',
@@ -24,6 +27,7 @@ export class EigeneEinweisungenComponent implements OnInit {
 
   columnsToDisplay = ['geraet', 'datum'];
   connected = false;
+  lastReceived = 0;
 
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
@@ -38,7 +42,7 @@ export class EigeneEinweisungenComponent implements OnInit {
   }
 
   connect() {
-    var connection = new WebSocket('ws://192.168.2.55:8765/');
+    var connection = new WebSocket(environment.ws_base);
     connection.onopen = () => {
       console.log("connected");
       this.connected = true;
@@ -49,6 +53,14 @@ export class EigeneEinweisungenComponent implements OnInit {
       this.connected = false;
       this.connect();
     }
+
+    interval(1000).subscribe(x => {
+      console.log("interval called", Date.now(), this.lastReceived);
+      if (Date.now() - this.lastReceived > 5000) {
+        console.log("card removed");
+        this.einweisungen = null;
+      }
+    });
 
     connection.onmessage = event => {
       console.log("received socket message: ", event);
@@ -88,12 +100,14 @@ export class EigeneEinweisungenComponent implements OnInit {
           }
         }
         this.einweisungen = data;
+        this.lastReceived = Date.now();
       }, error => {
         if (error.status == 404) {
           this.einweisungen = [];
         } else {
           this.einweisungen = null;
         }
+        this.lastReceived = Date.now();
       });
     };
   }

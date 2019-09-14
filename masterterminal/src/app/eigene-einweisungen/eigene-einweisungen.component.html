@@ -1,8 +1,10 @@
-<div *ngIf="!connected">
-  Keine Verbindung
-</div>
-<div *ngIf="connected">
-  Verbunden
+<div class="connection">
+  <div *ngIf="!connected">
+    Keine Verbindung zum Lesegerät
+  </div>
+  <div *ngIf="connected">
+    Verbunden
+  </div>
 </div>
 <div *ngIf="einweisungen !== null && einweisungen.length !== 0">
   <p>

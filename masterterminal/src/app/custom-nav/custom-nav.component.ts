@@ -12,6 +12,8 @@ import { LocationStrategy } from '@angular/common';
 
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
+import { EigeneEinweisungenComponent } from '../eigene-einweisungen/eigene-einweisungen.component';
+
 @Component({
   selector: 'custom-nav',
   templateUrl: './custom-nav.component.html',
@@ -39,6 +41,8 @@ export class CustomNavComponent {
 
   @ViewChild('drawer')
   sidenav : MatSidenav;
+  @ViewChild(EigeneEinweisungenComponent)
+  einweisung: EigeneEinweisungenComponent;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -59,6 +63,7 @@ export class CustomNavComponent {
       return false;
     });
   }
+
 
 
   selectEntry(entry: string) {
