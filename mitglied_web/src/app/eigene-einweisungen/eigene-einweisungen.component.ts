@@ -26,7 +26,7 @@ export class EigeneEinweisungenComponent implements OnInit {
   einweisungen:any = null;
 
   columnsToDisplay = ['geraet', 'datum'];
-
+  selectedUser:any;
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
               private formBuilder:FormBuilder, private loginService:LoginService) {
@@ -71,6 +71,12 @@ export class EigeneEinweisungenComponent implements OnInit {
           }
         );
   }
+
+  userSelected(user:any) {
+    this.selectedUser = user;
+    this.einweisungen = null;
+  }
+
 
   fetchUsers() {
     this.userQueryChanged.next('');

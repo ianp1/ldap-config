@@ -7,8 +7,8 @@
   </div>
 </div>
 <div *ngIf="einweisungen !== null && einweisungen.length !== 0">
-  <p>
-    Du hast die folgenden Einweisungen:
+  <p *ngIf="selectedUser !== null">
+    {{selectedUser.cn}} {{selectedUser.sn}} hat die folgenden Einweisungen:
   </p>
   <table mat-table [dataSource]="einweisungen" class="mat-elevation-z8">
     <ng-container matColumnDef="geraet">
