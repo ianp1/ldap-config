@@ -29,6 +29,8 @@ export class EigeneEinweisungenComponent implements OnInit {
   connected = false;
   lastReceived = 0;
 
+  selectedUser:any = null;
+
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
               private formBuilder:FormBuilder) {
@@ -108,6 +110,29 @@ export class EigeneEinweisungenComponent implements OnInit {
         }
         this.lastReceived = Date.now();
       });
+      if (!this.selectedUser || !this.selectedUser.rfid || this.selectedUser.rfid !== msg.rfid) {
+        headers = new HttpHeaders();
+        params = new HttpParams();
+        params = params.append('author_bot', "masterterminal");
+        params = params.append('author_password', "dL45JgsltF7jm5MGvjzc");
+        console.log("requesting user data");
+        this.http.get(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+msg.rfid, {
+          headers: headers,
+          params: params
+        }).subscribe(data => {
+          var users = <Array<any>> data;
+
+          if (users.length && users.length > 0) {
+            console.log("received user data: ", data);
+            this.selectedUser = users[0];
+            if (this.selectedUser != null) {
+              this.selectedUser.rfid = msg.rfid;
+            }
+          }
+        }, error => {
+          this.selectedUser = null;
+        });
+      }
     };
   }
 

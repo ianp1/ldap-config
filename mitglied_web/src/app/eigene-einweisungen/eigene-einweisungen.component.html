@@ -11,6 +11,7 @@
         <user-search
             [eingewiesenerControl]="'showUser'"
             [formGroup]="loginForm"
+            (userSelected)="userSelected($event)"
         >
         </user-search>
       </div>
@@ -27,8 +28,11 @@
     </div>
     <div *ngIf="einweisungen !== null && einweisungen.length !== 0">
       <br><br>
-      <p>
-        Der Nutzer hat die folgenden Einweisungen:
+      <p *ngIf="!loginControls.ownUser.value">
+        {{selectedUser.vorname}} {{selectedUser.nachname}} hat die folgenden Einweisungen:
+      </p>
+      <p *ngIf="loginControls.ownUser.value">
+        Du hast die folgenden Einweisungen:
       </p>
       <table mat-table [dataSource]="einweisungen" class="mat-elevation-z8">
         <ng-container matColumnDef="geraet">
