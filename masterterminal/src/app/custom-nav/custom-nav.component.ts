@@ -11,7 +11,8 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { LocationStrategy } from '@angular/common';
 
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { LoginService } from '../login/login.service';
+
+import { EigeneEinweisungenComponent } from '../eigene-einweisungen/eigene-einweisungen.component';
 
 @Component({
   selector: 'custom-nav',
@@ -20,7 +21,7 @@ import { LoginService } from '../login/login.service';
 })
 export class CustomNavComponent {
   valid = false;
-  entry = "start";
+  entry = "einweisungen-einsehen";
   title = "Einweisungsverwaltung";
 
   showMemberMenu = false;
@@ -40,6 +41,8 @@ export class CustomNavComponent {
 
   @ViewChild('drawer')
   sidenav : MatSidenav;
+  @ViewChild(EigeneEinweisungenComponent)
+  einweisung: EigeneEinweisungenComponent;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -49,8 +52,7 @@ export class CustomNavComponent {
 
   constructor(private breakpointObserver: BreakpointObserver,
               public appComponent: AppComponent,
-              public location:LocationStrategy, public http:HttpClient,
-              public loginService: LoginService) {
+              public location:LocationStrategy, public http:HttpClient) {
     this.isHandset$.subscribe(model=> {
       this.isHandsetLocal = model;
     });
@@ -63,6 +65,7 @@ export class CustomNavComponent {
   }
 
 
+
   selectEntry(entry: string) {
     this.entry=entry;
     this.title = this.titles[entry];
@@ -73,38 +76,7 @@ export class CustomNavComponent {
   }
 
   updateMenuEntries() {
-    if (!this.valid) {
-      this.showMemberMenu = false;
-      return;
-    }
 
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
-    params = params.append('author_user', user);
-    params = params.append('author_password', passw);
-
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Authentifizierung', {
-      headers: headers,
-      params: params
-    }).subscribe(data =>{
-      console.log("menu entries request successfull");
-      var headers = new HttpHeaders();
-      var params = new HttpParams();
-      params = params.append('author_user', user);
-      params = params.append('author_password', passw);
-
-      this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Mitgliederverwaltung', {
-        headers: headers,
-        params: params
-      }).subscribe(data => {
-        this.showMemberMenu = true;
-      });
-    }, error => {
-      console.log("menu entries request permission denied");
-      this.showMemberMenu = false;
-    });
   }
 
 }

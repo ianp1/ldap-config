@@ -1,0 +1,22 @@
+<div class="rfidcard" *ngIf="einweisung && einweisung.einweisungen==null">
+  <div>
+    <img src="assets/makercard.png"/>
+  </div>
+</div>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav-content>
+    <div class="page_container">
+      <div class="page_container_sub">
+        <div *ngIf="entry=='einweisungen-einsehen'">
+          <einweisungen-einsehen>
+          </einweisungen-einsehen>
+        </div>
+        <div *ngIf="entry=='start'">
+          <start>
+          </start>
+        </div>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

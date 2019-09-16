@@ -40,7 +40,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
 
 CRGB leds[NUM_LEDS];
 
-const char* GERAET = "geraetname=Lasercutter,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
+const char* GERAET = "geraetname=Drehbank,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
 
 const char* ssid = "fablab";
 const char* password = "fablabfdm";
@@ -65,6 +65,9 @@ bool LEDWifiShine = true;
 int einweisung = 0;
 int sicherheitsbelehrung = 0;
 
+bool led_false_state = true;
+long led_false_time = 0;
+
 
 
 void setup() {
@@ -82,6 +85,8 @@ void setup() {
 
 void reject() {
   state = 1;
+  led_false_state = true;
+  led_false_time = millis();
 }
 
 void authorize() {
@@ -134,9 +139,13 @@ bool ServerRequest(String rfid){
           Serial.println(doc["sicherheitsbelehrung"].as<String>());
           if (doc["einweisung"].is<bool>()) {
             Serial.println("Einweisung nicht vorhanden");
+            einweisung = -1;
+            sicherheitsbelehrung = 1;
             return false;
           } else if (doc["sicherheitsbelehrung"].is<bool>()) {
             Serial.println("Sicherheitsbelehrung nicht vorhanden");
+            sicherheitsbelehrung = -1;
+            einweisung = 1;
             return false;
           } else {
             einweisung = doc["einweisung"];
@@ -239,7 +248,23 @@ void LEDOff() {
 
 void LEDFalse() {
   FastLED.setBrightness(BRIGHTNESS_INVALID);
-  fill_solid(leds, NUM_LEDS, CRGB::Red);
+  if (led_false_state) { 
+    fill_solid(leds, NUM_LEDS, CRGB::Red); 
+  } else {
+    fill_solid(leds, NUM_LEDS, CRGB::Black);
+  }
+  
+  if (millis() - led_false_time > 1000) {
+    led_false_state = !led_false_state;
+    led_false_time = millis();
+  }
+  
+  if (sicherheitsbelehrung < 0) {
+    leds[0] = COLOR_SICHERHEIT;
+  }
+  if (einweisung < 0) {
+    leds[0] = COLOR_EINWEISUNG;
+  }
 }
 
 void LEDTrue() {
