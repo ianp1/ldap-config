@@ -245,6 +245,9 @@
 		return $response -> withStatus(500);
 	});
 
+	/**
+	* Gibt Nutzerdaten des mit der RFID-Karte verknüpften Users zurück
+	*/
 	$app -> get('/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
 		$RequestRfid = cleanRFIDTag($args['RequestRfid']);
 
