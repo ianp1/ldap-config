@@ -31,7 +31,7 @@ class RfidReaderProtocol(WebSocketServerProtocol):
             tag = hex(id)[2:-2]
             message = {"rfid":tag}
             self.sendMessage(json.dumps(message).encode('utf8'), False)
-        self.send_fut = reactor.callLater(1, self.sendRFID)
+        self.send_fut = reactor.callLater(0.1, self.sendRFID)
 
 log.startLogging(sys.stdout)
 

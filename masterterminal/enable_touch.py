@@ -32,6 +32,6 @@ try:
             else:
                 # disable touchscreen
                 os.system("xinput --enable "+str(inputId))
-        pass
+        time.sleep(0.1)
 finally:
     GPIO.cleanup()
