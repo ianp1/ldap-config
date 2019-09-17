@@ -27,6 +27,7 @@ export class EigeneEinweisungenComponent implements OnInit {
 
   columnsToDisplay = ['geraet', 'datum'];
   selectedUser:any;
+  ownUser: false;
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
               private formBuilder:FormBuilder, private loginService:LoginService) {
@@ -40,6 +41,10 @@ export class EigeneEinweisungenComponent implements OnInit {
     this.loginForm = this.formBuilder.group({
        ownUser: [false],
        showUser: ['']
+    });
+
+    this.loginForm.get('ownUser').valueChanges.subscribe(value => {
+      this.einweisungen = null;
     });
 
     this.userQueryChanged
