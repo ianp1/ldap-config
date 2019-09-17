@@ -8,7 +8,7 @@
 </div>
 <div *ngIf="einweisungen !== null && einweisungen.length !== 0">
   <p *ngIf="selectedUser !== null">
-    {{selectedUser.cn}} {{selectedUser.sn}} hat die folgenden Einweisungen:
+    <b>{{selectedUser.cn}} {{selectedUser.sn}}</b> hat die folgenden Einweisungen:
   </p>
   <table mat-table [dataSource]="einweisungen" class="mat-elevation-z8">
     <ng-container matColumnDef="geraet">
@@ -38,4 +38,6 @@
 </div>
 <div *ngIf="einweisungen !== null && einweisungen.length === 0">
   Keine Einweisungen für diese Karte gefunden
+</div>
+<div id="footer">
 </div>

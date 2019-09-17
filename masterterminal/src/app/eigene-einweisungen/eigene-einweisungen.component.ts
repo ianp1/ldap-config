@@ -9,6 +9,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
+import { ScrollToService } from '@nicky-lenaers/ngx-scroll-to';
+
 import { interval } from 'rxjs';
 
 @Component({
@@ -33,7 +35,8 @@ export class EigeneEinweisungenComponent implements OnInit {
 
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
-              private formBuilder:FormBuilder) {
+              private formBuilder:FormBuilder,
+              private scrollToService:ScrollToService) {
 
   }
 
@@ -57,14 +60,13 @@ export class EigeneEinweisungenComponent implements OnInit {
     }
 
     interval(1000).subscribe(x => {
-      if (Date.now() - this.lastReceived > 5000) {
+      if (Date.now() - this.lastReceived >7000) {
         console.log("card removed");
         this.einweisungen = null;
       }
     });
 
     connection.onmessage = event => {
-      console.log("received socket message: ", event);
       var msg = JSON.parse(event.data);
       var headers = new HttpHeaders();
       var params = new HttpParams();
@@ -80,8 +82,6 @@ export class EigeneEinweisungenComponent implements OnInit {
 
         var einweisung:any;
         for (einweisung of requestData) {
-          console.log(einweisung);
-          console.log(einweisung.mentor);
           if (einweisung.mentor) {
             einweisung.class = 'valid';
           } else {
@@ -100,8 +100,19 @@ export class EigeneEinweisungenComponent implements OnInit {
             }
           }
         }
-        this.einweisungen = data;
+        if (!this.einweisungen) {
+          console.log("einweisungsdata changed");
+          setTimeout(() => {
+            this.scrollToService.scrollTo({
+              target: 'footer',
+              duration: 5000,
+              easing: 'easeOutCubic'
+            });
+          }, 2000);
+
+        }
         this.lastReceived = Date.now();
+        this.einweisungen = data;
       }, error => {
         if (error.status == 404) {
           this.einweisungen = [];
@@ -158,8 +169,6 @@ export class EigeneEinweisungenComponent implements OnInit {
 
       var einweisung:any;
       for (einweisung of requestData) {
-        console.log(einweisung);
-        console.log(einweisung.mentor);
         if (einweisung.mentor) {
           einweisung.class = 'valid';
         } else {
