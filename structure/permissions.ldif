@@ -34,7 +34,7 @@ olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=sicherheitsbelehrung by self read by * break
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=entry by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=rfid,sicherheitsbelehrung by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=rfid,sicherheitsbelehrung,belehrtVon by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=uid,entry,cn,sn,uid,geburtstag,objectClass,rfid,sicherheitsbelehrung by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.regex="^([^,]+),geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" by dnattr=eingewiesener read by * break
 olcAccess: to dn.regex="^geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" attrs=children by group.expand="geraetname=$1,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" write by * break
