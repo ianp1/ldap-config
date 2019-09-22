@@ -33,6 +33,8 @@ export class EigeneEinweisungenComponent implements OnInit {
 
   selectedUser:any = null;
 
+  readTime = 0;
+
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
               private formBuilder:FormBuilder,
@@ -60,8 +62,8 @@ export class EigeneEinweisungenComponent implements OnInit {
     }
 
     interval(1000).subscribe(x => {
-      if (Date.now() - this.lastReceived >7000) {
-        console.log("card removed");
+      if (Date.now() - this.lastReceived > this.readTime) {
+        console.log("card removed, read Time: ", this.readTime, "lastReceived: ", this.lastReceived);
         this.einweisungen = null;
       }
     });
@@ -102,10 +104,14 @@ export class EigeneEinweisungenComponent implements OnInit {
         }
         if (!this.einweisungen) {
           console.log("einweisungsdata changed");
+          this.readTime = 7000;
+          if (requestData !== null && requestData.length && requestData.length > 0) {
+            this.readTime = requestData.length * 1500;
+          }
           setTimeout(() => {
             this.scrollToService.scrollTo({
               target: 'footer',
-              duration: 5000,
+              duration: this.readTime - 5000,
               easing: 'easeOutCubic'
             });
           }, 2000);
