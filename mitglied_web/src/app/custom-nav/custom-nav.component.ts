@@ -107,4 +107,8 @@ export class CustomNavComponent {
     });
   }
 
+  logout() {
+    window.location.reload();
+  }
+
 }
