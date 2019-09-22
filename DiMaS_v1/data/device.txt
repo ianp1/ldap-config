@@ -1,1 +1,1 @@
-geraetname=UltimakerOriginalPlus,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
+geraetname=Drehbank,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck

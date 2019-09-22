@@ -57,6 +57,7 @@ const int httpsPort = 443;
 const char* fingerprint = "52:07:0F:7E:47:06:E2:2C:19:44:B3:84:0F:4F:5D:52:A8:4D:71:86";
 
 byte state = 0;
+bool startup = true;
 
 // Timing
 long lastCardReadTime = 0;
@@ -75,6 +76,7 @@ long led_false_time = 0;
 
 
 void setup() {
+  Serial.begin(115200);
   // sanity check delay - allows reprogramming if accidently blowing power w/leds
   delay(2000);
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
@@ -82,7 +84,6 @@ void setup() {
   SPI.begin();           // Init SPI bus
   mfrc522.PCD_Init();    // Init MFRC522
   
-  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
@@ -224,6 +225,12 @@ void loop() {
     LEDWifi();
     FastLED.show();
     delay(500);
+    startup = true;
+  }
+  if (startup) {
+    startup = false;
+    Serial.print("Connected, IP address: ");
+    Serial.println(WiFi.localIP());
   }
   ArduinoOTA.handle();
   
