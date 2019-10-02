@@ -17,6 +17,11 @@
       <a mat-list-item (click)="selectEntry('sicherheitsbelehrung')">Neue Sicherheitsbelehrung eintragen</a>
       <a mat-list-item (click)="selectEntry('einweisungen-einsehen')">Einweisungen abfragen</a>
       <a mat-list-item (click)="selectEntry('neue-einweisung')">Neue Einweisung eintragen</a>
+      <div *ngIf="showTieredMenu">
+        <a mat-list-item (click)="selectEntry('staffeleinweisung-bearbeiten')">
+          Gestaffelte Einweisung verwalten
+        </a>
+      </div>
       <h3>
         RFID-Karten
       </h3>
@@ -97,6 +102,10 @@
           <div *ngIf="entry=='summary-page'">
             <summary-page>
             </summary-page>
+          </div>
+          <div *ngIf="entry=='staffeleinweisung-bearbeiten'">
+            <staffeleinweisung>
+            </staffeleinweisung>
           </div>
         </div>
       </div>

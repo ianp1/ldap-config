@@ -462,6 +462,25 @@
 		return $response -> withStatus(401);
 	});
 
+	$app -> get('/StaffelEinweisung', function(Request $request, Response $response, array $args) {
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
+
+		$usersearch = $request -> getAttribute("request_user");
+		$machines = "ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
+
+		$machineSearch = ldap_search($ldapconn, $machines, 
+					"(&(objectClass=geraet)(member=$usersearch)(gestaffelteEinweisung=TRUE))", array("dn"));
+		if ($machineSearch) {
+			$machines = ldap_get_entries($ldapconn, $machineSearch);
+			if ($machines['count'] > 0) {
+				return $response -> withStatus(201);
+			}
+		}
+
+		return $response -> withStatus(401);
+	});
+
 	/**
 	* $RequestToken : RFID-Token des Abgefragten Nutzers
 	* $RequestMachine : DN der Angefragten Maschine
@@ -726,16 +745,31 @@
 		}
 
 		$ar = array();
-		for ($i = 0; $i < $results['count']; $i++) {
-			array_push($ar, array(
-				"vorname"=>$results[$i]["cn"][0],
-				"nachname"=>$results[$i]["sn"][0],
-				"uid"=>$results[$i]["uid"][0],
-				"dn"=>$results[$i]["dn"],
-				"geburtstag"=>$results[$i]["geburtstag"][0],
-				"rfid"=>$results[$i]["rfid"][0]
-			));
+		if (isset($request->getQueryParams()["filter"])) {
+			$filter = json_decode($request -> getQueryParams()["filter"], true);
 		}
+		for ($i = 0; $i < $results['count']; $i++) {
+			$use = true;
+			if (isset($filter, $filter["maschine"])) {
+				$einweisungTerm = "(&(objectClass=einweisung)(eingewiesener=".$results[$i]["dn"]."))";
+				$einweisungSuche = ldap_search($ldapconn, $filter["maschine"], $einweisungTerm, array("dn"));
+				$einweisung = ldap_get_entries($ldapconn, $einweisungSuche);
+				if ($einweisung["count"] < 1) {
+					$use = false;
+				}
+			}
+			if ($use) {
+				array_push($ar, array(
+					"vorname"=>$results[$i]["cn"][0],
+					"nachname"=>$results[$i]["sn"][0],
+					"uid"=>$results[$i]["uid"][0],
+					"dn"=>$results[$i]["dn"],
+					"geburtstag"=>$results[$i]["geburtstag"][0],
+					"rfid"=>$results[$i]["rfid"][0]
+				));
+			}
+		}
+		
 		return $response -> withJson($ar, 201);
 	});
 
@@ -785,7 +819,13 @@
 		$ldapconn = $request -> getAttribute("ldapconn");
 
 		$dn = "ou=einweisung,".$ldap_base_dn;
-		$filter = "(&(objectClass=geraet)(member=$userDn))";
+		$filter = "(&(objectClass=geraet)(member=$userDn)";
+		if (isset($request->getQueryParams()["filter"])) {
+			if ($request->getQueryParams()["filter"] === "tiered") {
+				$filter .= "(gestaffelteEinweisung=TRUE)";
+			}
+		}
+		$filter .= ")";
 
 		$sr = ldap_search($ldapconn, $dn, $filter, array("geraetname", "dn", "cn"));
 
@@ -810,6 +850,56 @@
 		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 
 		return $response -> withJson(true, 201);
+	});
+
+	$app -> get('/Staffeleinweisung/{geraet}/{nutzer}', function(Request $request, Response $response, array $args) {
+		$geraet = $args["geraet"];
+		$nutzer = $args["nutzer"];
+
+		$ldapconn = $request -> getAttribute("ldapconn");
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+
+		$fields = array("dn", "aktiviert", "kommentar");
+		$sr = ldap_search($ldapconn, $geraet, "(&(objectClass=einweisung)(eingewiesener=$nutzer))", $fields);
+		$result = ldap_get_entries($ldapconn, $sr);
+
+		$ar = array(
+			"kommentar"=>"",
+			"aktiviert"=>false
+		);
+		if ($result["count"] > 0) {
+			if (isset($result[0]["aktiviert"])) {
+				$ar["aktiviert"] = $result[0]["aktiviert"][0];
+			}
+			if (isset($result[0]["kommentar"])) {
+				$ar["kommentar"] = $result[0]["kommentar"][0];
+			}
+		}
+
+		return $response -> withJson($ar, 201);
+	});
+
+	$app -> post('/Staffeleinweisung/{geraet}/{nutzer}', function(Request $request, Response $response, array $args) {
+		$geraet = $args["geraet"];
+		$nutzer = $args["nutzer"];
+
+		$ldapconn = $request -> getAttribute("ldapconn");
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+		
+		$vals = $request -> getParsedBody();
+		$aktiviert = strtolower($vals["aktiviert"])==='true' ? 'TRUE' : 'FALSE';
+		$kommentar = $vals["kommentar"];
+
+		$einweisungSuche = ldap_search($ldapconn, $geraet, "(&(objectClass=einweisung)(eingewiesener=$nutzer))", array("dn"));
+		$einweisungErg = ldap_get_entries($ldapconn, $einweisungSuche);
+		if ($einweisungErg["count"] > 0) {
+			ldap_mod_replace($ldapconn, $einweisungErg[0]["dn"], array(
+				"aktiviert" => $aktiviert,
+				"kommentar" => $kommentar
+			));
+		} else {
+			return $response -> withStatus(404);
+		}
 	});
 
 	$app -> run();

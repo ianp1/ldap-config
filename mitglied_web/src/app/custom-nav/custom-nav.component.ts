@@ -24,6 +24,7 @@ export class CustomNavComponent {
   title = "Einweisungsverwaltung";
 
   showMemberMenu = false;
+  showTieredMenu = false;
 
   titles = {
     "start":"Einweisungsverwaltung",
@@ -75,6 +76,7 @@ export class CustomNavComponent {
   updateMenuEntries() {
     if (!this.valid) {
       this.showMemberMenu = false;
+      this.showTieredMenu = false;
       return;
     }
 
@@ -100,6 +102,13 @@ export class CustomNavComponent {
         params: params
       }).subscribe(data => {
         this.showMemberMenu = true;
+      });
+
+      this.http.get(this.appComponent.url_base+'api/v1.0/index.php/StaffelEinweisung', {
+        headers: headers,
+        params: params
+      }).subscribe(data => {
+        this.showTieredMenu = true;
       });
     }, error => {
       console.log("menu entries request permission denied");
