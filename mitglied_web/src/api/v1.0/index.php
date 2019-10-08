@@ -647,7 +647,16 @@
 			}
 			return $response -> withJson(array("status" => "not updating", "date" => $einweisungResult[0]["einweisungsdatum"][0]), 202);
 		} else {
+			$machineFilter = "(objectClass=geraet)";
+			$machineSearch = ldap_search($ldapconn, $RequestMachine, $machineFilter, array("dn", "gestaffelteEinweisung"));
+			$machineResult = ldap_get_entries($ldapconn, $machineSearch);
+
 			$entry = array();
+			if ($machineResult["count"] === 1 && isset($machineResult[0]["gestaffelteeinweisung"])) {
+				if ($machineResult[0]["gestaffelteeinweisung"][0] === 'TRUE') {
+					$entry["aktiviert"] = "FALSE";
+				}
+			}
 			$entry["objectClass"] = "einweisung";
 			$entry["eingewiesener"] = $RequestUser;
 			$entry["einweisungsdatum"] = $RequestDate;
