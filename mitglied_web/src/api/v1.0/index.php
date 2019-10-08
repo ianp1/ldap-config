@@ -307,7 +307,7 @@
 		$dn = "ou=einweisung,".$ldap_base_dn;
 		$searchTerm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
-		$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum"));
+		$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum", "aktiviert"));
 		$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
 
 		for ($i = 0; $i < $einweisungenResult["count"]; $i++) {
@@ -321,14 +321,18 @@
 			}
 
 			$geraet = ldap_get_entries($ldapconn, ldap_read($ldapconn, $parent, "(objectClass=geraet)", array("geraetname","cn")));
-
-			array_push($ar, array(
+			$push = array(
 				"datum"=>$einweisungenResult[$i]["einweisungsdatum"][0],
 				"geraet"=>array(
 					"geraetname"=>$geraet[0]["geraetname"][0],
 					"cn"=>$geraet[0]["cn"][0]
 				)
-			));
+			);
+			if (isset($einweisungenResult[$i]["aktiviert"])) {
+				$push["aktiviert"] = ($einweisungenResult[$i]["aktiviert"][0]==="TRUE");
+			}
+			
+			array_push($ar, $push);
 		}
 
 		$searchTerm = "(&(objectClass=geraet)(member=$RequestUser))";
@@ -512,7 +516,7 @@
 			$einweisungterm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
 			$einweisungErg = ldap_search($ldapconn, $einweisungdn, $einweisungterm,
-										array("dn", "einweisungsdatum"));
+										array("dn", "einweisungsdatum", "aktiviert"));
 			$einweisungResult = ldap_get_entries($ldapconn, $einweisungErg);
 
 			$duedate = time() - 60 * 60 * 24 * 365; // 1 Jahr Dauer
@@ -527,6 +531,7 @@
 						$einweisungMonthsdiff = ceil($datediff / (60.0 * 60.0 * 24.0 * 30.0));
 					}
 				}
+				$aktiviert = $einweisungResult[0]["aktiviert"][0];
 			}
 
 			$sicherheitsdate = ldapToUnixTimestamp($RequestUserResults[0]["sicherheitsbelehrung"][0]);
@@ -551,22 +556,28 @@
 		}
 
 
-		if (isset($einweisungMonthsdiff, $sicherheitMonthsdiff)) {
-			$response = $response -> withJson(array(
-				"einweisung" => $einweisungMonthsdiff,
-				"sicherheitsbelehrung" => $sicherheitMonthsdiff
-			), 201);
-		} else if (!isset($einweisungMonthsdiff)) {
-			$response = $response -> withJson(array(
-				"einweisung" => false
-			), 201);
-		} else if (!isset($sicherheitMonthsdiff)) {
-			$response = $response -> withJson(array(
-				"sicherheitsbelehrung" => false
-			), 201);
+		$result = array();
+		if (isset($aktiviert)) {
+			$result["aktiviert"] = ($aktiviert === 'TRUE');
+		} else {
+			$result["aktiviert"] = true;
+		}
+		if ($result["aktiviert"] && isset($einweisungMonthsdiff)) {
+			$result["einweisung"] = $einweisungMonthsdiff;
+		} else {
+			$result["einweisung"] = false;
+		}
+		if ($result["aktiviert"] && isset($sicherheitMonthsdiff)) {
+			$result["sicherheitsbelehrung"] = $sicherheitMonthsdiff;
+		} else {
+			$result["sicherheitsbelehrung"] = false;
+		}
+
+		if (isset($einweisungMonthsdiff) || isset($sicherheitMonthsdiff)) {
+			$response = $response -> withJson($result, 201);
 		} else {
 			$response -> getBody() -> write("false\n");
-			return $response -> withStatus(201);
+			$response -> withStatus(201);
 		}
 
 		//needed for compatibility with esp wifi library
