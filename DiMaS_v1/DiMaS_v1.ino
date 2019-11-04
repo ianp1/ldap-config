@@ -21,6 +21,10 @@
 #include <fastled_delay.h>
 #include <pixeltypes.h> 
 #include <power_mgt.h>
+
+#include <ArduinoOTA.h>
+#include <FS.h>   // Include the SPIFFS library
+
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
 #define NUM_LEDS  4
@@ -40,7 +44,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance
 
 CRGB leds[NUM_LEDS];
 
-const char* GERAET = "geraetname=Drehbank,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
+String GERAET = "invalid";
 
 const char* ssid = "fablab";
 const char* password = "fablabfdm";
@@ -53,6 +57,7 @@ const int httpsPort = 443;
 const char* fingerprint = "52:07:0F:7E:47:06:E2:2C:19:44:B3:84:0F:4F:5D:52:A8:4D:71:86";
 
 byte state = 0;
+bool startup = true;
 
 // Timing
 long lastCardReadTime = 0;
@@ -71,6 +76,7 @@ long led_false_time = 0;
 
 
 void setup() {
+  Serial.begin(115200);
   // sanity check delay - allows reprogramming if accidently blowing power w/leds
   delay(2000);
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
@@ -78,9 +84,55 @@ void setup() {
   SPI.begin();           // Init SPI bus
   mfrc522.PCD_Init();    // Init MFRC522
   
-  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
+
+  SPIFFS.begin();
+  if (SPIFFS.exists("/device.txt")) {
+    File file = SPIFFS.open("/device.txt", "r");
+    GERAET = file.readString();
+    GERAET.trim();
+    Serial.print("Read Device Name: ");
+    Serial.println(GERAET);
+    file.close();
+  } else {
+    Serial.println("no device name found!");
+  }
+
+  ArduinoOTA.setPasswordHash("280def0401a4cfad3c06f5b280dacf7d");
+
+  ArduinoOTA.onStart([]() {
+    String type;
+    if (ArduinoOTA.getCommand() == U_FLASH) {
+      type = "sketch";
+    } else { // U_SPIFFS
+      type = "filesystem";
+    }
+
+    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    Serial.println("Start updating " + type);
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) {
+      Serial.println("Auth Failed");
+    } else if (error == OTA_BEGIN_ERROR) {
+      Serial.println("Begin Failed");
+    } else if (error == OTA_CONNECT_ERROR) {
+      Serial.println("Connect Failed");
+    } else if (error == OTA_RECEIVE_ERROR) {
+      Serial.println("Receive Failed");
+    } else if (error == OTA_END_ERROR) {
+      Serial.println("End Failed");
+    }
+  });
+  ArduinoOTA.begin();
 }
 
 void reject() {
@@ -173,7 +225,14 @@ void loop() {
     LEDWifi();
     FastLED.show();
     delay(500);
+    startup = true;
   }
+  if (startup) {
+    startup = false;
+    Serial.print("Connected, IP address: ");
+    Serial.println(WiFi.localIP());
+  }
+  ArduinoOTA.handle();
   
   if (state == 0) {
     LEDOff();
@@ -218,7 +277,6 @@ void loop() {
   }
 
   if (millis() - lastCardReadTime > cardReadTimeout) {
-    Serial.println("clearing state");
     clearState();
     lastCardRead = "";
     lastCardReadTime = 0;

@@ -27,8 +27,14 @@
       <td mat-cell
         *matCellDef="let einweisung"
         class="einweisung"
-        [ngClass]="einweisung.class">
-        {{einweisung.mentor ? 'Gerätementor' : einweisung.datum|ldapDate|date:"dd.MM.yyyy"}}
+        [ngClass]="einweisung.class"
+      >
+        <div *ngIf="isActivated(einweisung)">
+          {{einweisung.mentor ? 'Gerätementor' : einweisung.datum|ldapDate|date:"dd.MM.yyyy"}}
+        </div>
+        <div *ngIf="! isActivated(einweisung)">
+          Nur unter Aufsicht
+        </div>
       </td>
     </ng-container>
 

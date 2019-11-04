@@ -82,6 +82,7 @@ import { DateAdapter } from '@angular/material';
 import { GermanDateAdapter } from './GermanDateAdapter';
 
 import {Platform, PlatformModule} from '@angular/cdk/platform';
+import { StaffeleinweisungComponent } from './staffeleinweisung/staffeleinweisung.component';
 
 const appRoutes:Routes = [
 	{path: '', component: RedirectComponent},
@@ -110,7 +111,8 @@ registerLocaleData(localeDe, 'de');
     StartComponent,
     RedirectComponent,
     ReviewBannerComponent,
-    SummaryPageComponent
+    SummaryPageComponent,
+    StaffeleinweisungComponent
 	],
 	imports: [
     PlatformModule,

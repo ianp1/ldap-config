@@ -33,6 +33,8 @@ export class EigeneEinweisungenComponent implements OnInit {
 
   selectedUser:any = null;
 
+  readTime = 0;
+
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
               private formBuilder:FormBuilder,
@@ -60,8 +62,8 @@ export class EigeneEinweisungenComponent implements OnInit {
     }
 
     interval(1000).subscribe(x => {
-      if (Date.now() - this.lastReceived >7000) {
-        console.log("card removed");
+      if (Date.now() - this.lastReceived > this.readTime) {
+        console.log("card removed, read Time: ", this.readTime, "lastReceived: ", this.lastReceived);
         this.einweisungen = null;
       }
     });
@@ -90,8 +92,9 @@ export class EigeneEinweisungenComponent implements OnInit {
             date.setFullYear(date.getFullYear() + 1);
             var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
 
-
-            if (diff > 3) {
+            console.log("einweisung: ", einweisung);
+            console.log("activated: ", this.isActivated(einweisung))
+            if (diff > 3 && this.isActivated(einweisung)) { 
               einweisung.class = 'valid';
             } else if (diff >= 0) {
               einweisung.class = 'warning';
@@ -102,10 +105,14 @@ export class EigeneEinweisungenComponent implements OnInit {
         }
         if (!this.einweisungen) {
           console.log("einweisungsdata changed");
+          this.readTime = 7000;
+          if (requestData !== null && requestData.length && requestData.length > 0) {
+            this.readTime = requestData.length * 1500;
+          }
           setTimeout(() => {
             this.scrollToService.scrollTo({
               target: 'footer',
-              duration: 5000,
+              duration: this.readTime - 5000,
               easing: 'easeOutCubic'
             });
           }, 2000);
@@ -150,44 +157,7 @@ export class EigeneEinweisungenComponent implements OnInit {
   fetchUsers() {
   }
 
-  showEinweisungen() {
-    var searchTerm = "";
-
-
-
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
-    params = params.append('author_bot', "abc");
-    params = params.append('author_password', "cde");
-
-    //TODO change route
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/RFID/'+searchTerm, {
-      headers: headers,
-      params: params
-    }).subscribe(data => {
-      var requestData = <Array<any>> data;
-
-      var einweisung:any;
-      for (einweisung of requestData) {
-        if (einweisung.mentor) {
-          einweisung.class = 'valid';
-        } else {
-          var date = new Date(this.appComponent.reformatLDAPDate(einweisung.datum));
-
-          date.setFullYear(date.getFullYear() + 1);
-          var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
-
-
-          if (diff > 3) {
-            einweisung.class = 'valid';
-          } else if (diff >= 0) {
-            einweisung.class = 'warning';
-          } else {
-            einweisung.class = 'invalid';
-          }
-        }
-      }
-      this.einweisungen = data;
-    });
+  isActivated(einweisung) {
+    return typeof einweisung.aktiviert === 'undefined' || einweisung.aktiviert;
   }
 }

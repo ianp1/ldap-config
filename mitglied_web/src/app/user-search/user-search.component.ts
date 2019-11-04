@@ -22,6 +22,8 @@ export class UserSearchComponent implements OnInit {
   formGroup : FormGroup;
   @Input()
   eingewiesenerControl : string;
+  @Input()
+  filter: object;
 
   @Output()
   userSelected = new EventEmitter<any>();
@@ -60,6 +62,9 @@ export class UserSearchComponent implements OnInit {
               var params = new HttpParams();
               params = params.append('author_user', user);
               params = params.append('author_password', passw);
+              if (this.filter) {
+                params = params.append('filter', JSON.stringify(this.filter));
+              }
 
               this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
                 headers: headers,

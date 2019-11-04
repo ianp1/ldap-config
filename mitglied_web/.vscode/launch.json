@@ -1,0 +1,27 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "attach",
+            "name": "Server",
+            "webRoot": "${workspaceFolder}",
+            "port": 9222
+        },
+        {
+            "type": "php",
+            "request": "launch",
+            "name": "Backend",
+            "port": 9000
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Full Debug",
+            "configurations": ["Server", "Backend"]
+        }
+    ]
+}
