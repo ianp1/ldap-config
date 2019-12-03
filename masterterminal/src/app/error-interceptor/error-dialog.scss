@@ -1,0 +1,51 @@
+//@import '~@angular/material/theming';
+@import "../../fablabTheme";
+
+@mixin mat-icon-button-size($size: 40px) {
+  width: $size/2;
+  height: $size/2;
+  line-height: $size/2;
+  background-color: white;
+
+
+  .mat-icon, .mat-icon-button i {
+    line-height: $size / 2;
+    color:mat-color($customWarn, 500);
+  }
+
+  .mat-icon {
+    width: $size / 2;
+    height: $size / 2;
+    margin: 0;
+  }
+
+  .material-icons {
+    font-size: $size / 2;
+  }
+}
+
+#dialog-icon {
+  @include mat-icon-button-size(80px);
+}
+
+.mat-typography {
+  font-size:16px;
+}
+/*
+#dialog-icon {
+  display:inline;
+  width:40px;
+  height:40px;
+  font-size:40px;
+  position:relative;
+  top:10px;
+}*/
+
+#dialog-title {
+  display:inline;
+  margin-left:20px;
+}
+
+.mat-dialog-content {
+  margin-top:20px;
+}

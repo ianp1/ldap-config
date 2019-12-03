@@ -56,7 +56,9 @@ export class AppComponent {
     }
   }
 
-  @HostListener('window:mousemove') refreshUserState() {
+  @HostListener('window:keydown')
+  @HostListener('window:mousemove')
+  refreshUserState() {
     clearTimeout(this.userActivity);
     clearTimeout(this.userTimeout);
     this.setInactivity();

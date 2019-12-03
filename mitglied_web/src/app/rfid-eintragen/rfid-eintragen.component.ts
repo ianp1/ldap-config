@@ -110,9 +110,8 @@ export class RfidEintragenComponent implements OnInit {
             customText : "Der neue Besitzer wurde eingetragen. Bitte trage jetzt<br/>"+
             "<ul>"+
               "<li>Name ("+updateUser["vorname"]+" "+updateUser["nachname"]+")</li>"+
-              "<li>und ID ("+updateUser["uid"]+")</li>"+
             "</ul>"+
-            "in der neuen Karte ein und werfe den <b>Pfand (5€)</b> in die vorgesehene Kasse",
+            "in der neuen Karte ein und werfe die <b>Kosten (2€)</b> in die vorgesehene Kasse",
           }
         });
         dialogRef.afterClosed().subscribe(data => {
@@ -160,8 +159,6 @@ export class DialogRfidExisting {
   interfacestring: DialogRfidExistingColumn[];
   constructor (public dialogRef: MatDialogRef<DialogRfidExisting>,
         @Inject(MAT_DIALOG_DATA) public data: DialogRfidExistingData) {
-
-
     this.dataArray = data.users as any[];
     this.interfacestring = this.dataArray.map(obj => {
       return {

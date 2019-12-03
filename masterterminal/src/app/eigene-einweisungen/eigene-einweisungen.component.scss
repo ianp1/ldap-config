@@ -1,0 +1,34 @@
+@import "../../fablabTheme";
+
+table {
+  width:60%;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:center;
+  margin-top:50px;
+}
+
+table {
+  text-align: left;
+}
+
+td.einweisung {
+  color:white;
+  background-color:mat-color($customAccent,500);
+  padding-left:20px;
+}
+td.einweisung.warning {
+  background-color:#EFC94C;
+}
+td.einweisung.invalid {
+  background-color: mat-color($customWarn, 500);
+}
+
+.connection {
+  text-align:left;
+  position: absolute;
+  left:0px;
+  bottom: 0px;
+  font-size: 9px;
+  margin-left:25px;
+}
