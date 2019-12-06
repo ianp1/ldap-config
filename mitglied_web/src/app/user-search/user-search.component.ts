@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 
 import { AppComponent } from '../app.component';
 
@@ -9,6 +9,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { LoginService } from '../login/login.service';
+import { MatInput } from '@angular/material';
 
 @Component({
   selector: 'user-search',
@@ -33,6 +34,9 @@ export class UserSearchComponent implements OnInit {
   users : any;
 
   validUser : boolean;
+
+  @ViewChild('searchfield')
+  searchField;
 
   constructor(public appComponent:AppComponent, public http:HttpClient,
               private loginService:LoginService) { }
@@ -103,6 +107,10 @@ export class UserSearchComponent implements OnInit {
 
   fetchUsers() {
     this.userQueryChanged.next('');
+  }
+
+  public select() {
+    this.searchField.nativeElement.focus();
   }
 
 }
