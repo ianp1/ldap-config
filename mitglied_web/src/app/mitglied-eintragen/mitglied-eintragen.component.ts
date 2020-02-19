@@ -31,29 +31,30 @@ export class MitgliedEintragenComponent implements OnInit {
        neuesMitglied: [''],
        //
        mitgliedschaft: ['ehrenmitgliedschaft'],
-       anrede: [''],
+       anrede: ['Herr'],
        titel: [''],
        vorname: [''],
        nachname: [''],
        geburtsdatum: [''],
        //
-       plz: [''],
-       ort: [''],
-       straße: [''],
+       plz: ['23560'],
+       ort: ['Lübeck'],
+       strasse: ['abc'],
        //
-       email: [''],
-       telefon: [''],
+       email: ['a@b.de'],
+       telefon: ['123'],
        notfallkontakt: [''],
        //Nur wenn keine geteilte mitgliedschaft
-       iban: [''],
-       bic: [''],
-       kontoinhaber: [''],
+       iban: ['DE12'],
+       bic: ['DE12'],
+       kontoinhaber: ['ABC'],
        //Nur wenn keine geteilte mitgliedschaft
-       beitragsreduzierung: [''],
+       beitragsreduzierung: [0.0],
        ermaessigtBis: [''],
        //Nur bei geteilter Mitgliedschaft
        teilVon: [''],//TODO
-       beginnMitgliedschaft: ['']
+       beginnMitgliedschaft: [''],
+       kommentar: ['']
     });
   }
 

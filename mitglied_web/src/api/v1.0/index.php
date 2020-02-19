@@ -76,7 +76,9 @@
 				array_push($newClasses, $cl);
 			}
 		}
-		array_push($newClasses, "fablabMitglied");
+		if (!in_array("fablabMitglied", $newClasses)) {
+			array_push($newClasses, "fablabMitglied");
+		}
 		if (!in_array("inetOrgPerson", $newClasses)) {
 			array_push($newClasses, "inetOrgPerson");
 		}
@@ -96,11 +98,12 @@
 			"notfallkontakt"=>$vals["notfallkontakt"],
 			"ort"=>$vals["ort"],
 			"plz"=>$vals["plz"],
-			"strasse"=>$vals["straße"],
+			"strasse"=>$vals["strasse"],
 			"homePhone"=>$vals["telefon"],
 			"title"=>$vals["titel"],
 			"cn"=>$vals["vorname"],
-			"beginn"=>$vals["beginnMitgliedschaft"]
+			"beginn"=>$vals["beginnMitgliedschaft"],
+			"description"=>$vals["kommentar"]
 		);
 
 		foreach($newValues as $key=>$val) {

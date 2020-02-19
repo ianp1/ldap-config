@@ -113,7 +113,7 @@
             <mat-form-field>
               <input matInput
                   placeholder="Straße"
-                  formControlName="straße"
+                  formControlName="strasse"
                   required
               >
             </mat-form-field>
@@ -183,6 +183,7 @@
               <input matInput
                   placeholder="Beitragsreduzierung"
                   formControlName="beitragsreduzierung"
+                  type="number"
               >
             </mat-form-field>
 
@@ -216,6 +217,16 @@
               <mat-datepicker-toggle matSuffix [for]="beginnPicker"></mat-datepicker-toggle>
 
             </mat-form-field>
+          </div>
+          <div class="Sonstiges">
+            <h3>
+              Sonstiges:
+            </h3>
+
+            <textarea matInput
+                placeholder="Kommentar"
+                formControlName="kommentar"
+            ></textarea>
           </div>
           <button type="submit" mat-raised-button color="accent" (click)="mitgliedEintragen()">
             Mitglied Eintragen
