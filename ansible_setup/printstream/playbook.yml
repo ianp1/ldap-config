@@ -36,6 +36,12 @@
         dest: /etc/systemd/system/stream.service
       notify:
         - "start stream service"
+    - name: Install second systemd Service
+      template:
+        src: stream2.service.j2
+        dest: /etc/systemd/system/stream2.service
+      notify:
+        - "start second stream service"
   handlers:
     - name: build program
       make:
@@ -49,5 +55,10 @@
     - name: start stream service
       systemd:
         name: stream
+        enabled: yes
+        daemon_reload: yes
+    - name: start second stream service
+      systemd:
+        name: stream2
         enabled: yes
         daemon_reload: yes

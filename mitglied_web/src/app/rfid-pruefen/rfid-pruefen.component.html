@@ -8,7 +8,8 @@
               placeholder="RFID-Tag"
               value=""
               formControlName="rfid"
-              (input)='findUser()'
+              (input)='findUser();'
+              #rfidinput
           >
         </mat-form-field>
         <span [class]="searching ? '' : 'hidden'">

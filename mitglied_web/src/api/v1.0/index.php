@@ -693,6 +693,7 @@
 		$entry = array();
 		$entry["objectClass"][0] = "inetOrgPerson";
 		$entry["objectClass"][1] = "fablabPerson";
+		$entry["objectClass"][2] = "posixAccount";
 		$entry["uid"] = $RequestVorname.$RequestNachname;
 		$entry["cn"] = array();
 		$entry["sn"] = "";
@@ -703,6 +704,7 @@
 			$entry["sn"] = $entry["sn"]." ".$nachname;
 		}
 		$entry["sn"] = trim($entry["sn"]);
+		
 		$entry["geburtstag"] = $RequestGeburtstag;
 		$entry["sicherheitsbelehrung"] = $RequestSicherheitsbelehrung;
 		$entry["belehrtVon"] = $request -> getAttribute("request_user");
@@ -719,6 +721,17 @@
 		if ($i != 0) {
 			$entry["uid"] = $entry["uid"].$i;
 		}
+
+		$entry["gidNumber"] = 2001;
+		$configDN = "cn=nextUID,ou=config,dc=ldap-provider,dc=fablab-luebeck";
+		$nextUIDNumberEntry = ldap_read($ldapconn, $configDN, "(objectClass=nextUID)", array("uidNumber"));
+		$nextUIDNumber = ldap_get_entries($ldapconn, $nextUIDNumberEntry);
+
+		$uidNumber = $nextUIDNumber[0]["uidnumber"][0];
+		ldap_mod_replace($ldapconn, $configDN, array("uidNumber" => $uidNumber + 1 ));
+
+		$entry["uidNumber"] = $uidNumber;
+		$entry["homeDirectory"] = "/home/".strtolower($entry['uid']);
 
 		if (ldap_add($ldapconn, $dn, $entry)) {
 			return $response -> withJson($entry["uid"], 201);

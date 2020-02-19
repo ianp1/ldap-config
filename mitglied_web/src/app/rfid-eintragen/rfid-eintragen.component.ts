@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -27,6 +27,9 @@ export class RfidEintragenComponent implements OnInit {
 
   searching:boolean = false;
   users:any = [];
+
+  @ViewChild('usersearch')
+  userSearch;
 
   constructor(public dialog: MatDialog, private appComponent:AppComponent,
               private http:HttpClient, private formBuilder: FormBuilder,
@@ -116,6 +119,7 @@ export class RfidEintragenComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe(data => {
           this.initForm();
+          this.userSearch.select();
         });
       }, error => {
 
