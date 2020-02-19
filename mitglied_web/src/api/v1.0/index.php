@@ -61,6 +61,42 @@
 		return $response;
 	});
 
+	$app -> get('/Mitglied/{RequestUser}', function(Request $request, Response $response, array $args) {
+		$userDn = $args['RequestUser'];
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		$vals = $request -> getParsedBody();
+
+		$user = ldap_read($ldapconn, $userDn, "(|(objectClass=fablabPerson)(objectClass=fablabMitglied))");
+		$userResult = ldap_get_entries($ldapconn, $user)[0];
+
+		$result = array(
+			"anrede" => $userResult["anrede"][0],
+			"beitragsreduzierung" => $userResult["ermaessigung"][0],
+			"bic"=> $userResult["bic"][0],
+			"email"=> $userResult['mail'][0],
+			"ermaessigtBis"=>$userResult["ermaessigtbis"][0],
+			"geburtsdatum"=>$userResult["geburtstag"][0],
+			"iban"=>$userResult["iban"][0],
+			"kontoinhaber"=>$userResult["kontoinhaber"][0],
+			"mitgliedschaft"=>$userResult["mitgliedsart"][0],
+			"nachname"=>$userResult["sn"][0],
+			"notfallkontakt"=>$userResult["notfallkontakt"][0],
+			"ort"=>$userResult["ort"][0],
+			"plz"=>$userResult["plz"][0],
+			"strasse"=>$userResult["strasse"][0],
+			"telefon"=>$userResult["homephone"][0],
+			"titel"=>$userResult["title"][0],
+			"vorname"=>$userResult["cn"][0],
+			"beginnMitgliedschaft"=>$userResult["beginn"][0],
+			"kommentar"=>$userResult["description"][0]
+		);
+
+
+
+		return $response->withJson($result, 201);
+	});
+
 	$app -> post('/Mitglied/{RequestUser}', function (Request $request, Response $response, array $args) {
 		$userDn = $args['RequestUser'];
 		$ldapconn = $request -> getAttribute('ldapconn');

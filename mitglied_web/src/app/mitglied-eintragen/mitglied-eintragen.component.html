@@ -223,10 +223,12 @@
               Sonstiges:
             </h3>
 
-            <textarea matInput
-                placeholder="Kommentar"
-                formControlName="kommentar"
-            ></textarea>
+            <mat-form-field>
+              <textarea matInput
+                  placeholder="Kommentar"
+                  formControlName="kommentar"
+              ></textarea>
+            </mat-form-field>
           </div>
           <button type="submit" mat-raised-button color="accent" (click)="mitgliedEintragen()">
             Mitglied Eintragen

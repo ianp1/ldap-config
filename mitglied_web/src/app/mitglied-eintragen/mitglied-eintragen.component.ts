@@ -63,12 +63,50 @@ export class MitgliedEintragenComponent implements OnInit {
   }
 
   prefillMitglied(val) {
-
+    console.log("val: ", val);
     this.userSelected = val;
     this.loginForm.patchValue({
       vorname:val['vorname'],
       nachname:val['nachname'],
       geburtsdatum: this.appComponent.reformatLDAPDate(val['geburtstag']),
+    });
+
+    var user = this.appComponent.sanitize(this.loginService.username);
+    var passw = this.appComponent.sanitize(this.loginService.password);
+
+    var headers = new HttpHeaders();
+    var params = new HttpParams();
+    params = params.append('author_user', user);
+    params = params.append('author_password', passw);
+
+    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Mitglied/'+val.dn, {
+      headers: headers,
+      params: params
+    }).subscribe(data => {
+
+      this.loginForm.patchValue({
+        mitgliedschaft: data['mitgliedschaft'],
+        anrede: data['anrede'],
+        titel: data['titel'],
+
+        plz: data['plz'],
+        ort: data['ort'],
+        strasse: data['strasse'],
+
+        email: data['email'],
+        telefon: data['telefon'],
+        notfallkontakt: data['notfallkontakt'],
+        
+        iban: data['iban'],
+        bic: data['bic'],
+        kontoinhaber: data['kontoinhaber'],
+        beitragsreduzierung: data['beitragsreduzierung'],
+        ermaessigtBis: this.appComponent.reformatLDAPDate(data['ermaessigtBis']),
+        
+        beginnMitgliedschaft: this.appComponent.reformatLDAPDate(data['beginnMitgliedschaft']),
+        kommentar: data['kommentar']
+      });
+      console.log("request data: ", data);
     });
   }
 
