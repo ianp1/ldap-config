@@ -10,6 +10,9 @@ olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=use
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by self write by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * auth 
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" filter=(objectClass=posixAccount) attrs=entry,uid,objectClass,uidNumber,gidNumber,homeDirectory,loginShell,sshPublicKey by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" by self read by * break 
+#config
+olcAccess: to dn.base="ou=config,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="cn=nextUID,ou=config,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" write by * break
 #bots
 olcAccess: to dn.base="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="ou=group,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
