@@ -1,5 +1,6 @@
-dn: cn=mitglied,cn=schema,cn=config
-objectClass: olcSchemaConfig
+dn: cn={4}mitglied,cn=schema,cn=config
+changetype: modify
+replace: olcAttributeTypes
 olcAttributeTypes: {0}( 2.25.128424792425578037463837247958458780603.101 NAME 'mitgliedsnummer' EQUALITY 2.5.13.5 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
 olcAttributeTypes: {1}( 2.25.128424792425578037463837247958458780603.102 NAME 'mitgliedsart' EQUALITY 2.5.13.5 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
 olcAttributeTypes: {2}( 2.25.128424792425578037463837247958458780603.104 NAME 'beginn' DESC 'Beginn der Mitgliedschaft' EQUALITY 2.5.13.27 SYNTAX 1.3.6.1.4.1.1466.115.121.1.24)
@@ -16,13 +17,12 @@ olcAttributeTypes: {12}( 2.25.128424792425578037463837247958458780603.114 NAME '
 olcAttributeTypes: {13}( 2.25.128424792425578037463837247958458780603.115 NAME 'iban' DESC 'IBAN des Kontos' EQUALITY 2.5.13.2 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
 olcAttributeTypes: {14}( 2.25.128424792425578037463837247958458780603.116 NAME 'bic' DESC 'BIC des Kontos' EQUALITY 2.5.13.2 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
 olcAttributeTypes: {15}( 2.25.128424792425578037463837247958458780603.117 NAME 'kontoinhaber' DESC 'Inhaber des Kontos' EQUALITY 2.5.13.2 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
-olcAttributeTypes: {16}( 2.25.128424792425578037463837247958458780603.118 NAME 'beitragsanpassung' DESC 'Anpassung des Mitgliedsbeitrags (Negativ für Ermaessigung)' EQUALITY 2.5.13.2 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
-olcAttributeTypes: {17}( 2.25.128424792425578037463837247958458780603.119 NAME 'beitragsanpassungBis' DESC 'Ende der Anpassung (Gueltigkeit der Bestaetigung bsw.)' EQUALITY 2.5.13.2 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
+olcAttributeTypes: {16}( 2.25.128424792425578037463837247958458780603.118 NAME 'ermaessigung' DESC 'Ermäßigung des Mitgliedsbeitrags (Negativ für Mehrbetrag)' EQUALITY 2.5.13.2 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
+olcAttributeTypes: {17}( 2.25.128424792425578037463837247958458780603.119 NAME 'ermaessigtBis' DESC 'Ende der Ermäßigung (Gültigkeit der Bestätigung bsw.)' EQUALITY 2.5.13.2 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
 olcAttributeTypes: {18}( 2.25.128424792425578037463837247958458780603.120 NAME 'geteiltMit' DESC 'Inhaber der geteilten Mitgliedschaft (Bei Firmen- oder Familienmitgliedschaften' EQUALITY 2.5.13.1 SYNTAX 1.3.6.1.4.1.1466.115.121.1.12) )
 olcAttributeTypes: {19}( 2.25.128424792425578037463837247958458780603.121 NAME 'belehrtVon' DESC 'Person die die Sicherheitsbelehrung erteilt hat' EQUALITY 2.5.13.1 SYNTAX 1.3.6.1.4.1.1466.115.121.1.12) ) 
 #classes
-olcObjectClasses: {0}( 2.25.128424792425578037463837247958458780603.125 NAME 'fablabPerson' DESC 'Personen mit Sicherheitseinweisung' SUP top AUXILIARY MUST (geburtstag $ sicherheitsbelehrung) MAY (rfid $ belehrtVon))
-olcObjectClasses: {1}( 2.25.128424792425578037463837247958458780603.126 NAME 'fablabMitglied' DESC 'Fablab-Mitglieder' SUP fablabPerson AUXILIARY MUST (bic $ iban $ strasse $ ort $ plz $ anrede $ mitgliedsart $ beginn $ kontoinhaber) MAY ( notfallkontakt $ ende $ aktiv $ beitragsanpassung $ beitragsanpassungBis))
-olcObjectClasses: {2}( 2.25.128424792425578037463837247958458780603.127 NAME 'exFablabMitglied' DESC 'ehemalige Mitglieder' SUP fablabPerson AUXILIARY MUST (strasse $ ort $ plz $ beginn $ ende $ anrede ) MAY ( notfallkontakt $ aktiv ))
-olcObjectClasses: {3}( 2.25.128424792425578037463837247958458780603.128 NAME 'mitgliedTeilhaber' DESC 'Teilhaber einer Familien- oder Firmenmitgliedschaft' SUP fablabPerson AUXILIARY MUST (strasse $ ort $ plz $ anrede $ mitgliedsart $ beginn $ geteiltMit) MAY ( notfallkontakt $ ende $ aktiv $ beitragsanpassung $ beitragsanpassungBis) )
-olcObjectClasses: {4}( 2.25.128424792425578037463837247958458780603.129 NAME 'nextUID' DESC 'The next uid to be given to a user' SUP top STRUCTURAL MUST (uidNumber $ cn) )
+#olcObjectClasses: {0}( 2.25.128424792425578037463837247958458780603.125 NAME 'fablabPerson' DESC 'Personen mit Sicherheitseinweisung' SUP top AUXILIARY MUST (geburtstag $ sicherheitsbelehrung) MAY (rfid $ belehrtVon))
+#olcObjectClasses: {1}( 2.25.128424792425578037463837247958458780603.126 NAME 'fablabMitglied' DESC 'Fablab-Mitglieder' SUP fablabPerson AUXILIARY MUST (bic $ iban $ strasse $ ort $ plz $ anrede $ mitgliedsart $ beginn $ kontoinhaber) MAY ( notfallkontakt $ ende $ aktiv $ ermaessigung $ ermaessigtBis))
+#olcObjectClasses: {2}( 2.25.128424792425578037463837247958458780603.127 NAME 'exFablabMitglied' DESC 'ehemalige Mitglieder' SUP fablabPerson AUXILIARY MUST (strasse $ ort $ plz $ beginn $ ende $ anrede ) MAY ( notfallkontakt $ aktiv ))
+#olcObjectClasses: {3}( 2.25.128424792425578037463837247958458780603.128 NAME 'mitgliedTeilhaber' DESC 'Teilhaber einer Familien- oder Firmenmitgliedschaft' SUP fablabPerson AUXILIARY MUST (strasse $ ort $ plz $ anrede $ mitgliedsart $ beginn $ geteiltMit) MAY ( notfallkontakt $ ende $ aktiv $ermaessigung $ ermaessigtBis) )
