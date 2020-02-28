@@ -34,7 +34,8 @@ export class CustomNavComponent {
     "neues-mitglied":"Neues Mitglied eintragen",
     "rfid-vergeben":"RFID-Karte vergeben",
     "rfid-besitzer-finden":"RFID-Kartenbesitzer finden",
-    "summary-page":"Aktuelle Änderungen"
+    "summary-page":"Aktuelle Änderungen",
+    "mitglied-teil":"Neuen Mitgliedschaftsteilhaber eintragen"
   };
 
   isHandsetLocal:boolean = false;

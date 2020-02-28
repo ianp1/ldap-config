@@ -32,6 +32,7 @@
           Mitgliedsverwaltung
         </h3>
         <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
+        <a mat-list-item (click)="selectEntry('mitglied-teil')">Neuen Mitgliedschaftsteilhaber eintragen</a>
       </div>
       <h3>
         Überprüfen
@@ -112,6 +113,9 @@
       <div *ngIf="entry=='start'">
         <start>
         </start>
+      </div>
+      <div *ngIf="entry=='mitglied-teil'">
+        
       </div>
     </mat-card>
   </mat-sidenav-content>

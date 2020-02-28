@@ -1,0 +1,20 @@
+<div class="input-mask">
+  <form [formGroup]="loginForm">
+    <div>
+      <h3>
+        Zu welcher Mitgliedschaft soll das neue Mitglied hinzugefügt werden?
+      </h3>
+    </div>
+    <div>
+      <h3>
+        Mitgliedsinformationen
+      </h3>
+      <user-search
+        [eingewiesenerControl]="'neuesMitglied'"
+        [formGroup]="loginForm"
+        (userSelected)="prefillMitglied($event)"
+      >
+      </user-search>
+    </div>
+  </form>
+</div>
