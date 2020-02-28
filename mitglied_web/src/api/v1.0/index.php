@@ -698,10 +698,10 @@
 		$entry["cn"] = array();
 		$entry["sn"] = "";
 		foreach ($RequestVornamen as $vorname) {
-			array_push($entry["cn"], trim($vorname));
+			array_push($entry["cn"], trim(normalizeUtf8String($vorname)));
 		}
 		foreach ($RequestNachnamen as $nachname) {
-			$entry["sn"] = $entry["sn"]." ".$nachname;
+			$entry["sn"] = $entry["sn"]." ".normalizeUtf8String($nachname);
 		}
 		$entry["sn"] = trim($entry["sn"]);
 		
