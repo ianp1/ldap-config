@@ -102,6 +102,34 @@
 		$ldapconn = $request -> getAttribute('ldapconn');
 
 		$vals = $request -> getParsedBody();
+		$valid = true;
+		$pflichtfelder = array(
+			"anrede",
+			"bic",
+			"email",
+			"geburtsdatum",
+			"iban",
+			"kontoinhaber",
+			"mitgliedschaft",
+			"nachname",
+			"ort",
+			"plz",
+			"strasse",
+			"telefon",
+			"vorname",
+			"beginnMitgliedschaft",
+		);
+		if (!isset($vals)) {
+			$valid = false;
+		}
+		foreach($pflichtfelder as $pflicht) {
+			if (!isset($vals[$pflicht]) || $vals[$pflicht] == '') {
+				$valid = false;
+			}
+		} 
+		if (!$valid) {
+			return $response -> withStatus(400);
+		}
 
 		$user = ldap_read($ldapconn, $userDn, "(objectClass=fablabPerson)");
 		$userResult = ldap_get_entries($ldapconn, $user);
@@ -165,6 +193,30 @@
 		$ldapconn = $request -> getAttribute('ldapconn');
 
 		$vals = $request -> getParsedBody();
+		$valid = true;
+		$pflichtfelder = array(
+			"anrede",
+			"email",
+			"geburtsdatum",
+			"nachname",
+			"ort",
+			"plz",
+			"strasse",
+			"telefon",
+			"vorname",
+			"beginnMitgliedschaft"
+		);
+		if (!isset($vals)) {
+			$valid = false;
+		}
+		foreach($pflichtfelder as $pflicht) {
+			if (!isset($vals[$pflicht]) || $vals[$pflicht] == '') {
+				$valid = false;
+			}
+		} 
+		if (!$valid) {
+			return $response -> withStatus(400);
+		}
 
 		$user = ldap_read($ldapconn, $neuMitgliedDn, "(objectClass=fablabPerson)");
 		$userResult = ldap_get_entries($ldapconn, $user);

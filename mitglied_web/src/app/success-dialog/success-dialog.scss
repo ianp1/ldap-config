@@ -31,6 +31,10 @@
   @include mat-icon-button-size(60px, white, #EFC94C, 6);
 }
 
+#dialog-icon.iconError {
+  @include mat-icon-button-size(60px, red, white, 6);
+}
+
 .mat-typography {
   font-size:16px;
 }

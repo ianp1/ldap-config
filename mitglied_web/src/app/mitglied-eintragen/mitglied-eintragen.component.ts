@@ -148,6 +148,19 @@ export class MitgliedEintragenComponent implements OnInit {
           this.initForm();
         });
       }
+    }, error => {
+      //400: Fehlende Daten
+      //Sonst: Anderer Fehler
+      if (error.status === 400) {
+        let dialogRef = this.dialog.open(SuccessDialog, {
+          data : {
+            icon:"error",
+            icon_class: "iconError",
+            customText : "Die Anfrage konnte nicht ausgeführt werden. Wurden alle Pflichtfelder ausgefüllt?",
+            title: "Fehler"
+          }
+        });
+      }
     });
   }
 }
