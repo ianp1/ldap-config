@@ -35,6 +35,8 @@ export class UserSearchComponent implements OnInit {
 
   validUser : boolean;
 
+  emptySearchResult : boolean = false;
+
   @ViewChild('searchfield')
   searchField;
 
@@ -60,6 +62,7 @@ export class UserSearchComponent implements OnInit {
             var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.formGroup.value[this.eingewiesenerControl]));
 
             if (searchTerm != "") {
+              this.emptySearchResult = false;
               this.searching = true;
 
               var headers = new HttpHeaders();
@@ -85,6 +88,9 @@ export class UserSearchComponent implements OnInit {
                   }
                 }
                 this.users = data;
+                if (this.users.length === 0) {
+                  this.emptySearchResult = true;
+                }
                 this.searching = false;
               }, error => {
                 this.searching = false;

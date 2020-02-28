@@ -14,7 +14,7 @@
       autoActiveFirstOption
     >
       <mat-option *ngFor="let user of users" [value]="user.uid">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}}, {{appComponent.reformatLDAPDate(user.geburtstag) | date : "dd.MM.yyyy"}})</mat-option>
-      <mat-option disabled>Sicherheitsbelehrung eingetragen?</mat-option>
+      <mat-option disabled [ngClass]="{ 'highlight': emptySearchResult }">Wurde schon eine Sicherheitsbelehrung eingetragen?</mat-option>
     </mat-autocomplete>
   </mat-form-field>
 
