@@ -67,7 +67,7 @@
 
 		$vals = $request -> getParsedBody();
 
-		$user = ldap_read($ldapconn, $userDn, "(|(objectClass=fablabPerson)(objectClass=fablabMitglied))");
+		$user = ldap_read($ldapconn, $userDn, "(|(objectClass=fablabPerson)(objectClass=fablabMitglied)(objectClass=mitgliedTeilhaber))");
 		$userResult = ldap_get_entries($ldapconn, $user)[0];
 
 		$result = array(
@@ -151,6 +151,65 @@
 		$ldapconn = $request -> getAttribute('ldapconn');
 
 		if (ldap_mod_replace($ldapconn, $userDn, $newValues)) {
+			return $response -> withJson(true, 201);
+		} else {
+			return $response -> withStatus(500);
+		}
+
+		return $response;
+	});
+
+	$app -> post('/Mitgliedteil/{MitgliedBesitzer}/{NeuMitglied}', function (Request $request, Response $response, array $args) {
+		$mitgliedBesitzerDn = $args['MitgliedBesitzer'];
+		$neuMitgliedDn = $args['NeuMitglied'];
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		$vals = $request -> getParsedBody();
+
+		$user = ldap_read($ldapconn, $neuMitgliedDn, "(objectClass=fablabPerson)");
+		$userResult = ldap_get_entries($ldapconn, $user);
+
+
+		$newClasses = array();
+		foreach ($userResult[0]["objectclass"] as $key => $cl) {
+			if ($key !== "count" && $cl != "fablabPerson") {
+				array_push($newClasses, $cl);
+			}
+		}
+		if (!in_array("mitgliedTeilhaber", $newClasses)) {
+			array_push($newClasses, "mitgliedTeilhaber");
+		}
+		if (!in_array("inetOrgPerson", $newClasses)) {
+			array_push($newClasses, "inetOrgPerson");
+		}
+
+		$newValues = array(
+			"objectClass"=> $newClasses,
+			"anrede"=> $vals["anrede"],
+			"mail"=> $vals['email'],
+			"geburtstag"=>$vals["geburtsdatum"],
+			"sn"=>$vals["nachname"],
+			"notfallkontakt"=>$vals["notfallkontakt"],
+			"ort"=>$vals["ort"],
+			"plz"=>$vals["plz"],
+			"strasse"=>$vals["strasse"],
+			"homePhone"=>$vals["telefon"],
+			"title"=>$vals["titel"],
+			"cn"=>$vals["vorname"],
+			"beginn"=>$vals["beginnMitgliedschaft"],
+			"description"=>$vals["kommentar"],
+			"geteiltMit"=>$mitgliedBesitzerDn,
+		);
+
+		foreach($newValues as $key=>$val) {
+			if ($val === '') {
+				$newValues[$key] = array();
+			}
+		}
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		if (ldap_mod_replace($ldapconn, $neuMitgliedDn, $newValues)) {
 			return $response -> withJson(true, 201);
 		} else {
 			return $response -> withStatus(500);
@@ -804,7 +863,7 @@
 			}
 		}
 		$term .= "))";
-		$selectedKeys = array("cn", "sn", "uid", "dn", "geburtstag", "rfid");
+		$selectedKeys = array("cn", "sn", "uid", "dn", "geburtstag", "rfid", "mitgliedsart");
 
 		$searchtermrfid = "(&(objectClass=fablabPerson)(rfid=".cleanRFIDTag($st)."))";
 		$ergRfid = ldap_search($ldapconn, $dn, $searchtermrfid, $selectedKeys);
@@ -829,6 +888,18 @@
 				$einweisung = ldap_get_entries($ldapconn, $einweisungSuche);
 				if ($einweisung["count"] < 1) {
 					$use = false;
+				}
+			}
+			if (isset($filter, $filter['mitgliedschaft'])) {
+				$use = false;
+				if (is_array($filter['mitgliedschaft'])) {
+					foreach ($filter['mitgliedschaft'] as $mitgliedschaft) {
+						if ($results[$i]["mitgliedsart"][0] == $mitgliedschaft) {
+							$use = true;
+						}
+					}
+				} else if (isset($filter) && $filter['mitgliedschaft'] === ''){
+					$use = !isset($results[$i]['mitgliedsart']);
 				}
 			}
 			if ($use) {
