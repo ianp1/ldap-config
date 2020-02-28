@@ -11,6 +11,7 @@
           <user-search
             [eingewiesenerControl]="'neuesMitglied'"
             [formGroup]="loginForm"
+            [filter]="{'notObjectClass':'mitgliedTeilhaber'}"
             (userSelected)="prefillMitglied($event)"
           >
           </user-search>

@@ -915,7 +915,7 @@
 			}
 		}
 		$term .= "))";
-		$selectedKeys = array("cn", "sn", "uid", "dn", "geburtstag", "rfid", "mitgliedsart");
+		$selectedKeys = array("cn", "sn", "uid", "dn", "geburtstag", "rfid", "mitgliedsart", "objectClass");
 
 		$searchtermrfid = "(&(objectClass=fablabPerson)(rfid=".cleanRFIDTag($st)."))";
 		$ergRfid = ldap_search($ldapconn, $dn, $searchtermrfid, $selectedKeys);
@@ -954,6 +954,14 @@
 					$use = !isset($results[$i]['mitgliedsart']);
 				}
 			}
+			if (isset($filter, $filter['notObjectClass'])) {
+				foreach ($results[$i]["objectclass"] as $class) {
+					if ($class == $filter['notObjectClass']) {
+						$use = false;
+					}
+				}
+			}
+
 			if ($use) {
 				array_push($ar, array(
 					"vorname"=>$results[$i]["cn"][0],

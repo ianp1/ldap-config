@@ -20,7 +20,7 @@
         [eingewiesenerControl]="'neuesMitglied'"
         [formGroup]="detailForm"
         (userSelected)="prefillMitglied($event)"
-        [filter]="{'mitgliedschaft':''}"
+        [filter]="{'mitgliedschaft':'', 'notObjectClass': 'fablabMitglied'}"
       >
       </user-search>
       <div class="personendaten">
