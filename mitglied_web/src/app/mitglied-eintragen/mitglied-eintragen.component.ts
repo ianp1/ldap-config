@@ -49,8 +49,8 @@ export class MitgliedEintragenComponent implements OnInit {
        bic: ['DE12'],
        kontoinhaber: ['ABC'],
        //Nur wenn keine geteilte mitgliedschaft
-       beitragsreduzierung: [0.0],
-       ermaessigtBis: [''],
+       beitragsanpassung: [0.0],
+       beitragsanpassungBis: [''],
        //Nur bei geteilter Mitgliedschaft
        teilVon: [''],//TODO
        beginnMitgliedschaft: [''],
@@ -83,6 +83,15 @@ export class MitgliedEintragenComponent implements OnInit {
       headers: headers,
       params: params
     }).subscribe(data => {
+      var beitragsDate = '';
+      if (data['beitragsanpassungBis'] && data['beitragsanpassungBis']!='') {
+        beitragsDate = this.appComponent.reformatLDAPDate(data['beitragsanpassungBis']);
+      }
+
+      var mitgliedDate = '';
+      if (data['beginnMitgliedschaft'] && data['beginnMitgliedschaft'] != '') {
+        mitgliedDate = this.appComponent.reformatLDAPDate(data['beginnMitgliedschaft']);
+      }
 
       this.loginForm.patchValue({
         mitgliedschaft: data['mitgliedschaft'],
@@ -100,10 +109,10 @@ export class MitgliedEintragenComponent implements OnInit {
         iban: data['iban'],
         bic: data['bic'],
         kontoinhaber: data['kontoinhaber'],
-        beitragsreduzierung: data['beitragsreduzierung'],
-        ermaessigtBis: this.appComponent.reformatLDAPDate(data['ermaessigtBis']),
+        beitragsanpassung: data['beitragsanpassung'],
+        beitragsanpassungBis: beitragsDate,
         
-        beginnMitgliedschaft: this.appComponent.reformatLDAPDate(data['beginnMitgliedschaft']),
+        beginnMitgliedschaft: mitgliedDate,
         kommentar: data['kommentar']
       });
       console.log("request data: ", data);
@@ -119,7 +128,7 @@ export class MitgliedEintragenComponent implements OnInit {
     var values = {};
     Object.keys(this.loginForm.controls).forEach(key=> {
       var value = this.appComponent.sanitize(this.loginForm.value[key]);
-      if (key == "geburtsdatum" || key == "ermaessigtBis" || key == "beginnMitgliedschaft") {
+      if (key == "geburtsdatum" || key == "beitragsanpassungBis" || key == "beginnMitgliedschaft") {
         if (value != "") {
           value = this.appComponent.formatLDAPDate(value);
         }

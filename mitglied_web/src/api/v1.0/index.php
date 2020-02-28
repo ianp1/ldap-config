@@ -72,10 +72,10 @@
 
 		$result = array(
 			"anrede" => $userResult["anrede"][0],
-			"beitragsreduzierung" => $userResult["ermaessigung"][0],
+			"beitragsanpassung" => $userResult["beitragsanpassung"][0],
 			"bic"=> $userResult["bic"][0],
 			"email"=> $userResult['mail'][0],
-			"ermaessigtBis"=>$userResult["ermaessigtbis"][0],
+			"beitragsanpassungBis"=>$userResult["beitragsanpassungbis"][0],
 			"geburtsdatum"=>$userResult["geburtstag"][0],
 			"iban"=>$userResult["iban"][0],
 			"kontoinhaber"=>$userResult["kontoinhaber"][0],
@@ -122,10 +122,10 @@
 		$newValues = array(
 			"objectClass"=> $newClasses,
 			"anrede"=> $vals["anrede"],
-			"ermaessigung"=> $vals["beitragsreduzierung"],
+			"beitragsanpassung"=> $vals["beitragsanpassung"],
 			"bic"=> $vals["bic"],
 			"mail"=> $vals['email'],
-			"ermaessigtBis"=>$vals["ermaessigtBis"],
+			"beitragsanpassungBis"=>$vals["beitragsanpassungBis"],
 			"geburtstag"=>$vals["geburtsdatum"],
 			"iban"=>$vals["iban"],
 			"kontoinhaber"=>$vals["kontoinhaber"],
@@ -767,7 +767,8 @@
 		$nextUIDNumber = ldap_get_entries($ldapconn, $nextUIDNumberEntry);
 
 		$uidNumber = $nextUIDNumber[0]["uidnumber"][0];
-		ldap_mod_replace($ldapconn, $configDN, array("uidNumber" => $uidNumber + 1 ));
+		$newConfigVals = array("uidNumber" => $uidNumber + 1 );
+		ldap_mod_replace($ldapconn, $configDN, $newConfigVals);
 
 		$entry["uidNumber"] = $uidNumber;
 		$entry["homeDirectory"] = "/home/".strtolower($entry['uid']);

@@ -181,8 +181,8 @@
             </h3><br>
             <mat-form-field>
               <input matInput
-                  placeholder="Beitragsreduzierung"
-                  formControlName="beitragsreduzierung"
+                  placeholder="Beitragsanpassung"
+                  formControlName="beitragsanpassung"
                   type="number"
               >
             </mat-form-field>
@@ -190,13 +190,13 @@
             <mat-form-field>
               <input matInput
                   placeholder="Enddatum der Reduzierung"
-                  formControlName="ermaessigtBis"
-                  [matDatepicker]="ermaessigungPicker"
+                  formControlName="beitragsanpassungBis"
+                  [matDatepicker]="beitragsanpassungPicker"
               >
-              <mat-datepicker #ermaessigungPicker>
+              <mat-datepicker #beitragsanpassungPicker>
               </mat-datepicker>
 
-              <mat-datepicker-toggle matSuffix [for]="ermaessigungPicker"></mat-datepicker-toggle>
+              <mat-datepicker-toggle matSuffix [for]="beitragsanpassungPicker"></mat-datepicker-toggle>
 
             </mat-form-field>
           </div>
