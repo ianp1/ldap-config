@@ -1,0 +1,169 @@
+<div class="input-mask">
+  <form [formGroup]="detailForm">
+    <div>
+      <h3>
+        Inhaber der Mitgliedschaft?
+      </h3>
+      <user-search
+        [eingewiesenerControl]="'mitgliedschaftInhaber'"
+        [formGroup]="detailForm"
+        (userSelected)="inhaber=$event"
+        [filter]="{'mitgliedschaft':['fördermitgliedschaft_familie', 'fördermitgliedschaft_firma']}"
+      >
+      </user-search>
+    </div>
+    <div *ngIf="inhaber!=null">
+      <h3>
+        Mitgliedsinformationen
+      </h3>
+      <user-search
+        [eingewiesenerControl]="'neuesMitglied'"
+        [formGroup]="detailForm"
+        (userSelected)="prefillMitglied($event)"
+        [filter]="{'mitgliedschaft':'', 'notObjectClass': 'fablabMitglied'}"
+      >
+      </user-search>
+      <div class="personendaten">
+        <h3>
+          Persönliche Daten:
+        </h3>
+        <mat-form-field>
+          <input matInput
+              placeholder="Anrede"
+              value=""
+              formControlName="anrede"
+              required
+          >
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput
+              placeholder="Titel"
+              formControlName="titel"
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Vorname"
+              formControlName="vorname"
+              required
+          >
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput
+              placeholder="Nachname"
+              formControlName="nachname"
+              required
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Geburtsdatum"
+              formControlName="geburtsdatum"
+              [matDatepicker]="geburtstagPicker"
+              required
+          >
+          <mat-datepicker #geburtstagPicker>
+          </mat-datepicker>
+
+          <mat-datepicker-toggle matSuffix [for]="geburtstagPicker"></mat-datepicker-toggle>
+
+        </mat-form-field>
+      </div>
+      <div class="wohninfos">
+        <h3>
+          Wohnort des neuen Mitglieds:
+        </h3>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="PLZ"
+              formControlName="plz"
+              required
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Ort"
+              formControlName="ort"
+              required
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Straße"
+              formControlName="strasse"
+              required
+          >
+        </mat-form-field>
+      </div>
+      <div class="erreichbarkeit">
+        <h3>
+          Kontaktinformationen:
+        </h3>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Emailadresse"
+              formControlName="email"
+              required
+          >
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput
+              placeholder="Telefon"
+              formControlName="telefon"
+              required
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <textarea matInput
+              placeholder="Notfallkontakt"
+              formControlName="notfallkontakt"
+          ></textarea>
+        </mat-form-field>
+      </div>
+      <div class="Mitgliedschaft">
+        <h3>
+          Mitgliedschaft:
+        </h3>
+        <mat-form-field>
+          <input matInput
+              placeholder="Beginn der Mitgliedschaft"
+              formControlName="beginnMitgliedschaft"
+              [matDatepicker]="beginnPicker"
+              required
+          >
+          <mat-datepicker #beginnPicker>
+          </mat-datepicker>
+
+          <mat-datepicker-toggle matSuffix [for]="beginnPicker"></mat-datepicker-toggle>
+
+        </mat-form-field>
+      </div>
+
+      <div class="Sonstiges">
+        <h3>
+          Sonstiges:
+        </h3>
+
+        <mat-form-field>
+          <textarea matInput
+              placeholder="Kommentar"
+              formControlName="kommentar"
+          ></textarea>
+        </mat-form-field>
+      </div>
+
+      <button type="submit" mat-raised-button color="accent" (click)="teilhaberEintragen()">
+        Mitglied Eintragen
+      </button>
+    </div>
+  </form>
+</div>
