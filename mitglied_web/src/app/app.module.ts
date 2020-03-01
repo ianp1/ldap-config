@@ -84,6 +84,7 @@ import { GermanDateAdapter } from './GermanDateAdapter';
 import {Platform, PlatformModule} from '@angular/cdk/platform';
 import { StaffeleinweisungComponent } from './staffeleinweisung/staffeleinweisung.component';
 import { MitgliedTeilComponent } from './mitglied-teil/mitglied-teil.component';
+import { AbrechnungExportierenComponent } from './abrechnung-exportieren/abrechnung-exportieren.component';
 
 const appRoutes:Routes = [
 	{path: '', component: RedirectComponent},
@@ -114,7 +115,8 @@ registerLocaleData(localeDe, 'de');
     ReviewBannerComponent,
     SummaryPageComponent,
     StaffeleinweisungComponent,
-    MitgliedTeilComponent
+    MitgliedTeilComponent,
+    AbrechnungExportierenComponent
 	],
 	imports: [
     PlatformModule,

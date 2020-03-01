@@ -892,6 +892,83 @@
 	});
 
 	/**
+	 * 
+	 */
+	$app -> post('/Abrechnung/{Date}/{Kosten}', function (Request $request, Response $response, array $args) {
+		$ldapconn = $request -> getAttribute("ldapconn");
+		$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+
+		$date = $args['Date'];
+		$kostenAr = json_decode(trim($args['Kosten']), true);
+		$kosten = array();
+		foreach ($kostenAr as $k => $v) {
+			$kosten[$k] = intval($v);
+			//$kosten[utf8_decode($k)] = intval(utf8_decode($v));
+		}
+		$user_base_dn = 'ou=user,'.$ldap_base_dn;
+
+		$selectedKeys = array(
+			"cn",
+			"sn",
+			"kontoinhaber",
+			"dn",
+			"iban",
+			"bic",
+			"mitgliedsart"
+		);
+		$mitgliederFilter = "(&(objectClass=fablabMitglied)(beginn<=".$date."))";
+		$mitgliederSearch = ldap_search($ldapconn, $user_base_dn, 
+				$mitgliederFilter, $selectedKeys);
+		$mitglieder = ldap_get_entries($ldapconn, $mitgliederSearch);
+
+		$ar = array();
+		foreach ($mitglieder as $key => $mitglied) {
+			if ($key !== 'count') {
+				$cost = 0;
+				if ($mitglied['mitgliedsart'][0] == 'foerdermitgliedschaft_firma') {
+					$submitgliedFilter = "(&(objectClass=mitgliedTeilhaber)(beginn<=$date)(geteiltMit=".$mitglied['dn']."))";
+					$submitgliedSearch = ldap_search($ldapconn, $user_base_dn, $submitgliedFilter, array("dn"));
+					$submitglieder = ldap_get_entries($ldapconn, $submitgliedSearch);
+					$cost = $submitglieder['count'] * $kosten['foerdermitgliedschaft_firma'];
+				} else {
+					$cost = $kosten[$mitglied['mitgliedsart'][0]];
+				}
+				unset($mitglied['cn']['count']);
+				unset($mitglied['sn']['count']);
+				array_push($ar, array(
+					'Mitglied' => implode(" ", $mitglied['cn'])." ".implode(" ", $mitglied['sn']),
+					'Kontoinhaber' => $mitglied['kontoinhaber'][0],
+					'IBAN' => $mitglied['iban'][0],
+					'BIC' => $mitglied['bic'][0],
+					'Mitgliedsart' => $mitglied['mitgliedsart'][0],
+					'Betrag' => $cost
+				));
+			}
+		}
+
+		$out = fopen('php://temp', 'w');
+		$header = false;
+		foreach ($ar as $fields) {
+			if (!$header) {
+				$header = true;
+
+				fputcsv($out, array_keys($fields));
+				fputcsv($out, array());
+			}
+			fputcsv($out, $fields);
+		}
+		rewind($out);
+		$csvData = stream_get_contents($out);
+		fclose($out);
+		$response->getBody()->rewind();
+		$response->getBody()->write($csvData);
+		return $response->withHeader('Content-Type', 'application/force-download');
+
+		//return $response -> withJson($ar, 201);
+
+	});
+
+	/**
 	* $search_term : Name der gesucht wird
 	* author_user : UID des anfragenden Benutzers
 	* author_password : Passwort des anfragenden Benutzers

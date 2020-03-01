@@ -33,6 +33,7 @@
         </h3>
         <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
         <a mat-list-item (click)="selectEntry('mitglied-teil')">Neuen Mitgliedschaftsteilhaber eintragen</a>
+        <a mat-list-item (click)="selectEntry('abrechnung-exportieren')">Abrechnung exportieren</a>
       </div>
       <h3>
         Überprüfen
@@ -117,6 +118,10 @@
       <div *ngIf="entry=='mitglied-teil'">
         <mitglied-teil>
         </mitglied-teil>
+      </div>
+      <div *ngIf="entry=='abrechnung-exportieren'">
+        <abrechnung-exportieren>
+        </abrechnung-exportieren>
       </div>
     </mat-card>
   </mat-sidenav-content>

@@ -32,6 +32,7 @@ export class CustomNavComponent {
     "einweisungen-einsehen":"Einweisungen abfragen",
     "neue-einweisung":"Neue Einweisung eintragen",
     "neues-mitglied":"Neues Mitglied eintragen",
+    "abrechnung-exportieren":"Abrechnung exportieren",
     "rfid-vergeben":"RFID-Karte vergeben",
     "rfid-besitzer-finden":"RFID-Kartenbesitzer finden",
     "summary-page":"Aktuelle Änderungen",
