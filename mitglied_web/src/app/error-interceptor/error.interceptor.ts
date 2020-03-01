@@ -26,7 +26,7 @@ export class ErrorInterceptor implements HttpInterceptor {
       x.subscribe(data => {
         observer.next(data);
       }, error => {
-        if (error.status !== 404 && error.status !== 401) {
+        if (error.status !== 404 && error.status !== 401 && error.status !== 400) {
 
 
           const dialogRef = this.dialog.open(ErrorDialog);

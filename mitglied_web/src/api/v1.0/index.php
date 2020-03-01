@@ -61,11 +61,75 @@
 		return $response;
 	});
 
+	$app -> get('/Mitglied/{RequestUser}', function(Request $request, Response $response, array $args) {
+		$userDn = $args['RequestUser'];
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		$vals = $request -> getParsedBody();
+
+		$user = ldap_read($ldapconn, $userDn, "(|(objectClass=fablabPerson)(objectClass=fablabMitglied)(objectClass=mitgliedTeilhaber))");
+		$userResult = ldap_get_entries($ldapconn, $user)[0];
+
+		$result = array(
+			"anrede" => $userResult["anrede"][0],
+			"beitragsanpassung" => $userResult["beitragsanpassung"][0],
+			"bic"=> $userResult["bic"][0],
+			"email"=> $userResult['mail'][0],
+			"beitragsanpassungBis"=>$userResult["beitragsanpassungbis"][0],
+			"geburtsdatum"=>$userResult["geburtstag"][0],
+			"iban"=>$userResult["iban"][0],
+			"kontoinhaber"=>$userResult["kontoinhaber"][0],
+			"mitgliedschaft"=>$userResult["mitgliedsart"][0],
+			"nachname"=>$userResult["sn"][0],
+			"notfallkontakt"=>$userResult["notfallkontakt"][0],
+			"ort"=>$userResult["ort"][0],
+			"plz"=>$userResult["plz"][0],
+			"strasse"=>$userResult["strasse"][0],
+			"telefon"=>$userResult["homephone"][0],
+			"titel"=>$userResult["title"][0],
+			"vorname"=>$userResult["cn"][0],
+			"beginnMitgliedschaft"=>$userResult["beginn"][0],
+			"kommentar"=>$userResult["description"][0]
+		);
+
+
+
+		return $response->withJson($result, 201);
+	});
+
 	$app -> post('/Mitglied/{RequestUser}', function (Request $request, Response $response, array $args) {
 		$userDn = $args['RequestUser'];
 		$ldapconn = $request -> getAttribute('ldapconn');
 
 		$vals = $request -> getParsedBody();
+		$valid = true;
+		$pflichtfelder = array(
+			"anrede",
+			"bic",
+			"email",
+			"geburtsdatum",
+			"iban",
+			"kontoinhaber",
+			"mitgliedschaft",
+			"nachname",
+			"ort",
+			"plz",
+			"strasse",
+			"telefon",
+			"vorname",
+			"beginnMitgliedschaft",
+		);
+		if (!isset($vals)) {
+			$valid = false;
+		}
+		foreach($pflichtfelder as $pflicht) {
+			if (!isset($vals[$pflicht]) || $vals[$pflicht] == '') {
+				$valid = false;
+			}
+		} 
+		if (!$valid) {
+			return $response -> withStatus(400);
+		}
 
 		$user = ldap_read($ldapconn, $userDn, "(objectClass=fablabPerson)");
 		$userResult = ldap_get_entries($ldapconn, $user);
@@ -76,7 +140,9 @@
 				array_push($newClasses, $cl);
 			}
 		}
-		array_push($newClasses, "fablabMitglied");
+		if (!in_array("fablabMitglied", $newClasses)) {
+			array_push($newClasses, "fablabMitglied");
+		}
 		if (!in_array("inetOrgPerson", $newClasses)) {
 			array_push($newClasses, "inetOrgPerson");
 		}
@@ -84,10 +150,10 @@
 		$newValues = array(
 			"objectClass"=> $newClasses,
 			"anrede"=> $vals["anrede"],
-			"ermaessigung"=> $vals["beitragsreduzierung"],
+			"beitragsanpassung"=> $vals["beitragsanpassung"],
 			"bic"=> $vals["bic"],
 			"mail"=> $vals['email'],
-			"ermaessigtBis"=>$vals["ermaessigtBis"],
+			"beitragsanpassungBis"=>$vals["beitragsanpassungBis"],
 			"geburtstag"=>$vals["geburtsdatum"],
 			"iban"=>$vals["iban"],
 			"kontoinhaber"=>$vals["kontoinhaber"],
@@ -96,11 +162,12 @@
 			"notfallkontakt"=>$vals["notfallkontakt"],
 			"ort"=>$vals["ort"],
 			"plz"=>$vals["plz"],
-			"strasse"=>$vals["straße"],
+			"strasse"=>$vals["strasse"],
 			"homePhone"=>$vals["telefon"],
 			"title"=>$vals["titel"],
 			"cn"=>$vals["vorname"],
-			"beginn"=>$vals["beginnMitgliedschaft"]
+			"beginn"=>$vals["beginnMitgliedschaft"],
+			"description"=>$vals["kommentar"]
 		);
 
 		foreach($newValues as $key=>$val) {
@@ -112,6 +179,89 @@
 		$ldapconn = $request -> getAttribute('ldapconn');
 
 		if (ldap_mod_replace($ldapconn, $userDn, $newValues)) {
+			return $response -> withJson(true, 201);
+		} else {
+			return $response -> withStatus(500);
+		}
+
+		return $response;
+	});
+
+	$app -> post('/Mitgliedteil/{MitgliedBesitzer}/{NeuMitglied}', function (Request $request, Response $response, array $args) {
+		$mitgliedBesitzerDn = $args['MitgliedBesitzer'];
+		$neuMitgliedDn = $args['NeuMitglied'];
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		$vals = $request -> getParsedBody();
+		$valid = true;
+		$pflichtfelder = array(
+			"anrede",
+			"email",
+			"geburtsdatum",
+			"nachname",
+			"ort",
+			"plz",
+			"strasse",
+			"telefon",
+			"vorname",
+			"beginnMitgliedschaft"
+		);
+		if (!isset($vals)) {
+			$valid = false;
+		}
+		foreach($pflichtfelder as $pflicht) {
+			if (!isset($vals[$pflicht]) || $vals[$pflicht] == '') {
+				$valid = false;
+			}
+		} 
+		if (!$valid) {
+			return $response -> withStatus(400);
+		}
+
+		$user = ldap_read($ldapconn, $neuMitgliedDn, "(objectClass=fablabPerson)");
+		$userResult = ldap_get_entries($ldapconn, $user);
+
+
+		$newClasses = array();
+		foreach ($userResult[0]["objectclass"] as $key => $cl) {
+			if ($key !== "count" && $cl != "fablabPerson") {
+				array_push($newClasses, $cl);
+			}
+		}
+		if (!in_array("mitgliedTeilhaber", $newClasses)) {
+			array_push($newClasses, "mitgliedTeilhaber");
+		}
+		if (!in_array("inetOrgPerson", $newClasses)) {
+			array_push($newClasses, "inetOrgPerson");
+		}
+
+		$newValues = array(
+			"objectClass"=> $newClasses,
+			"anrede"=> $vals["anrede"],
+			"mail"=> $vals['email'],
+			"geburtstag"=>$vals["geburtsdatum"],
+			"sn"=>$vals["nachname"],
+			"notfallkontakt"=>$vals["notfallkontakt"],
+			"ort"=>$vals["ort"],
+			"plz"=>$vals["plz"],
+			"strasse"=>$vals["strasse"],
+			"homePhone"=>$vals["telefon"],
+			"title"=>$vals["titel"],
+			"cn"=>$vals["vorname"],
+			"beginn"=>$vals["beginnMitgliedschaft"],
+			"description"=>$vals["kommentar"],
+			"geteiltMit"=>$mitgliedBesitzerDn,
+		);
+
+		foreach($newValues as $key=>$val) {
+			if ($val === '') {
+				$newValues[$key] = array();
+			}
+		}
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		if (ldap_mod_replace($ldapconn, $neuMitgliedDn, $newValues)) {
 			return $response -> withJson(true, 201);
 		} else {
 			return $response -> withStatus(500);
@@ -698,10 +848,10 @@
 		$entry["cn"] = array();
 		$entry["sn"] = "";
 		foreach ($RequestVornamen as $vorname) {
-			array_push($entry["cn"], trim($vorname));
+			array_push($entry["cn"], trim(normalizeUtf8String($vorname)));
 		}
 		foreach ($RequestNachnamen as $nachname) {
-			$entry["sn"] = $entry["sn"]." ".$nachname;
+			$entry["sn"] = $entry["sn"]." ".normalizeUtf8String($nachname);
 		}
 		$entry["sn"] = trim($entry["sn"]);
 		
@@ -728,7 +878,8 @@
 		$nextUIDNumber = ldap_get_entries($ldapconn, $nextUIDNumberEntry);
 
 		$uidNumber = $nextUIDNumber[0]["uidnumber"][0];
-		ldap_mod_replace($ldapconn, $configDN, array("uidNumber" => $uidNumber + 1 ));
+		$newConfigVals = array("uidNumber" => $uidNumber + 1 );
+		ldap_mod_replace($ldapconn, $configDN, $newConfigVals);
 
 		$entry["uidNumber"] = $uidNumber;
 		$entry["homeDirectory"] = "/home/".strtolower($entry['uid']);
@@ -764,7 +915,7 @@
 			}
 		}
 		$term .= "))";
-		$selectedKeys = array("cn", "sn", "uid", "dn", "geburtstag", "rfid");
+		$selectedKeys = array("cn", "sn", "uid", "dn", "geburtstag", "rfid", "mitgliedsart", "objectClass");
 
 		$searchtermrfid = "(&(objectClass=fablabPerson)(rfid=".cleanRFIDTag($st)."))";
 		$ergRfid = ldap_search($ldapconn, $dn, $searchtermrfid, $selectedKeys);
@@ -791,6 +942,26 @@
 					$use = false;
 				}
 			}
+			if (isset($filter, $filter['mitgliedschaft'])) {
+				$use = false;
+				if (is_array($filter['mitgliedschaft'])) {
+					foreach ($filter['mitgliedschaft'] as $mitgliedschaft) {
+						if ($results[$i]["mitgliedsart"][0] == $mitgliedschaft) {
+							$use = true;
+						}
+					}
+				} else if (isset($filter) && $filter['mitgliedschaft'] === ''){
+					$use = !isset($results[$i]['mitgliedsart']);
+				}
+			}
+			if (isset($filter, $filter['notObjectClass'])) {
+				foreach ($results[$i]["objectclass"] as $class) {
+					if ($class == $filter['notObjectClass']) {
+						$use = false;
+					}
+				}
+			}
+
 			if ($use) {
 				array_push($ar, array(
 					"vorname"=>$results[$i]["cn"][0],
