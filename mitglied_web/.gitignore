@@ -24,6 +24,7 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
+
 # misc
 /.sass-cache
 /connect.lock
@@ -37,3 +38,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# docker persistence files
+docker/persistence/*
+!docker/persistence/.gitkeep
