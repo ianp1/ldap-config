@@ -41,4 +41,5 @@ Thumbs.db
 
 # docker persistence files
 docker/persistence/*
-!docker/persistence/.gitkeep
+docker/backups/*
+!**/.gitkeep
