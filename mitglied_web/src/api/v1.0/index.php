@@ -14,7 +14,11 @@
 		}
 
 
-		$ldaphost = "192.168.3.4";
+		if (getenv("DEV")) {
+			$ldaphost = "localhost";
+		} else {
+			$ldaphost = "192.168.3.4";
+		}
 		$ldapport = 389;
 		$ldap_base_dn =  "dc=ldap-provider,dc=fablab-luebeck";
 
@@ -146,7 +150,10 @@
 		if (!in_array("inetOrgPerson", $newClasses)) {
 			array_push($newClasses, "inetOrgPerson");
 		}
-
+		//cn,sn,beginn,ende,aktiv,entry,uid,objectClass,givenName,
+		//mail,mitgliedsnummer,mitgliedsart,beitragsanpassung,beitragsanpassungBis,
+		//geburtstag,anrede,plz,ort,strasse,notfallkontakt,iban,bic,kontoinhaber,
+		//description,title,mail,homePhone
 		$newValues = array(
 			"objectClass"=> $newClasses,
 			"anrede"=> $vals["anrede"],
@@ -234,7 +241,9 @@
 		if (!in_array("inetOrgPerson", $newClasses)) {
 			array_push($newClasses, "inetOrgPerson");
 		}
-
+		//cn,sn,beginn,ende,aktiv,entry,uid,objectClass,givenName,mail,
+		//mitgliedsnummer,mitgliedsart,beitragsanpassung,beitragsanpassungBis,geburtstag,
+		//anrede,plz,ort,strasse,notfallkontakt,iban,bic,kontoinhaber,description,title,mail,homePhone,geteiltMit
 		$newValues = array(
 			"objectClass"=> $newClasses,
 			"anrede"=> $vals["anrede"],

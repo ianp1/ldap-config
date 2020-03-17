@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "docker start ldap-provider && ng serve",
+    "db_structure": "cd docker && ./setup.sh",
+    "db_seed": "cd docker && ./seed.sh",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",

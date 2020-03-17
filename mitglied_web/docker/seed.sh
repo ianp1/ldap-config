@@ -26,6 +26,8 @@ do
         echo -e "error performing seed action \e[31m$f\e[0m"
         echo -n "error is "
         echo -e "\e[31m$TASK_RESPONSE\e[0m"
+    else
+        echo -e "successfully performed \e[92m$f\e[0m"
     fi
 
 done

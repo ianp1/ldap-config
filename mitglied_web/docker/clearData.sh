@@ -1,0 +1,39 @@
+#!/bin/bash
+
+CONTAINER=ldap-provider
+# stop running containers and remove them
+docker stop $CONTAINER
+docker rm $CONTAINER
+
+# backup data and remove it afterwards
+tar czf backups/database_$NOW.tar.gz persistence/database
+rm -r persistence/database
+
+# need to rebuild config, too
+# since docker container will complain otherwise
+tar czf backups/config_$NOW.tar.gz persistence/config
+rm -r persistence/config
+
+# rebuild image
+docker image build --no-cache -t $CONTAINER ./
+# build new container
+docker run -p 389:389 -p 636:636 --name $CONTAINER \
+            --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/database:/var/lib/ldap \
+            --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/config:/etc/ldap/slapd.d \
+            --env LDAP_DOMAIN="ldap-provider.fablab-luebeck" \
+            --env LDAP_ORGANISATION="FabLab Luebeck e.V." \
+            --env LDAP_CONFIG_PASSWORD="config" \
+            --env LDAP_TLS_VERIFY_CLIENT=never \
+            --detach $CONTAINER \
+            --loglevel trace 2>&1
+
+# check if container was successfully started, to ensure everything is working 
+sleep 3
+if [ ! "$(docker ps -q -f name=$CONTAINER)" ];
+then
+    IFS=
+    echo `docker logs $CONTAINER`
+    echo "container not started, check output above"
+    echo "check debug output and try again"
+    exit -1
+fi

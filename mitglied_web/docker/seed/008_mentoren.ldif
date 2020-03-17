@@ -1,0 +1,5 @@
+dn: cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck
+objectClass: groupOfNames
+cn: geraetementor
+member: uid=mentor,ou=user,dc=ldap-provider,dc=fablab-luebeck
+member: uid=mitgliedv,ou=user,dc=ldap-provider,dc=fablab-luebeck

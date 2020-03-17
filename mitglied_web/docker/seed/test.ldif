@@ -1,3 +1,0 @@
-dn: ou=users,dc=ldap-provider,dc=fablab-luebeck
-objectClass: organizationalUnit
-ou: users

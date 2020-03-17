@@ -10,7 +10,7 @@ docker image rm $CONTAINER
 # backup old config
 NOW=`date '+%F_%H:%M:%S'`;
 
-tar czf backups/$NOW.tar.gz persistence/config
+tar czf backups/config_$NOW.tar.gz persistence/config
 rm -r persistence/config
 
 # start docker container to generate config
@@ -21,8 +21,11 @@ docker run -p 389:389 -p 636:636 --name $CONTAINER \
             --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/config:/etc/ldap/slapd.d \
             --env LDAP_DOMAIN="ldap-provider.fablab-luebeck" \
             --env LDAP_ORGANISATION="FabLab Luebeck e.V." \
+            --env LDAP_CONFIG_PASSWORD="config" \
+            --hostname localhost\
             --detach $CONTAINER \
             --loglevel trace 2>&1
+
 
 # wait if container is successfully started or not
 sleep 3
@@ -45,6 +48,7 @@ docker run -p 389:389 -p 636:636 --name $CONTAINER \
             --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/config:/etc/ldap/slapd.d \
             --env LDAP_DOMAIN="ldap-provider.fablab-luebeck" \
             --env LDAP_ORGANISATION="FabLab Luebeck e.V." \
+            --env LDAP_CONFIG_PASSWORD="config" \
             --detach $CONTAINER \
             --loglevel trace 2>&1
 
