@@ -1,6 +1,5 @@
 #!/bin/bash
 # seeds a newly created ldap file system with standard entries
-# checks if necessary files were created and then passes them to the system
 
 
 echo "What ldap-user should the operation be performed with [cn=admin,dc=ldap-provider,dc=fablab-luebeck]?"

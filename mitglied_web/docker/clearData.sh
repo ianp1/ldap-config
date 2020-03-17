@@ -1,4 +1,6 @@
 #!/bin/bash
+# stops and removes old containers
+# clears config and data folders and rebuilds them
 
 CONTAINER=ldap-provider
 # stop running containers and remove them

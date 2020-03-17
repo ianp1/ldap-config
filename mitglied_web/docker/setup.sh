@@ -1,4 +1,6 @@
 #!/bin/bash
+# script to update ldap configuration based on ldif files
+# deletes old containers, rebuilds image and config and loads old data
 
 CONTAINER=ldap-provider
 # stop running containers and remove them
