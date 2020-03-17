@@ -7,6 +7,7 @@ CONTAINER=ldap-provider
 docker stop $CONTAINER
 docker rm $CONTAINER
 
+NOW=`date '+%F_%H:%M:%S'`;
 # backup data and remove it afterwards
 tar czf backups/database_$NOW.tar.gz persistence/database
 rm -r persistence/database
