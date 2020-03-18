@@ -914,6 +914,11 @@
 			$kosten[$k] = intval($v);
 			//$kosten[utf8_decode($k)] = intval(utf8_decode($v));
 		}
+
+		//"{\"\":0,\"\":60,\"\":80,\"\":50,\"ordentliche_mitgliedschaft\":10}
+		if (!isset($kosten, $kosten['ehrenmitgliedschaft'], $kosten['foerdermitgliedschaft'], $kosten['foerdermitgliedschaft_familie'], $kosten['foerdermitgliedschaft_firma'], $kosten['ordentliche_mitgliedschaft'])) {
+			return $response -> withStatus(400);
+		}
 		$user_base_dn = 'ou=user,'.$ldap_base_dn;
 
 		$selectedKeys = array(
@@ -934,12 +939,18 @@
 		foreach ($mitglieder as $key => $mitglied) {
 			if ($key !== 'count') {
 				$cost = 0;
-				if ($mitglied['mitgliedsart'][0] == 'foerdermitgliedschaft_firma') {
+				$submitgliedZahl = 0;
+				if ($mitglied['mitgliedsart'][0] === 'foerdermitgliedschaft_firma' 
+					|| $mitglied['mitgliedsart'][0] === 'foerdermitgliedschaft_familie') {
 					$submitgliedFilter = "(&(objectClass=mitgliedTeilhaber)(beginn<=$date)(geteiltMit=".$mitglied['dn']."))";
 					$submitgliedSearch = ldap_search($ldapconn, $user_base_dn, $submitgliedFilter, array("dn"));
 					$submitglieder = ldap_get_entries($ldapconn, $submitgliedSearch);
-					$cost = $submitglieder['count'] * $kosten['foerdermitgliedschaft_firma'];
-				} else {
+					$submitgliedZahl = $submitglieder['count'];
+					if ($mitglied['mitgliedsart'][0] === 'foerdermitgliedschaft_firma') {
+						$cost = ($submitgliedZahl + 1) * $kosten['foerdermitgliedschaft_firma'];
+					}
+				} 
+				if ($mitglied['mitgliedsart'][0] !== 'foerdermitgliedschaft_firma'){
 					$cost = $kosten[$mitglied['mitgliedsart'][0]];
 				}
 				unset($mitglied['cn']['count']);
@@ -950,7 +961,8 @@
 					'IBAN' => $mitglied['iban'][0],
 					'BIC' => $mitglied['bic'][0],
 					'Mitgliedsart' => $mitglied['mitgliedsart'][0],
-					'Betrag' => $cost
+					'Betrag' => $cost,
+					'#Teilhaber' => $submitgliedZahl !== 0 ? $submitgliedZahl : ''
 				));
 			}
 		}

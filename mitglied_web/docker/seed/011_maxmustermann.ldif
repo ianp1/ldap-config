@@ -1,0 +1,9 @@
+dn: uid=MaxM,ou=user,dc=ldap-provider,dc=fablab-luebeck
+objectClass: fablabPerson
+objectClass: inetOrgPerson
+uid: MaxM
+cn: Max
+sn: Mustermann
+geburtstag: 20200229230530Z
+sicherheitsbelehrung: 20200229230530Z
+userPassword: MaxM

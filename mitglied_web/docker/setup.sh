@@ -24,7 +24,7 @@ docker run -p 389:389 -p 636:636 --name $CONTAINER \
             --env LDAP_DOMAIN="ldap-provider.fablab-luebeck" \
             --env LDAP_ORGANISATION="FabLab Luebeck e.V." \
             --env LDAP_CONFIG_PASSWORD="config" \
-            --hostname localhost\
+            --env LDAP_TLS_VERIFY_CLIENT=never \
             --detach $CONTAINER \
             --loglevel trace 2>&1
 
@@ -51,6 +51,7 @@ docker run -p 389:389 -p 636:636 --name $CONTAINER \
             --env LDAP_DOMAIN="ldap-provider.fablab-luebeck" \
             --env LDAP_ORGANISATION="FabLab Luebeck e.V." \
             --env LDAP_CONFIG_PASSWORD="config" \
+            --env LDAP_TLS_VERIFY_CLIENT=never \
             --detach $CONTAINER \
             --loglevel trace 2>&1
 

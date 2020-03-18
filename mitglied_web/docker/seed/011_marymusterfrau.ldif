@@ -1,0 +1,9 @@
+dn: uid=MaryM,ou=user,dc=ldap-provider,dc=fablab-luebeck
+objectClass: fablabPerson
+objectClass: inetOrgPerson
+uid: MaryM
+cn: Mary
+sn: Musterfrau
+geburtstag: 20200229230530Z
+sicherheitsbelehrung: 20200229230530Z
+userPassword: MaryM
