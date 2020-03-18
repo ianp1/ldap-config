@@ -30,7 +30,7 @@ export class AbrechnungExportierenComponent implements OnInit {
     };
 
     let prices = "{\"ehrenmitgliedschaft\":0,\"foerdermitgliedschaft\":60,\"foerdermitgliedschaft_familie\":80,\"foerdermitgliedschaft_firma\":50,\"ordentliche_mitgliedschaft\":10}";
-    this.http.post<Blob>(this.appComponent.url_base+'api/v1.0/index.php/Abrechnung/20200229000000Z/' + 
+    this.http.post<Blob>(this.appComponent.url_base+'api/v1.0/index.php/Abrechnung/20200330000000Z/' + 
         this.appComponent.encodeURL(prices), params, {
           responseType: 'blob' as 'json'
         }).subscribe(
