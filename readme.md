@@ -1,91 +1,28 @@
+## Über dieses Projekt
+Dieses Repository enthält die verschiedenen Software-Komponenten die im FabLab Lübeck zur Verwaltung der Einweisungen und Mitgliedsdatensätze verwendet wird.
+Zur Verwendung werden im Wesentlichen ein OpenLDAP-Server, ein Webserver und Geräteterminals (beschrieben in DiMaS) benötigt. 
+Zur Authentifizierung dienen RFID-Karten.
 
-## LDAP auf STARTTLS umschalten
-https://www.digitalocean.com/community/tutorials/how-to-encrypt-openldap-connections-using-starttls
-``` shell
-sudo mkdir /etc/ssl/templates
-sudo cp ca_server.conf /etc/ssl/templates
-sudo cp ldap_server.conf /etc/ssl/templates
+Die Teilkomponenten werden hier kurz Beschrieben, genauere Beschreibungen in den Unterordnern
 
-sudo apt install gnutls-bin
-sudo certtool -p --outfile /etc/ssl/private/ca_server.key
-sudo certtool -s --load-privkey /etc/ssl/private/ca_server.key --template /etc/ssl/templates/ca_server.conf --outfile /etc/ssl/certs/ca_server.pem
+### DiMaS
+Hier befindet sich ein ESP8266-Sketch zum Auslesen von RFID-Chips und zur Bestätigung von Einweisungen über eine REST-Schnittstelle. Außerdem liegen hier Skripte zum komfortablen Update von mehreren ESPs in einem Netzwerk
 
-sudo certtool -p --sec-param high --outfile /etc/ssl/private/ldap_server.key
-sudo certtool -c --load-privkey /etc/ssl/private/ldap_server.key --load-ca-certificate /etc/ssl/certs/ca_server.pem --load-ca-privkey /etc/ssl/private/ca_server.key --template /etc/ssl/templates/ldap_server.conf --outfile /etc/ssl/certs/ldap_server.pem
+### einweisungImport
+Dieser Ordner enhält ein Java-Programm zum Import von Excel-Daten in die LDAP-Datenbank. Es ist auf die alte Datenstruktur des FabLabs ausgelegt, kann aber leicht angepasst werden
 
-sudo groupadd ssl-cert
-sudo usermod -aG ssl-cert openldap
-sudo chown :ssl-cert /etc/ssl/private/ldap_server.key
-sudo chmod 640 /etc/ssl/private/ldap_server.key
-sudo chown :ssl-cert /etc/ssl/private
-sudo chmod 650 /etc/ssl/private/
+### ansible_setup
+Hier werden Ansible-Dokumente gesammelt, die der komfortablen Einrichtung von LDAP-Authentifizierung unter Linux-Geräten dienen
 
-sudo ldapmodify -H ldapi:// -Y EXTERNAL -f addcerts.ldif
+### mitglied_web
+Eine Angular-Anwendung, die mithilfe eines PHP-Backends den OpenLDAP-Server anspricht um eine Benutzeroberfläche für die Mitglieder- und Einweisungsverwaltung bereitzustellen.
 
-sudo service slapd force-reload
-```
-Anschließend im ADS(Apache Directory Studio) überprüfen
+### masterterminal
+Eine angepasste Version der Mitgliederverwaltung, die auf einem Raspberry pi genutzt werden kann um die Einweisungen eines Nutzers mit einer RFID-Karte aufzulisten
 
-## STARTTLS verpflichtend
-https://www.digitalocean.com/community/tutorials/how-to-encrypt-openldap-connections-using-starttls
-``` shell
-sudo ldapmodify -H ldapi:// -Y EXTERNAL -f forcetls.ldif
-sudo service slapd force-reload
-```
+### structure
+Enhält die Datenstruktur des OpenLDAP-Verzeichnisses. 
 
-# Struktur anlegen
-## Memberof overlay
-``` shell
-sudo ldapadd -Q -Y EXTERNAL -H ldapi:// -f overlays/memberof.ldif
-sudo ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f overlays/refint1.ldif
-sudo ldapadd -Q -Y EXTERNAL -H ldapi:/// -f overlays/refint2.ldif
+### rfid_reader 
+Dieses Arduino Pro Mini-Programm dient der Tastatur-Eingabe von RFID-IDs. Das hiermit gebaute Terminal dient der Eingabe der IDs ins mitglied-web-Programm
 
-```
-
-## Klassen
-``` shell
-sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/fablabPerson.ldif
-sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/einweisungen.ldif
-```
-## Einträge
-Erstellen von 
-```
-ou=user,dc=ldap-provider,dc=fablab-luebeck
-ou=group,dc=ldap-provider,dc=fablab-luebeck
-
-ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
-ou=machine,dc=ldap-provider,dc=fablab-luebeck
-
-cn=ldap-admin,ou=group,dc=ldap-provider,dc=fablab-luebeck
-cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck
-cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck
-cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck
-```
-mithilfe von ADS
-
-## Berechtigungen
-``` shell
-sudo ldapmodify -Q -Y EXTERNAL -H ldapi:// -f structure/permissions.ldif
-```
-
-## Überprüfen
-So werden die Berechtigungen und Einstellungen überprüft:
-
-### Erstellen von Testbenutzern
-* `uid=einweisungvtest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
-* `uid=finanzvtest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
-* `uid=mitgliedvtest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
-* `uid=normaltest,ou=user,dc=ldap-provider,dc=fablab-luebeck`
-
-Anschließend hinzufügen zu den jeweiligen Gruppen
-
-### Ausführen der automatischen Tests
-``` shell
-cd testsuite
-mvn test
-```
-### Manueller Test
-* Einloggen per ADS
-* Sichtung der Einträge in den jeweiligen Testaccounts
-
-### Testnutzer löschen
