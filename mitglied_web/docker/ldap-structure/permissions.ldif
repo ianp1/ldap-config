@@ -32,7 +32,7 @@ olcAccess: to dn.base="ou=users,dc=ldap-provider,dc=fablab-luebeck" attrs=childr
 #mitgliederverwaltung
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn,beginn,ende,aktiv,entry,uid,objectClass,givenName,mail,mitgliedsnummer,mitgliedsart,beitragsanpassung,beitragsanpassungBis,geburtstag,anrede,plz,ort,strasse,notfallkontakt,iban,bic,kontoinhaber,description,title,mail,homePhone,geteiltMit by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn,beginn,ende,aktiv,entry,uid,objectClass,givenName,mail,mitgliedsnummer,mitgliedsart,beitragsanpassung,beitragsanpassungBis,geburtstag,anrede,plz,ort,strasse,notfallkontakt,iban,bic,kontoinhaber,description,title,mail,homePhone,geteiltMit,zahltPerRechnung by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
 #einweisungen
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=sicherheitsbelehrung by self read by * break
 olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break

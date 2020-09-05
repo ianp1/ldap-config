@@ -901,7 +901,12 @@
 	});
 
 	/**
+	 * $date: Datum, an dem die Abrechnung gestellt werden soll
+	 * $kostenAr: Array mit Kosten für die jeweiligen Mitgliedschaften
 	 * 
+	 * 
+	 * Exportiert eine Abrechnungsliste zum Import in ein Finanztool. Filtert die Nutzer heraus, die per Rechnung zahlen.
+	 * Rechnet geteilte Mitgliedschaften zusammen und verwendet gegebene Preise, um Gesamtkosten pro Nutzer zu errechnen.
 	 */
 	$app -> post('/Abrechnung/{Date}/{Kosten}', function (Request $request, Response $response, array $args) {
 		$ldapconn = $request -> getAttribute("ldapconn");
@@ -930,7 +935,9 @@
 			"bic",
 			"mitgliedsart"
 		);
-		$mitgliederFilter = "(&(objectClass=fablabMitglied)(beginn<=".$date."))";
+		// (&(objectClass=fablabMitglied)(beginn<=".$date.")(|(!(zahltPerRechnung=*))(zahltPerRechnung=FALSE)))
+		// (&(objectClass=fablabMitglied)(beginn<=".$date.")(|(!(zahltPerRechnung=*))(zahltPerRechnung=FALSE)))
+		$mitgliederFilter = "(&(objectClass=fablabMitglied)(beginn<=".$date.")(|(!(zahltPerRechnung=*))(zahltPerRechnung=FALSE)))";
 		$mitgliederSearch = ldap_search($ldapconn, $user_base_dn, 
 				$mitgliederFilter, $selectedKeys);
 		$mitglieder = ldap_get_entries($ldapconn, $mitgliederSearch);
