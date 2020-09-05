@@ -15,7 +15,15 @@
             "type": "php",
             "request": "launch",
             "name": "Backend",
-            "port": 9000
+            "port": 9000,
+            "log": true,
+            "externalConsole": false,
+            "pathMappings": {
+                "/usr/share/nginx/html": "${workspaceRoot}/mitglied_web/src",
+            },
+            "ignore": [
+                "**/vendor/**/*.php"
+            ]
         }
     ],
     "compounds": [
