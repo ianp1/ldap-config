@@ -3,6 +3,8 @@
 # deletes old containers, rebuilds image and config and loads old data
 
 CONTAINER=ldap-provider
+DATA_VOLUME=$PWD/persistence/database
+CONFIG_VOLUME=$PWD/persistence/config
 # stop running containers and remove them
 docker stop $CONTAINER
 docker rm $CONTAINER
@@ -20,7 +22,7 @@ rm -r persistence/config
 # dont mount data volume, since it could possibly prevent it from loading
 docker image build --no-cache -t $CONTAINER ./
 docker run -p 389:389 -p 636:636 --name $CONTAINER \
-            --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/config:/etc/ldap/slapd.d \
+            --volume $CONFIG_VOLUME:/etc/ldap/slapd.d \
             --env LDAP_DOMAIN="ldap-provider.fablab-luebeck" \
             --env LDAP_ORGANISATION="FabLab Luebeck e.V." \
             --env LDAP_CONFIG_PASSWORD="config" \
@@ -46,8 +48,8 @@ echo "starting up main container to check data integrity"
 docker stop $CONTAINER
 docker rm $CONTAINER
 docker run -p 389:389 -p 636:636 --name $CONTAINER \
-            --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/database:/var/lib/ldap \
-            --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/config:/etc/ldap/slapd.d \
+            --volume $DATA_VOLUME:/var/lib/ldap \
+            --volume $CONFIG_VOLUME:/etc/ldap/slapd.d \
             --env LDAP_DOMAIN="ldap-provider.fablab-luebeck" \
             --env LDAP_ORGANISATION="FabLab Luebeck e.V." \
             --env LDAP_CONFIG_PASSWORD="config" \

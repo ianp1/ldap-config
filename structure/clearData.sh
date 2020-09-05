@@ -3,6 +3,9 @@
 # clears config and data folders and rebuilds them
 
 CONTAINER=ldap-provider
+echo $PWD
+DATA_VOLUME=$PWD/persistence/database
+CONFIG_VOLUME=$PWD/persistence/config
 # stop running containers and remove them
 docker stop $CONTAINER
 docker rm $CONTAINER
@@ -21,8 +24,8 @@ rm -r persistence/config
 docker image build --no-cache -t $CONTAINER ./
 # build new container
 docker run -p 389:389 -p 636:636 --name $CONTAINER \
-            --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/database:/var/lib/ldap \
-            --volume /home/ian/Dokumente/Programmieren/FabLab/ldap/ldap-config/mitglied_web/docker/persistence/config:/etc/ldap/slapd.d \
+            --volume $DATA_VOLUME:/var/lib/ldap \
+            --volume $CONFIG_VOLUME:/etc/ldap/slapd.d \
             --env LDAP_DOMAIN="ldap-provider.fablab-luebeck" \
             --env LDAP_ORGANISATION="FabLab Luebeck e.V." \
             --env LDAP_CONFIG_PASSWORD="config" \
