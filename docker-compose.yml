@@ -1,0 +1,7 @@
+version: '3'
+services:
+    mitglied-web:
+        build: ./mitglied_web
+
+    ldap-server:
+        build: ./structure
