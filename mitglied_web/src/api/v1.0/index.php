@@ -17,11 +17,11 @@
 		if (getenv("DEV")) {
 			$ldaphost = "localhost";
 		} else {
-			$ldaphost = "192.168.3.4";
+			$ldaphost = "192.168.16.4";
 		}
 		$ldapport = 389;
 		$ldap_base_dn =  "dc=ldap-provider,dc=fablab-luebeck";
-
+		ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, 7);
 		$ldapconn = ldap_connect($ldaphost, $ldapport);
 		if (!$ldapconn) {
 			$response -> getBody() -> write("LDAP-Server Verbindung nicht möglich<br>");

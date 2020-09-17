@@ -29,7 +29,7 @@
         - sssd-common
         - ldap-utils
         - libsss-sudo
-      when: host_system == 'mint'
+      when: host_system is defined and host_system == 'mint'
     - name: write common-auth
       template:
         src: common-auth.j2
