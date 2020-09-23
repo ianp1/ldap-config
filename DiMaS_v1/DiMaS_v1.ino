@@ -49,7 +49,7 @@ String GERAET = "invalid";
 const char* ssid = "fablab";
 const char* password = "fablabfdm";
 
-const char* host = "192.168.2.201";
+const char* host = "192.168.8.211";
 const int httpsPort = 443;
 
 // Use web browser to view and copy
@@ -258,7 +258,7 @@ void loop() {
     }
     content.toUpperCase();
     Serial.println("Card read:" + content);
-  
+    /*
     if (content != "") {
       if (lastCardRead != "" && content == lastCardRead) {
         Serial.println("refreshing state");
@@ -273,7 +273,7 @@ void loop() {
           reject();
         }
       }
-    }
+    }*/
   }
 
   if (millis() - lastCardReadTime > cardReadTimeout) {

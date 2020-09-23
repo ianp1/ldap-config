@@ -17,7 +17,7 @@
 		if (getenv("DEV")) {
 			$ldaphost = "localhost";
 		} else {
-			$ldaphost = "192.168.16.4";
+			$ldaphost = "ldap-provider.fablab-luebeck.de";
 		}
 		$ldapport = 389;
 		$ldap_base_dn =  "dc=ldap-provider,dc=fablab-luebeck";

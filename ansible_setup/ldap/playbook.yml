@@ -82,18 +82,18 @@
       template:
         src: ldap.j2
         dest: /etc/ldap.conf
-        group: root
+        group: www-data
         owner: root
-        mode: 0700
+        mode: 0750
       notify:
       - restart services
     - name: to be safe use old config path, too
       template:
         src: ldap.j2
         dest: /etc/ldap/ldap.conf
-        group: root
+        group: www-data
         owner: root
-        mode: 0700
+        mode: 0750
       notify:
       - restart services
     - name: configure nslcd config
