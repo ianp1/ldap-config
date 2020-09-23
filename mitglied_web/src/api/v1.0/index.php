@@ -14,11 +14,11 @@
 		}
 
 
-		if (getenv("DEV")) {
-			$ldaphost = "localhost";
-		} else {
-			$ldaphost = "ldap-provider.fablab-luebeck.de";
-		}
+		//if (getenv("DEV")) {
+		//	$ldaphost = "localhost";
+		//} else {
+		$ldaphost = "ldap-provider.fablab-luebeck.de";
+		//}
 		$ldapport = 389;
 		$ldap_base_dn =  "dc=ldap-provider,dc=fablab-luebeck";
 		ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, 7);
