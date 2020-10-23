@@ -5,9 +5,12 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 
+#define PM_PIN                    5
+#define RELAY_PIN                 15
+
 #define MQTT_SERVER               "192.168.8.202"
 #define MQTT_SERVERPORT           1883
-#define CERT_FINGERPRINT          "A4 F1 26 A6 2E 21 18 EF B7 E8 4B 31 DE DD CE D2 EA 90 C8 4A"
+#define CERT_FINGERPRINT          "A5 F1 26 A6 2E 21 18 EF B7 E8 4B 31 DE DD CE D2 EA 90 C8 4A"
 
 #define WLAN_SSID                 "fablab"
 #define WLAN_PW                   "fablabfdm"
@@ -21,14 +24,16 @@ Adafruit_MQTT_Subscribe *OnOffSwitch;
 
 String GERAET;
 String PASSWORD;
-String topic;
+String readTopic;
+String writeTopic;
 String hostname;
 
 void setup() {
   Serial.begin(115200);
   delay(2000);
   SPIFFS.begin();
-  pinMode(15, OUTPUT);
+  pinMode(RELAY_PIN, OUTPUT);
+  pinMode(PM_PIN, INPUT);
   
   if (SPIFFS.exists("/device.txt")) {
     File file = SPIFFS.open("/device.txt", "r");
@@ -47,14 +52,15 @@ void setup() {
     Serial.println(PASSWORD);
     file.close();
   }  
-  topic = "machines/"+GERAET;
+  readTopic = "machines/"+GERAET;
+  writeTopic = "machines/"+GERAET+"/current";
   hostname = "shelly"+GERAET;
 
   Serial.println("finished reading: ");
   Serial.println(GERAET);
   Serial.println(PASSWORD);
 
-  digitalWrite(15, LOW);
+  digitalWrite(RELAY_PIN, LOW);
 
   Serial.print("Connecting to ");
   Serial.println(WLAN_SSID);
@@ -70,7 +76,7 @@ void setup() {
 
   mqtt = new Adafruit_MQTT_Client(&client, MQTT_SERVER, MQTT_SERVERPORT, GERAET.c_str(), PASSWORD.c_str());
 
-  OnOffSwitch = new Adafruit_MQTT_Subscribe(mqtt, topic.c_str());
+  OnOffSwitch = new Adafruit_MQTT_Subscribe(mqtt, readTopic.c_str());
 
   client.setFingerprint(CERT_FINGERPRINT);
   mqtt->subscribe(OnOffSwitch);
@@ -155,19 +161,27 @@ void loop() {
 
   Adafruit_MQTT_Subscribe *subscription;
   Serial.println("start waiting");
-  while ((subscription = mqtt->readSubscription(5000))) {
+  while ((subscription = mqtt->readSubscription(1000))) {
     Serial.println("subscription received");
     if (subscription == OnOffSwitch) {
       Serial.print(F("Got: "));
       Serial.println((char *)(*OnOffSwitch).lastread);
       if (((char*)(*OnOffSwitch).lastread)[0] == '1') {
-        digitalWrite(15, HIGH);
+        digitalWrite(RELAY_PIN, HIGH);
         Serial.println("AN");
       } else {
-        digitalWrite(15, LOW);
+        digitalWrite(RELAY_PIN, LOW);
         Serial.println("AUS");
       }
     }
   }
+  unsigned long ampVal = pulseIn(PM_PIN, LOW);
+  Serial.print("ampVal: ");
+  Serial.println(ampVal);
+  char ampValStr[30];
+  ultoa(ampVal, ampValStr, 10);
+  mqtt->publish(writeTopic.c_str(), ampValStr);
+
+
   // put your main code here, to run repeatedly:
 }
