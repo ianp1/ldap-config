@@ -14,11 +14,11 @@
 		}
 
 
-		//if (getenv("DEV")) {
-		//	$ldaphost = "localhost";
-		//} else {
-		$ldaphost = "ldap-provider.fablab-luebeck.de";
-		//}
+		if (getenv("DEV")) {
+			$ldaphost = "localhost";
+		} else {
+			$ldaphost = "ldap-provider.fablab-luebeck.de";
+		}
 		$ldapport = 389;
 		$ldap_base_dn =  "dc=ldap-provider,dc=fablab-luebeck";
 		ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, 7);
@@ -33,8 +33,9 @@
 		$request = $request -> withAttribute("ldap_base_dn", $ldap_base_dn);
 
 		ldap_set_option($ldapconn,LDAP_OPT_PROTOCOL_VERSION,3);
-		ldap_start_tls($ldapconn);
-
+		if (!getenv("DEV")) {
+			ldap_start_tls($ldapconn);
+		}
 		//Login if possible
 		if ($request -> getMethod() === "GET"
 									|| $request -> getMethod() === "DELETE") {
@@ -44,7 +45,10 @@
 		}
 
 		$AuthorUser = $params["author_user"];
-		$AuthorBot = $params["author_bot"];
+		$AuthorBot = "";
+		if (isset($params["author_bot"])) {
+			$AuthorBot = $params["author_bot"];
+		}
 		$AuthorPassword = $params["author_password"];
 
 		if (isset($AuthorUser, $AuthorPassword)) {
@@ -615,11 +619,13 @@
 		$usersearch = $request -> getAttribute("request_user");
 		$group = "cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck";
 
-		$search = ldap_search($ldapconn, $group, "(&(objectClass=groupOfNames)(member=$usersearch))", array("dn"));
+		$search = ldap_search($ldapconn, $group, "(objectClass=groupOfNames)", array("member"));
 		if ($search) {
 			$res = ldap_get_entries($ldapconn, $search);
 			if ($res['count'] > 0) {
-				return $response -> withStatus(201);
+				if (array_search($usersearch, $res[0]['member']) !== false) {
+					return $response -> withStatus(201);
+				}
 			}
 		}
 		return $response -> withStatus(401);
