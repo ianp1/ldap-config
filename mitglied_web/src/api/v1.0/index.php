@@ -216,17 +216,7 @@
 		$user = ldap_read($ldapconn, $userDn, "(objectClass=fablabPerson)");
 		$userResult = ldap_get_entries($ldapconn, $user);
 
-		$newClasses = array();
-		foreach ($userResult[0]["objectclass"] as $key => $cl) {
-			if ($key !== "count") {
-				array_push($newClasses, $cl);
-			}
-		}
-		if (!in_array("inetOrgPerson", $newClasses)) {
-			array_push($newClasses, "inetOrgPerson");
-		}
 		$newValues = array(
-			"objectClass"=> $newClasses,
 			"mail"=> $vals['email'],
 			"notfallkontakt"=>$vals["notfallkontakt"],
 			"ort"=>$vals["ort"],
