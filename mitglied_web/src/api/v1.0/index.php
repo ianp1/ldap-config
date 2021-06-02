@@ -71,6 +71,10 @@
 
 	$app -> get('/Mitglied/{RequestUser}', function(Request $request, Response $response, array $args) {
 		$userDn = $args['RequestUser'];
+		if (strpos($userDn, ",ou=user,dc=ldap-provider,dc=fablab-luebeck") === false) {
+			$userDn = "uid=".$userDn.",ou=user,dc=ldap-provider,dc=fablab-luebeck";
+		}
+		//echo $userDn;
 		$ldapconn = $request -> getAttribute('ldapconn');
 
 		$vals = $request -> getParsedBody();
@@ -179,6 +183,56 @@
 			"cn"=>$vals["vorname"],
 			"beginn"=>$vals["beginnMitgliedschaft"],
 			"description"=>$vals["kommentar"]
+		);
+
+		foreach($newValues as $key=>$val) {
+			if ($val === '') {
+				$newValues[$key] = array();
+			}
+		}
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		if (ldap_mod_replace($ldapconn, $userDn, $newValues)) {
+			return $response -> withJson(true, 201);
+		} else {
+			return $response -> withStatus(500);
+		}
+
+		return $response;
+	});
+
+
+	//Update Person data
+	$app -> post('/Person/{RequestUser}', function (Request $request, Response $response, array $args) {
+		$userDn = $args['RequestUser'];
+		if (strpos($userDn, ",ou=user,dc=ldap-provider,dc=fablab-luebeck") === false) {
+			$userDn = "uid=".$userDn.",ou=user,dc=ldap-provider,dc=fablab-luebeck";
+		}
+		$ldapconn = $request -> getAttribute('ldapconn');
+
+		$vals = $request -> getParsedBody();
+
+		$user = ldap_read($ldapconn, $userDn, "(objectClass=fablabPerson)");
+		$userResult = ldap_get_entries($ldapconn, $user);
+
+		$newClasses = array();
+		foreach ($userResult[0]["objectclass"] as $key => $cl) {
+			if ($key !== "count") {
+				array_push($newClasses, $cl);
+			}
+		}
+		if (!in_array("inetOrgPerson", $newClasses)) {
+			array_push($newClasses, "inetOrgPerson");
+		}
+		$newValues = array(
+			"objectClass"=> $newClasses,
+			"mail"=> $vals['email'],
+			"notfallkontakt"=>$vals["notfallkontakt"],
+			"ort"=>$vals["ort"],
+			"plz"=>$vals["plz"],
+			"strasse"=>$vals["strasse"],
+			"homePhone"=>$vals["telefon"],
 		);
 
 		foreach($newValues as $key=>$val) {

@@ -1,0 +1,86 @@
+<div>
+  <div class="input-mask">
+    <form [formGroup]="dataForm">
+      <h3>
+        Das bin ich:
+      </h3>
+      <br>
+      <mat-form-field>
+        <input matInput
+            placeholder="Vorname"
+            value=""
+            formControlName="vorname"
+        >
+      </mat-form-field><br>
+      <mat-form-field>
+        <input matInput
+            placeholder="Nachname"
+            value=""
+            formControlName="nachname"
+        >
+      </mat-form-field><br>
+      <mat-form-field>
+        <input matInput
+            placeholder="Geburtsdatum"
+            value=""
+            formControlName="geburtsdatum"
+        >
+      </mat-form-field><br>
+      <div class="wohninfos">
+        <h3>
+          Mein Wohnort:
+        </h3>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="PLZ"
+              formControlName="plz"
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Ort"
+              formControlName="ort"
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Straße"
+              formControlName="strasse"
+          >
+        </mat-form-field>
+      </div>
+      <div class="kontaktinfos">
+        <h3>
+          So könnt Ihr mich kontaktieren:
+        </h3>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Emailadresse"
+              formControlName="email"
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <input matInput
+              placeholder="Telefon"
+              formControlName="telefon"
+          >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <textarea matInput
+              placeholder="Notfallkontakt"
+              formControlName="notfallkontakt"
+          ></textarea>
+        </mat-form-field>
+      </div>
+      <button type="submit" mat-raised-button color="accent" (click)="datenSpeichern()">
+        Daten aktualisieren
+      </button>
+    </form>
+  </div>
+</div>

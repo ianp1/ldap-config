@@ -11,6 +11,13 @@
     [mode]="(isHandset$) ? 'over' : 'side'"-->
     <mat-nav-list>
       <a mat-list-item (click)="selectEntry('start')" class="link-home"><i class="material-icons">home</i>Startseite</a>
+      
+
+      <h3>
+        Meine Daten
+      </h3>
+      <a mat-list-item (click)="selectEntry('meine-daten')">Meine Daten bearbeiten</a>
+
       <h3>
         Einweisungen
       </h3>
@@ -109,19 +116,25 @@
             <staffeleinweisung>
             </staffeleinweisung>
           </div>
+
+          <div *ngIf="entry=='meine-daten'">
+            <meine-daten>
+            </meine-daten>
+          </div>
+
+          <div *ngIf="entry=='mitglied-teil'">
+            <mitglied-teil>
+            </mitglied-teil>
+          </div>
+          <div *ngIf="entry=='abrechnung-exportieren'">
+            <abrechnung-exportieren>
+            </abrechnung-exportieren>
+          </div>
         </div>
       </div>
       <div *ngIf="entry=='start'">
         <start>
         </start>
-      </div>
-      <div *ngIf="entry=='mitglied-teil'">
-        <mitglied-teil>
-        </mitglied-teil>
-      </div>
-      <div *ngIf="entry=='abrechnung-exportieren'">
-        <abrechnung-exportieren>
-        </abrechnung-exportieren>
       </div>
     </mat-card>
   </mat-sidenav-content>

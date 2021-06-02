@@ -85,6 +85,7 @@ import {Platform, PlatformModule} from '@angular/cdk/platform';
 import { StaffeleinweisungComponent } from './staffeleinweisung/staffeleinweisung.component';
 import { MitgliedTeilComponent } from './mitglied-teil/mitglied-teil.component';
 import { AbrechnungExportierenComponent } from './abrechnung-exportieren/abrechnung-exportieren.component';
+import { MeineDatenComponent } from './meine-daten/meine-daten.component';
 
 const appRoutes:Routes = [
 	{path: '', component: RedirectComponent},
@@ -116,7 +117,8 @@ registerLocaleData(localeDe, 'de');
     SummaryPageComponent,
     StaffeleinweisungComponent,
     MitgliedTeilComponent,
-    AbrechnungExportierenComponent
+    AbrechnungExportierenComponent,
+    MeineDatenComponent
 	],
 	imports: [
     PlatformModule,
