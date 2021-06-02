@@ -258,7 +258,7 @@ void loop() {
     }
     content.toUpperCase();
     Serial.println("Card read:" + content);
-    /*
+    
     if (content != "") {
       if (lastCardRead != "" && content == lastCardRead) {
         Serial.println("refreshing state");
@@ -273,7 +273,7 @@ void loop() {
           reject();
         }
       }
-    }*/
+    }
   }
 
   if (millis() - lastCardReadTime > cardReadTimeout) {

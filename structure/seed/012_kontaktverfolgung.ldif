@@ -1,0 +1,5 @@
+dn: cn=kontaktverfolgung,ou=bot,dc=ldap-provider,dc=fablab-luebeck
+objectClass: person
+cn: kontaktverfolgung
+sn: kontakt
+userPassword: kontaktverfolgung

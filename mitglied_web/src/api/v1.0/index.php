@@ -242,6 +242,59 @@
 		return $response;
 	});
 
+	$app -> post('/Kontaktverfolgung/{RFID}', function (Request $request, Response $response, array $args) {
+		$rfid = $args['RFID'];
+
+		$ldapconn = $request -> getAttribute('ldapconn');
+		$required = array(
+			"cn",
+			"sn",
+			"mail",
+			"homePhone",
+			"ort",
+			"plz",
+			"strasse"
+		);
+		$user = ldap_search($ldapconn, "ou=user,dc=ldap-provider,dc=fablab-luebeck", "(&(objectClass=fablabPerson)(rfid=$rfid))", $required);
+		$userResult = ldap_get_entries($ldapconn, $user);
+		
+		if ($userResult['count'] == 1) {
+			$valid = true;
+			$vals = $userResult[0];
+			//var_dump($vals);
+			foreach ($required as $key) {
+				$r = strtolower($key);
+				if (!(isset($vals[$r], $vals[$r][0]) && $vals[$r][0] != '' )) {
+					var_dump($r);
+					var_dump($vals[$r]);
+					$valid = false;
+				}
+			}
+
+			if (!$valid) {
+				return $response -> withStatus(400);
+			}
+
+			$mysqli = new mysqli("192.168.8.202", "kontaktverfolgung", "oHzHb8w3mPqsRAU7wQ1E", "kontaktverfolgung");
+			if ($mysqli -> connect_errno) {
+				echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
+				return $response -> withStatus(500);
+			}
+			  
+			  // Perform query
+			if ($stmt = $mysqli -> prepare("INSERT INTO Ereignis (DN) VALUES (?)")) {
+				$dn = $vals['dn'];
+				$stmt -> bind_param("s", $dn);
+				$stmt -> execute();
+				$stmt -> close();
+				
+				return $response -> withStatus(200);
+			}
+		}
+		var_dump($userResult);
+
+	});
+
 	$app -> post('/Mitgliedteil/{MitgliedBesitzer}/{NeuMitglied}', function (Request $request, Response $response, array $args) {
 		$mitgliedBesitzerDn = $args['MitgliedBesitzer'];
 		$neuMitgliedDn = $args['NeuMitglied'];
