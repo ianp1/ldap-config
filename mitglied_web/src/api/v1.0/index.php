@@ -242,9 +242,8 @@
 		return $response;
 	});
 
-	$app -> post('/Kontaktverfolgung/{RFID}', function (Request $request, Response $response, array $args) {
-		$rfid = $args['RFID'];
-
+	$app -> get('/Kontaktverfolgung/{RFID}', function (Request $request, Response $response, array $args) {
+		$rfid = cleanRFIDTag($args['RFID']);
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$required = array(
 			"cn",
@@ -265,8 +264,6 @@
 			foreach ($required as $key) {
 				$r = strtolower($key);
 				if (!(isset($vals[$r], $vals[$r][0]) && $vals[$r][0] != '' )) {
-					var_dump($r);
-					var_dump($vals[$r]);
 					$valid = false;
 				}
 			}
@@ -277,7 +274,6 @@
 
 			$mysqli = new mysqli("192.168.8.202", "kontaktverfolgung", "oHzHb8w3mPqsRAU7wQ1E", "kontaktverfolgung");
 			if ($mysqli -> connect_errno) {
-				echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
 				return $response -> withStatus(500);
 			}
 			  
@@ -291,8 +287,8 @@
 				return $response -> withStatus(200);
 			}
 		}
-		var_dump($userResult);
-
+		//var_dump($userResult);
+		return $response -> withStatus(400);
 	});
 
 	$app -> post('/Mitgliedteil/{MitgliedBesitzer}/{NeuMitglied}', function (Request $request, Response $response, array $args) {
