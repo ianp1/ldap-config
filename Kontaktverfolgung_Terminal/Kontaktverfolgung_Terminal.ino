@@ -36,6 +36,7 @@
 #define COLOR_MISSING CRGB::Orange
 #define COLOR_ERROR CRGB::Red
 #define COLOR_COUNTDOWN CRGB::Orange
+#define COLOR_RFID CRGB::Blue
 
 #define BRIGHTNESS_VALID 100
 #define BRIGHTNESS_INVALID 255
@@ -68,6 +69,7 @@ bool LEDWifiShine = true;
 
 //ReadValues
 int serverError = 0;
+int rfidError = 0;
 int missingData = 0;
 
 bool led_false_state = true;
@@ -190,11 +192,14 @@ bool ServerRequest(String rfid){
           Serial.println("accept");
           missingData = 4;
           serverError = 4;
+          rfidError = 4;
           return true;
         } else if (rescode == 400) {
           Serial.println("missing info");
 
           missingData = -1;
+        } else if (rescode == 404) {
+          rfidError = -1;
         } else {
           Serial.println("server error");
 
@@ -345,6 +350,9 @@ void LEDFalse() {
     }
     if (serverError < 0) {
       fill_solid(leds, NUM_LEDS, COLOR_ERROR);
+    }
+    if (rfidError < 0) {
+      fill_solid(leds, NUM_LEDS, COLOR_RFID);
     }
   } else {
     fill_solid(leds, NUM_LEDS, CRGB::Black);

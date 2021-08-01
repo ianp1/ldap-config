@@ -288,7 +288,7 @@
 			}
 		}
 		//var_dump($userResult);
-		return $response -> withStatus(400);
+		return $response -> withStatus(404);
 	});
 
 	$app -> post('/Mitgliedteil/{MitgliedBesitzer}/{NeuMitglied}', function (Request $request, Response $response, array $args) {
