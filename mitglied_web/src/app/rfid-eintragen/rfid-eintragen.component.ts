@@ -28,7 +28,7 @@ export class RfidEintragenComponent implements OnInit {
   searching:boolean = false;
   users:any = [];
 
-  @ViewChild('usersearch')
+  @ViewChild('usersearch', {static: false})
   userSearch;
 
   constructor(public dialog: MatDialog, private appComponent:AppComponent,

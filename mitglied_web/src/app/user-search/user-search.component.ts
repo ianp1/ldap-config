@@ -37,7 +37,7 @@ export class UserSearchComponent implements OnInit {
 
   emptySearchResult : boolean = false;
 
-  @ViewChild('searchfield')
+  @ViewChild('searchfield', {static: false})
   searchField;
 
   constructor(public appComponent:AppComponent, public http:HttpClient,

@@ -41,7 +41,7 @@ export class CustomNavComponent {
 
   isHandsetLocal:boolean = false;
 
-  @ViewChild('drawer')
+  @ViewChild('drawer', {static: false})
   sidenav : MatSidenav;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)

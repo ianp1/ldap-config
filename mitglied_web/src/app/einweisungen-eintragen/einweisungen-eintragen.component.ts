@@ -28,7 +28,7 @@ export class EinweisungenEintragenComponent implements OnInit {
 
   loginForm: FormGroup;
 
-  @ViewChild('usersearch')
+  @ViewChild('usersearch', {static: false})
   usersearch:UserSearchComponent;
 
 

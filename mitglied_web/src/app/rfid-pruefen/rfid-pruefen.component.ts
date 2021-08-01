@@ -28,7 +28,7 @@ export class RfidPruefenComponent implements OnInit {
 
   found_users:any;
   noUsersFound:boolean = false;
-  @ViewChild('rfidinput')
+  @ViewChild('rfidinput', {static: false})
   rfidInput;
 
   constructor(public appComponent:AppComponent, private http:HttpClient,
