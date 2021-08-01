@@ -8,7 +8,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 import { LoginService } from '../login/login.service';
-import { MatInput } from '@angular/material';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'rfid-besitzer-finden',

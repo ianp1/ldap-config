@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { AppComponent } from '../app.component';
 
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {

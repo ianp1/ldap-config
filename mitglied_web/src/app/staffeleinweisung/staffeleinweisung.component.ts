@@ -4,7 +4,7 @@ import { AppComponent } from '../app.component';
 import { LoginService } from '../login/login.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { SuccessDialog } from '../success-dialog/success-dialog';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'staffeleinweisung',

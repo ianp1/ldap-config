@@ -7,7 +7,7 @@ import { debounceTime, map } from 'rxjs/operators';
 
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
 import { LoginService } from '../login/login.service';

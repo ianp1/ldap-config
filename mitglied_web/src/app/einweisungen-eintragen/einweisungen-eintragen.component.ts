@@ -3,7 +3,7 @@ import { AppComponent } from '../app.component';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
 import { LdapDatePipe } from '../ldap-date.pipe'
 import { DatePipe } from '@angular/common';

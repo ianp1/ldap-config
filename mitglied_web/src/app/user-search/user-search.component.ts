@@ -9,7 +9,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { LoginService } from '../login/login.service';
-import { MatInput } from '@angular/material';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'user-search',
