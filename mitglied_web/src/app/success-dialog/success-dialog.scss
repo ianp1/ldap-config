@@ -1,7 +1,8 @@
 //@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 @import "../../fablabTheme";
 
-@mixin mat-icon-button-size($size: 40px, $iconColor:white, $iconBackground:mat-color($customAccent,500), $iconOffset:0) {
+@mixin mat-icon-button-size($size: 40px, $iconColor:white, $iconBackground:mat.get-color-from-palette($customAccent,500), $iconOffset:0) {
   width: $size * 5/9;
   height: $size * 5/9;
   line-height: $size * 5/9;
