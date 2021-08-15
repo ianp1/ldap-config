@@ -150,9 +150,6 @@ registerLocaleData(localeDe, 'de');
 		CustomNavComponent,
     PlatformModule
 	],
-  entryComponents: [
-    ErrorDialog
-  ],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }

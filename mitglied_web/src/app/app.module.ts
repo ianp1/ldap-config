@@ -177,12 +177,6 @@ registerLocaleData(localeDe, 'de');
 		CustomNavComponent,
     PlatformModule
 	],
-  entryComponents: [
-    DialogUserExisting,
-    DialogRfidExisting,
-    ErrorDialog,
-    SuccessDialog
-  ],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }
