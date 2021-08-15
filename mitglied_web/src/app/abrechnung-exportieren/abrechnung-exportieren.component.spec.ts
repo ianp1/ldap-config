@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AbrechnungExportierenComponent } from './abrechnung-exportieren.component';
 
@@ -6,7 +6,7 @@ describe('AbrechnungExportierenComponent', () => {
   let component: AbrechnungExportierenComponent;
   let fixture: ComponentFixture<AbrechnungExportierenComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ AbrechnungExportierenComponent ]
     })
