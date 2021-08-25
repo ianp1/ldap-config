@@ -1,26 +1,27 @@
 //@import '~@angular/material/theming';
 @use '~@angular/material' as mat;
+@use 'sass:math';
 @import "../../fablabTheme";
 
 @mixin mat-icon-button-size($size: 40px, $iconColor:white, $iconBackground:mat.get-color-from-palette($customAccent,500), $iconOffset:0) {
-  width: $size * 5/9;
-  height: $size * 5/9;
-  line-height: $size * 5/9;
+  width: math.div($size * 5, 9);
+  height: math.div($size * 5, 9);
+  line-height: math.div($size * 5, 9);
   background-color: $iconBackground;
 
   .mat-icon, .mat-icon-button i {
-    line-height: $size / 2 - $iconOffset;
+    line-height: math.div($size, 2) - $iconOffset;
     color:$iconColor;
   }
 
   .mat-icon {
-    width: $size / 2;
-    height: $size / 2;
+    width: math.div($size, 2);
+    height: math.div($size, 2);
     margin: 0;
   }
 
   .material-icons {
-    font-size: $size / 2;
+    font-size: math.div($size, 2);
   }
 }
 
