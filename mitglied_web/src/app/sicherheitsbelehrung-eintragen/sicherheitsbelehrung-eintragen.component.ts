@@ -35,17 +35,19 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var password = "";
     var useCurrentDate = true;
     var date = new Date();
+    var refresh = false;
 
     if (typeof this.sicherheitForm !== 'undefined') {
       useCurrentDate = this.sicherheitForm.value["useCurrentDate"];
       date = this.sicherheitForm.value["selectedDate"];
+      refresh = this.sicherheitForm.value["refresh"];
     }
 
     this.sicherheitForm = this.formBuilder.group({
       vorname: [''],
       nachname: [''],
       geburtsdatum: [''],
-      refresh: [''],
+      refresh: [refresh],
       refreshUser: [''],
       useCurrentDate: [useCurrentDate],
       selectedDate: [date]
