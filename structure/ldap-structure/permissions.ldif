@@ -51,7 +51,7 @@ olcAccess: to dn.subtree="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by g
 olcAccess: to dn.subtree="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=uid,objectClass,cn,sn,givenName by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #selbst
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn,mail,userPassword,givenName,entry,mail,notfallkontakt,ort,plz,strasse,homePhone by self write by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn,mail,userPassword,givenName,entry,mail,notfallkontakt,ort,plz,strasse,homePhone,discordName by self write by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" by self read by * break 
 # php password self service
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,uid,entry,mail by dn.exact="cn=selfservice,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
