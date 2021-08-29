@@ -71,12 +71,24 @@
           >
         </mat-form-field>
         <br>
-        <mat-form-field>
+        <mat-form-field class="wide">
           <textarea matInput
               placeholder="Notfallkontakt"
               formControlName="notfallkontakt"
           ></textarea>
         </mat-form-field>
+        <br>
+        <mat-form-field class="wide">
+          <input matInput
+              placeholder="Discord-Name (Beispiel: maxmueller#7111)"
+              formControlName="discordName"
+          >
+        </mat-form-field>
+        <br>
+        <span id="discordTooltip">
+          Gerätementoren können ihren Discord-Namen eingeben, um ihre Mentorenschaft automatisch mit ihrem Discord-Profil zu synchronisieren.
+        </span>
+        <br><br>
       </div>
       <button type="submit" mat-raised-button color="accent" (click)="datenSpeichern()">
         Daten aktualisieren

@@ -101,7 +101,8 @@
 			"titel"=>$userResult["title"][0],
 			"vorname"=>$userResult["cn"][0],
 			"beginnMitgliedschaft"=>$userResult["beginn"][0],
-			"kommentar"=>$userResult["description"][0]
+			"kommentar"=>$userResult["description"][0],
+			"discordName"=>$userResult["discordname"][0]
 		);
 
 
@@ -223,6 +224,7 @@
 			"plz"=>$vals["plz"],
 			"strasse"=>$vals["strasse"],
 			"homePhone"=>$vals["telefon"],
+			"discordName"=>$vals["discordName"]
 		);
 
 		foreach($newValues as $key=>$val) {

@@ -36,6 +36,8 @@ export class MeineDatenComponent implements OnInit {
        email: [''],
        telefon: [''],
        notfallkontakt: [''],
+       //
+       discordName: ['']
     });
   }
 
@@ -76,6 +78,8 @@ export class MeineDatenComponent implements OnInit {
         email: data['email'],
         telefon: data['telefon'],
         notfallkontakt: data['notfallkontakt'],
+
+        discordName: data['discordName']
       });
     });
   }
