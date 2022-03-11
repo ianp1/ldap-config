@@ -75,7 +75,7 @@
         state: directory
     - name: Place certificate download script
       template:
-        src: downloadCertificates.sh.j2
+        src: ../downloadCertificates.sh.j2
         dest: /root/scripts/downloadCertificates.sh
     - name: Update script permissions
       file:

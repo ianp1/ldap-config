@@ -3,8 +3,8 @@
 # be overriden soon!
 {% for domain in domains %}
 {% if domain.certificate %}
-mkdir /etc/ssl/{{ domain.domain }}
-chmod 640 /etc/ssl/{{ domain.domain }}
+mkdir -p /etc/ssl/{{ domain.domain }}
+chmod 750 /etc/ssl/{{ domain.domain }}
 scp -i /root/.ssh/id_certificates -r certificates@fablab-luebeck.de:/etc/letsencrypt/live/{{ domain.domain }}/* /etc/ssl/{{ domain.domain }}/
 {% endif %}
 {% endfor %}
