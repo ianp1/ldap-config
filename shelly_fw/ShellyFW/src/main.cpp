@@ -28,12 +28,13 @@ String readTopic;
 String writeTopic;
 String hostname;
 
+bool POWER_MANAGEMENT = false;
+
 void setup() {
   Serial.begin(115200);
   delay(2000);
   SPIFFS.begin();
   pinMode(RELAY_PIN, OUTPUT);
-  pinMode(PM_PIN, INPUT);
   
   if (SPIFFS.exists("/device.txt")) {
     File file = SPIFFS.open("/device.txt", "r");
@@ -52,6 +53,17 @@ void setup() {
     Serial.println(PASSWORD);
     file.close();
   }  
+
+  if (SPIFFS.exists("/pm.txt")) {
+    File file = SPIFFS.open("/pm.txt", "r");
+    String content = file.readString();
+    content.trim();
+    POWER_MANAGEMENT = content == "1";
+    Serial.print("Power Management: ");
+    Serial.println(POWER_MANAGEMENT ? "enabled" : "disabled");
+
+    pinMode(PM_PIN, INPUT);
+  }
   readTopic = "machines/"+GERAET;
   writeTopic = "machines/"+GERAET+"/current";
   hostname = "shelly"+GERAET;
@@ -175,12 +187,14 @@ void loop() {
       }
     }
   }
-  unsigned long ampVal = pulseIn(PM_PIN, LOW);
-  Serial.print("ampVal: ");
-  Serial.println(ampVal);
-  char ampValStr[30];
-  ultoa(ampVal, ampValStr, 10);
-  mqtt->publish(writeTopic.c_str(), ampValStr);
+  if (POWER_MANAGEMENT) {
+    unsigned long ampVal = pulseIn(PM_PIN, LOW);
+    Serial.print("ampVal: ");
+    Serial.println(ampVal);
+    char ampValStr[30];
+    ultoa(ampVal, ampValStr, 10);
+    mqtt->publish(writeTopic.c_str(), ampValStr);
+  }
 
 
   // put your main code here, to run repeatedly:

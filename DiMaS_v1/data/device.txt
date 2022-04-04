@@ -1,1 +1,1 @@
-geraetname=Drehbank,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
+geraetname=EEcke,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck

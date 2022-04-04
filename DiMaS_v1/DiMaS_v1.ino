@@ -151,6 +151,7 @@ void clearState() {
 
 bool ServerRequest(String rfid){
   WiFiClientSecure client;
+  client.setInsecure();
   
   String url = "/api/v1.0/index.php/Einweisung/"+rfid+"/"+GERAET+"?author_bot=terminal&author_password=LwRa2RPYY";
   Serial.print("requesting URL: ");
