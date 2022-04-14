@@ -8,6 +8,7 @@
 #include <SPI.h>
 #include <ArduinoJson.h>
 #include <MQTT.h>
+#include <LittleFS.h>
 
 #define NUM_LEDS 4
 #define FASTLED_ESP8266_RAW_PIN_ORDER
@@ -80,6 +81,7 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 BearSSL::X509List x509(ca_cert);
 
 static const String API_AUTH = "?author_bot=terminal&author_password=LwRa2RPYY";
+static const String API_LDAP_SUFFIX = ",ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
 static const String API_BACKEND = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/Einweisung/";
 
 #define MFRC522_SS_PIN 2
@@ -106,10 +108,13 @@ long lastCardReadTimestamp = 0;
 
 const char MQTT_HOST[] = "mqtt.local";
 const int MQTT_PORT = 1883;
-const char MQTT_USER[] = "ELab_Tisch_1";
-const char MQTT_PASSWORD[] = "qQZNXOPQ";
+String mqttUser = "invalid";
+String mqttPassword;
 
 MQTTClient mqttClient;
+
+String geraet = "invalid";
+String mqttChannel = "invalid";
 
 void blinkWifiConnecting() {
   if (blinkWifiConnectingTimer == 0 || millis() - blinkWifiConnectingTimer > 10000) {
@@ -199,7 +204,8 @@ time_t setClock() {
 
 void mqttConnect() {
   Serial.println("connecting to mqtt server");
-  while (!mqttClient.connect(MQTT_HOST, MQTT_USER, MQTT_PASSWORD)) {
+
+  while (!mqttClient.connect(WiFi.macAddress().c_str(), mqttUser.c_str(), mqttPassword.c_str())) {
     Serial.println(mqttClient.lastError());
     delay(100);
     char messageBuffer[100];
@@ -207,12 +213,13 @@ void mqttConnect() {
     Serial.println(messageBuffer);
     blinkWifiConnecting();
   }
+  Serial.println(mqttClient.lastError());
   Serial.println("connected");
   //subscribe here to topics
 }
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   delay(2000);
   
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
@@ -232,6 +239,49 @@ void setup() {
   SPI.begin();
   mfrc522.PCD_Init();
 
+  //Load file system information
+  if (!LittleFS.begin()) {
+    Serial.println("An error has occured while initializing littlefs");
+  }
+
+  File file = LittleFS.open("/device.txt", "r");
+  if (!file) {
+    Serial.println("Failed to open file device.txt");
+  }
+  geraet = "";
+  char c;
+  while (file.available()) {
+    c = file.read();
+    geraet += c;
+  }
+  
+  mqttChannel = "";
+  file = LittleFS.open("/mqttchannel.txt", "r");
+  while (file.available()) {
+    c = file.read();
+    mqttChannel += c;
+  }
+
+  mqttUser = "";
+  file = LittleFS.open("/mqttuser.txt", "r");
+  while (file.available()) {
+    c = file.read();
+    mqttUser += c;
+  }
+
+  mqttPassword = "";
+  file = LittleFS.open("/mqttpw.txt", "r");
+  while (file.available()) {
+    c = file.read();
+    mqttPassword += c;
+  }
+
+  Serial.println("finished reading filesystem information");
+  Serial.println(geraet);
+  Serial.println(mqttChannel);
+  Serial.println(mqttUser);
+  Serial.println(mqttPassword);
+
   //Init mqtt connection
   mqttClient.begin(MQTT_HOST, MQTT_PORT, wifiClient);
   mqttConnect();
@@ -241,7 +291,10 @@ void checkCard(String content) {
   fill_solid(leds, NUM_LEDS, CRGB::Yellow);
   FastLED.show();
   HTTPClient httpClient;
-  httpClient.begin(wifiClient, API_BACKEND+content+"/geraetname=EEcke,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck"+API_AUTH);
+  String path = API_BACKEND+content+"/geraetname="+geraet+API_LDAP_SUFFIX+API_AUTH;
+  Serial.print("path: ");
+  Serial.println(path);
+  httpClient.begin(wifiClient, path);
   int respCode = httpClient.GET();
 
   //Catch Server errors and internal errors
@@ -277,6 +330,7 @@ void checkCard(String content) {
       Serial.println(result);
       blinkRetrieveError();
     } else {
+
       cardStateVisible = true;
       Serial.println(doc["einweisung"].as<String>());
       Serial.println(doc["sicherheitsbelehrung"].as<String>());
@@ -297,8 +351,10 @@ void checkCard(String content) {
         Serial.print(einweisung);
         Serial.print(" ");
         Serial.println(sicherheitsbelehrung);
+
         mqttConnect();
-        mqttClient.publish("machines/ELab_Tisch_1", "valid_card");
+        Serial.println("printing valid");
+        mqttClient.publish(mqttChannel, "valid_card");
       }
     }
   }
@@ -316,24 +372,27 @@ void loop() {
   }
   if (!mqttClient.connected())
   {
-      mqttConnect();
+    mqttConnect();
   }
   else
   {
     mqttClient.loop();
+    delay(10);
   }
 
 
   fill_solid(leds, NUM_LEDS, CRGB::Black);
   leds[0] = CRGB::Green;
 
-  if (lastCardRead != "" && millis() - lastCardReadTimestamp > 4000) {
+  if (lastCardRead != "" && millis() - lastCardReadTimestamp > 3000) {
     Serial.println("reset lastCardRead");
     cardStateVisible = false;
     lastCardRead = "";
     lastCardReadTimestamp = 0;
-    mqttConnect();
-    mqttClient.publish("machines/ELab_Tisch_1", "card_removed");
+    if (!mqttClient.connected()) {
+      mqttConnect();
+    }
+    mqttClient.publish(mqttChannel, "card_removed");
   }
   showCardState();
 
