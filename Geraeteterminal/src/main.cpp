@@ -9,10 +9,15 @@
 #include <ArduinoJson.h>
 #include <MQTT.h>
 #include <LittleFS.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <AsyncElegantOTA.h>
 
 #define NUM_LEDS 4
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 #define LED_PIN 15
+
+AsyncWebServer server(80);
 
 const String WIFI_SSID = "fablab";
 const String WIFI_PASSWORD = "fablabfdm";
@@ -281,6 +286,13 @@ void setup() {
   wifiClient.setTrustAnchors(&x509);
   delay(1000);
   setClock();
+
+  //setup ota update
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", "Hi! I am ESP32.");
+  });
+  AsyncElegantOTA.begin(&server, "otaUpdate", "11Ie8alLvfe50It");    // Start ElegantOTA
+  server.begin();
 
   //Init rfid reader
   SPI.begin();
