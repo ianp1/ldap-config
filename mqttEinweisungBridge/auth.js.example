@@ -1,0 +1,6 @@
+let auth = {
+    clientId: "user",
+    username: "user",
+    password: "pass"
+};
+module.exports = auth;
