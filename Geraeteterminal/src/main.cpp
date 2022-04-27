@@ -99,6 +99,7 @@ int einweisung = 0;
 int sicherheitsbelehrung = 0;
 bool cardStateVisible = false;
 
+long cardSendTimestamp = 0;
 String lastCardRead = "";
 long lastCardReadTimestamp = 0;
 
@@ -106,7 +107,7 @@ long lastCardReadTimestamp = 0;
 #define COLOR_COUNTDOWN CRGB::Orange
 #define COLOR_SICHERHEIT CRGB::Blue
 
-const char MQTT_HOST[] = "mqtt.local";
+const char MQTT_HOST[] = "mqtt.fablab-luebeck.de";
 const int MQTT_PORT = 1883;
 String mqttUser = "invalid";
 String mqttPassword;
@@ -115,6 +116,7 @@ MQTTClient mqttClient;
 
 String geraet = "invalid";
 String mqttChannel = "invalid";
+String mqttChannelCard = "";
 
 void blinkWifiConnecting() {
   if (blinkWifiConnectingTimer == 0 || millis() - blinkWifiConnectingTimer > 10000) {
@@ -202,6 +204,48 @@ time_t setClock() {
   return now;
 }
 
+void mqttConnect();
+
+void messageReceived(String &topic, String &payload) {
+  Serial.println("incoming: " + topic + " - " + payload);
+
+  const int capacity = JSON_OBJECT_SIZE(5) + 64;
+  DynamicJsonDocument doc(capacity);
+  DeserializationError err = deserializeJson(doc, payload);
+  if (err) {
+    Serial.print("JSON-Serialization failed with code ");
+    Serial.println(err.c_str());
+    Serial.print("Http response was");
+    Serial.println(payload);
+  }
+
+  Serial.println(doc.as<String>());
+  Serial.println(doc["einweisung"].as<String>());
+  Serial.println(doc["sicherheitsbelehrung"].as<String>());
+  if (doc["terminalMac"].is<String>() && doc["terminalMac"] == WiFi.macAddress()) {
+    cardStateVisible = true;
+    cardSendTimestamp = 0;
+    if (doc["einweisung"].is<bool>()) {
+      Serial.println("Einweisung nicht vorhanden");
+      einweisung = -1;
+      sicherheitsbelehrung = 1;
+    } else if (doc["sicherheitsbelehrung"].is<bool>()) {
+      Serial.println("Sicherheitsbelehrung nicht vorhanden");
+      sicherheitsbelehrung = -1;
+      einweisung = 1;
+    } else {
+      einweisung = doc["einweisung"];
+      sicherheitsbelehrung = doc["sicherheitsbelehrung"];
+      
+      Serial.print("Verbleibend: ");
+      Serial.print(einweisung);
+      Serial.print(" ");
+      Serial.println(sicherheitsbelehrung);
+    }
+
+  }
+}
+
 void mqttConnect() {
   Serial.println("connecting to mqtt server");
 
@@ -215,8 +259,11 @@ void mqttConnect() {
   }
   Serial.println(mqttClient.lastError());
   Serial.println("connected");
+  mqttClient.subscribe(mqttChannel);
+  mqttClient.onMessage(messageReceived);
   //subscribe here to topics
 }
+
 
 void setup() {
   Serial.begin(57600);
@@ -261,6 +308,7 @@ void setup() {
     c = file.read();
     mqttChannel += c;
   }
+  mqttChannelCard = mqttChannel + "/card";
 
   mqttUser = "";
   file = LittleFS.open("/mqttuser.txt", "r");
@@ -284,83 +332,15 @@ void setup() {
 
   //Init mqtt connection
   mqttClient.begin(MQTT_HOST, MQTT_PORT, wifiClient);
+
   mqttConnect();
 }
 
 void checkCard(String content) {
   fill_solid(leds, NUM_LEDS, CRGB::Yellow);
   FastLED.show();
-  HTTPClient httpClient;
-  String path = API_BACKEND+content+"/geraetname="+geraet+API_LDAP_SUFFIX+API_AUTH;
-  Serial.print("path: ");
-  Serial.println(path);
-  httpClient.begin(wifiClient, path);
-  int respCode = httpClient.GET();
-
-  //Catch Server errors and internal errors
-  if (respCode >= 400 || respCode <= 0) {
-    if (respCode >= 400) {
-      Serial.println("Server error: "+respCode);
-    } else {
-      Serial.println("Error code is: "+respCode);
-      Serial.println("Error message: "+httpClient.errorToString(respCode));
-    }
-    blinkRetrieveError();
-  //Successfull request
-  } else {
-    String result = httpClient.getString();
-    Serial.print("result: ");
-    Serial.println(result);
-
-    if (result[0] != '{') {
-      cardStateVisible = true;
-      einweisung = -1;
-      sicherheitsbelehrung = 1;
-
-      return;
-    }
-    const int capacity = JSON_OBJECT_SIZE(2) + 64;
-    DynamicJsonDocument doc(capacity);
-
-    DeserializationError err = deserializeJson(doc, result);
-    if (err) {
-      Serial.print("JSON-Serialization failed with code ");
-      Serial.println(err.c_str());
-      Serial.print("Http response was");
-      Serial.println(result);
-      blinkRetrieveError();
-    } else {
-
-      cardStateVisible = true;
-      Serial.println(doc["einweisung"].as<String>());
-      Serial.println(doc["sicherheitsbelehrung"].as<String>());
-
-      if (doc["einweisung"].is<bool>()) {
-        Serial.println("Einweisung nicht vorhanden");
-        einweisung = -1;
-        sicherheitsbelehrung = 1;
-      } else if (doc["sicherheitsbelehrung"].is<bool>()) {
-        Serial.println("Sicherheitsbelehrung nicht vorhanden");
-        sicherheitsbelehrung = -1;
-        einweisung = 1;
-      } else {
-        einweisung = doc["einweisung"];
-        sicherheitsbelehrung = doc["sicherheitsbelehrung"];
-        
-        Serial.print("Verbleibend: ");
-        Serial.print(einweisung);
-        Serial.print(" ");
-        Serial.println(sicherheitsbelehrung);
-
-        mqttConnect();
-        Serial.println("printing valid");
-        mqttClient.publish(mqttChannel, "valid_card");
-      }
-    }
-  }
-  httpClient.end();
-
-
+  mqttClient.publish(mqttChannelCard, ("{\"terminalMac\": \""+WiFi.macAddress()+"\",\"machine\": \""+geraet+"\",\"rfid\": \""+content+"\"}").c_str());
+  cardSendTimestamp = millis();
 }
 
 void loop() {
@@ -384,19 +364,27 @@ void loop() {
   fill_solid(leds, NUM_LEDS, CRGB::Black);
   leds[0] = CRGB::Green;
 
-  if (lastCardRead != "" && millis() - lastCardReadTimestamp > 3000) {
-    Serial.println("reset lastCardRead");
-    cardStateVisible = false;
-    lastCardRead = "";
-    lastCardReadTimestamp = 0;
-    if (!mqttClient.connected()) {
-      mqttConnect();
-    }
-    mqttClient.publish(mqttChannel, "card_removed");
+  if (cardSendTimestamp != 0 && millis() - cardSendTimestamp > 5000) {
+    Serial.println("no answer for rfid request");
+    cardSendTimestamp = 0;
+    blinkRetrieveError();
   }
-  showCardState();
 
-  FastLED.show();
+  if (cardSendTimestamp == 0) {
+    if (lastCardRead != "" && millis() - lastCardReadTimestamp > 3000) {
+      Serial.println("reset lastCardRead");
+      cardStateVisible = false;
+      lastCardRead = "";
+      lastCardReadTimestamp = 0;
+      if (!mqttClient.connected()) {
+        mqttConnect();
+      }
+      mqttClient.publish(mqttChannelCard, "card_removed");
+    }
+    showCardState();
+
+    FastLED.show();
+  }
 
   if (startup) {
     Serial.print("Connected, IP address: ");
