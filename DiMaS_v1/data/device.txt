@@ -1,1 +1,0 @@
-geraetname=EEcke,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
