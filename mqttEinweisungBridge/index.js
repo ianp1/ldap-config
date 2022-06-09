@@ -17,8 +17,9 @@ const client = mqtt.connect(mqttOptions);
 client.on('connect', function() {
     console.log("connected");
     //TODO: Remove
-    client.subscribe('machines/ELab_Tisch_1/card');
-    client.publish('machines/ELab_Tisch_1', 'hi');
+    client.subscribe('machines/+/card');
+    //client.subscribe('machines/ELab_Tisch_1/card');
+    //client.publish('machines/ELab_Tisch_1', 'hi');
 });
 
 client.on('message', function(topic, message) {
