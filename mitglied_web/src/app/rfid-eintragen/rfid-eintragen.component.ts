@@ -88,7 +88,7 @@ export class RfidEintragenComponent implements OnInit {
     this.userSelected = user;
     if (typeof user.rfid !== 'undefined' && user.rfid != '' && user.rfid !== null) {
       this.showRfidWarning = true;
-
+      console.log(user.rfid);
       this.loginForm.patchValue({
         'rfid':user.rfid
       });

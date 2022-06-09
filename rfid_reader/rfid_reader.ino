@@ -1,3 +1,8 @@
+/****
+ * Board information:
+ * sparkfun pro micro
+ * processor atmega32u4 (3.3v, 8mhz)
+ */
 #include <SPI.h> 
 #include <MFRC522.h> 
 #include <Wire.h> 
@@ -20,6 +25,7 @@ bool showingRfid = true;
 
 void setup() {
   //Serial.begin(9600);
+  delay(2000);
   Keyboard.begin();
   lcd.init();
   lcd.backlight();
@@ -48,7 +54,7 @@ void loop() {
   //Serial.print("ID des RFID-TAGS:");CC598C1F
   String content= "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
-    if (i != 0) {
+    if (i >= 0) {
       content += char('\0'+32);
       if (mfrc522.uid.uidByte[i] < 0x10) {
         content.concat(String("0"));
@@ -73,10 +79,10 @@ void loop() {
     }
 
     lcd.clear();
-    
     lcd.setCursor(0, 0);
     lcd.print("RFID-TAG ID:"); 
     lcd.setCursor(0, 1);
+    content.replace(" ", "");
     lcd.print(content);
   }
   /*

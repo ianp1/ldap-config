@@ -123,6 +123,9 @@ String geraet = "invalid";
 String mqttChannel = "invalid";
 String mqttChannelCard = "";
 
+long wifiDisconnectedTimestamp = 0;
+long mqttDisconnectedTimestamp = 0;
+
 void blinkWifiConnecting() {
   if (blinkWifiConnectingTimer == 0 || millis() - blinkWifiConnectingTimer > 10000) {
     blinkWifiConnectingTimer = millis();
@@ -254,10 +257,16 @@ void messageReceived(String &topic, String &payload) {
 void mqttConnect() {
   Serial.println("connecting to mqtt server");
 
+
   while (!mqttClient.connect(WiFi.macAddress().c_str(), mqttUser.c_str(), mqttPassword.c_str())) {
+    
+    if (!(WiFi.status() != WL_CONNECTED)) {
+      Serial.println("wifi not connected"); 
+    }
     Serial.println(mqttClient.lastError());
     delay(100);
     char messageBuffer[100];
+    Serial.println("WifiError:");
     Serial.println(wifiClient.getLastSSLError(messageBuffer, 100));
     Serial.println(messageBuffer);
     blinkWifiConnecting();
@@ -357,6 +366,9 @@ void checkCard(String content) {
 
 void loop() {
   while (WiFi.status() != WL_CONNECTED) {
+    if (wifiDisconnectedTimestamp == 0) {
+      wifiDisconnectedTimestamp = millis();
+    }
     startup = true;
     delay(100);
     Serial.println("connecting");
@@ -364,7 +376,12 @@ void loop() {
   }
   if (!mqttClient.connected())
   {
+    if (mqttDisconnectedTimestamp == 0) {
+      mqttDisconnectedTimestamp = millis();
+      Serial.println("set mqttDisconnectedTimestamp");
+    }
     mqttConnect();
+    startup = true;
   }
   else
   {
@@ -399,6 +416,16 @@ void loop() {
   }
 
   if (startup) {
+    if (mqttDisconnectedTimestamp != 0) {
+      mqttClient.publish(mqttChannel+"/debug", "mqtt disconnected for "+String(millis() - mqttDisconnectedTimestamp)+" milliseconds");
+      mqttDisconnectedTimestamp = 0;
+      Serial.println("printing mqtt debug message");
+    }
+    if (wifiDisconnectedTimestamp != 0) {
+      mqttClient.publish(mqttChannel+"/debug", "wifi disconnected for "+String(millis() - wifiDisconnectedTimestamp)+" milliseconds");
+      wifiDisconnectedTimestamp = 0;
+      Serial.println("printing wifi debug message");
+    }
     Serial.print("Connected, IP address: ");
     Serial.println(WiFi.localIP());
     startup = false;
@@ -409,7 +436,9 @@ void loop() {
       for (byte i = 0; i < mfrc522.uid.size; i++) 
       {
         if (i != 0) {
-        content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? "_0" : "_"));
+          content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? "_0" : "_"));
+        } else {
+          content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? "0" : ""));
         }
         content.concat(String(mfrc522.uid.uidByte[i], HEX));
       }

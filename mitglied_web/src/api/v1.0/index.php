@@ -15,6 +15,8 @@
 
 
 		if (getenv("DEV")) {
+			echo "hier";
+			die();
 			$ldaphost = "localhost";
 		} else {
 			$ldaphost = "ldap-provider.fablab-luebeck.de";
@@ -543,8 +545,7 @@
 	* Gibt alle Einweisungen des Nutzers zurück
 	*/
 	$app -> get('/Einweisung/RFID/{RequestRfid}', function(Request $request, Response $response, array $args) {
-		$RequestRfid = strtoupper(preg_replace('/(?![0-9a-fA-F])./', "", $args['RequestRfid']));
-
+		$RequestRfid = cleanRFIDTag($args['RequestRfid']);//strtoupper(preg_replace('/(?![0-9a-fA-F_])./', "", $tag))
 		$ldapconn = $request -> getAttribute('ldapconn');
 		$ldap_base_dn = $request -> getAttribute('ldap_base_dn');
 
@@ -1338,7 +1339,8 @@
 	}
 
 	function cleanRFIDTag($tag) {
-		return strtoupper(preg_replace('/(?![0-9a-fA-F])./', "", $tag));
+		$tag = str_replace(" ", "_", $tag);
+		return strtoupper(preg_replace('/(?![0-9a-fA-F_])./', "", $tag));
 	}
 
 	function normalizeUtf8String($s) {
