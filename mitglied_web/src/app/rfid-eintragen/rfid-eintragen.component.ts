@@ -51,7 +51,9 @@ export class RfidEintragenComponent implements OnInit {
     var passw = this.appComponent.sanitize(this.loginService.password);
     var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
     var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
-
+    console.log(this.loginForm.value['rfid']);
+    console.log(this.appComponent.sanitize(this.loginForm.value['rfid']));
+    console.log(updateRfid);
     var headers = new HttpHeaders();
     var params = new HttpParams();
     params = params.append('author_user', user);
