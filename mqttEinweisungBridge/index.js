@@ -36,20 +36,34 @@ client.on('message', function(topic, message) {
         .then(response => {
             console.log("response is: ", response.data);
 
-            //TODO: Parse values
-            let einweisung = response.data.einweisung;
-            let sicherheitsbelehrung = response.data.sicherheitsbelehrung;
-            let aktiviert = response.data.aktiviert;
-            let payload = {
-                terminalMac: sourceMac,
-                einweisung: einweisung,
-                aktiviert: aktiviert,
-                sicherheitsbelehrung: sicherheitsbelehrung
-            };
             let newTopic = topic.split("/");
             newTopic = newTopic[0] + "/" + newTopic[1];
-            client.publish(newTopic, JSON.stringify(payload));
-            client.publish(newTopic+"/active", "1");
+
+            if (response.data === false) {
+                console.log("response is false");
+                client.publish(newTopic, JSON.stringify(false));
+            } else {
+                
+                //TODO: Parse values
+                let einweisung = response.data.einweisung;
+                let sicherheitsbelehrung = response.data.sicherheitsbelehrung;
+                let aktiviert = response.data.aktiviert;
+                let payload = {
+                    terminalMac: sourceMac,
+                    einweisung: einweisung,
+                    aktiviert: aktiviert,
+                    sicherheitsbelehrung: sicherheitsbelehrung
+                };
+
+                if (aktiviert && einweisung !== false && einweisung > 0 && sicherheitsbelehrung !== false && sicherheitsbelehrung > 0) {
+                    console.log("activate relay");
+                    client.publish(newTopic+"/active", "1");
+                } else {
+                    console.log("dont activate relay:");
+                    console.log(aktiviert, einweisung, sicherheitsbelehrung);
+                }
+                client.publish(newTopic, JSON.stringify(payload));
+            }
         }).catch(error => {
             client.publish(topic, JSON.stringify({
                 terminalMac: sourceMac,

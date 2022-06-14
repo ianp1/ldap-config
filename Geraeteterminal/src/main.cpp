@@ -228,29 +228,36 @@ void messageReceived(String &topic, String &payload) {
   }
 
   Serial.println(doc.as<String>());
-  Serial.println(doc["einweisung"].as<String>());
-  Serial.println(doc["sicherheitsbelehrung"].as<String>());
-  if (doc["terminalMac"].is<String>() && doc["terminalMac"] == WiFi.macAddress()) {
+  if (doc.as<String>() == "false") {
+    Serial.println("mqtt returned false, einweisung und sicherheitsbelehrung not set");
+    einweisung = -1;
+    sicherheitsbelehrung = -1;
     cardStateVisible = true;
     cardSendTimestamp = 0;
-    if (doc["einweisung"].is<bool>()) {
-      Serial.println("Einweisung nicht vorhanden");
-      einweisung = -1;
-      sicherheitsbelehrung = 1;
-    } else if (doc["sicherheitsbelehrung"].is<bool>()) {
-      Serial.println("Sicherheitsbelehrung nicht vorhanden");
-      sicherheitsbelehrung = -1;
-      einweisung = 1;
-    } else {
-      einweisung = doc["einweisung"];
-      sicherheitsbelehrung = doc["sicherheitsbelehrung"];
-      
-      Serial.print("Verbleibend: ");
-      Serial.print(einweisung);
-      Serial.print(" ");
-      Serial.println(sicherheitsbelehrung);
+  } else {
+    Serial.println(doc["einweisung"].as<String>());
+    Serial.println(doc["sicherheitsbelehrung"].as<String>());
+    if (doc["terminalMac"].is<String>() && doc["terminalMac"] == WiFi.macAddress()) {
+      cardStateVisible = true;
+      cardSendTimestamp = 0;
+      if (doc["einweisung"].is<bool>()) {
+        Serial.println("Einweisung nicht vorhanden");
+        einweisung = -1;
+        sicherheitsbelehrung = 1;
+      } else if (doc["sicherheitsbelehrung"].is<bool>()) {
+        Serial.println("Sicherheitsbelehrung nicht vorhanden");
+        sicherheitsbelehrung = -1;
+        einweisung = 1;
+      } else {
+        einweisung = doc["einweisung"];
+        sicherheitsbelehrung = doc["sicherheitsbelehrung"];
+        
+        Serial.print("Verbleibend: ");
+        Serial.print(einweisung);
+        Serial.print(" ");
+        Serial.println(sicherheitsbelehrung);
+      }
     }
-
   }
 }
 
@@ -275,6 +282,9 @@ void mqttConnect() {
   Serial.println("connected");
   mqttClient.subscribe(mqttChannel);
   mqttClient.onMessage(messageReceived);
+
+  Serial.print("listening on mqtt channel ");
+  Serial.println(mqttChannel);
   //subscribe here to topics
 }
 
