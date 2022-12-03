@@ -258,7 +258,9 @@ void messageReceived(String &topic, String &payload) {
 
 void mqttConnect() {
   Serial.println("connecting to mqtt server");
-
+  Serial.print("error before: ");
+  
+  Serial.println(mqttClient.lastError());
 
   while (!mqttClient.connect(WiFi.macAddress().c_str(), mqttUser.c_str(), mqttPassword.c_str())) {
     
@@ -271,6 +273,9 @@ void mqttConnect() {
     Serial.println("WifiError:");
     Serial.println(wifiClient.getLastSSLError(messageBuffer, 100));
     Serial.println(messageBuffer);
+    Serial.print("mqtt Data is: ");
+    Serial.println(mqttUser);
+    Serial.println(mqttPassword);
     blinkWifiConnecting();
   }
   Serial.println(mqttClient.lastError());
@@ -363,13 +368,24 @@ void setup() {
 }
 
 void checkCard(String content) {
+  if (!mqttClient.connected()) {
+    mqttConnect();
+  }
+  /*
+  Serial.println(test);
+  mqttClient.publish(mqttChannelCard, test);
+  */
+  //mqttClient.publish(mqttChannelCard, "test");
+  
+  Serial.println(mqttClient.lastError());
   fill_solid(leds, NUM_LEDS, CRGB::Yellow);
   FastLED.show();
-  mqttClient.publish(mqttChannelCard, ("{\"terminalMac\": \""+WiFi.macAddress()+"\",\"machine\": \""+geraet+"\",\"rfid\": \""+content+"\"}").c_str());
   cardSendTimestamp = millis();
+  mqttClient.publish(mqttChannelCard, "{\"terminalMac\":\""+WiFi.macAddress()+"\",\"machine\":\""+geraet+"\",\"rfid\":\""+content+"\"}");
 }
 
 void loop() {
+  //Serial.println("loop");
   while (WiFi.status() != WL_CONNECTED) {
     if (wifiDisconnectedTimestamp == 0) {
       wifiDisconnectedTimestamp = millis();
@@ -435,6 +451,7 @@ void loop() {
     Serial.println(WiFi.localIP());
     startup = false;
   } else {
+    //checkCard("04_28_1A_2A_12_62_80");
     
     if ( mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {  
       String content= "";
@@ -448,6 +465,12 @@ void loop() {
         content.concat(String(mfrc522.uid.uidByte[i], HEX));
       }
       content.toUpperCase();
+      delay(100);
+      if (!mqttClient.connected()) {
+        mqttConnect();
+      } else {
+        Serial.println("mqtt already connected before sending");
+      }
       Serial.println("Card read:" + content);
       Serial.println("Last card read: " + lastCardRead);
       if (lastCardRead != content) {
