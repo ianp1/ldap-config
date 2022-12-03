@@ -1,9 +1,11 @@
 //New Terminal, by Marco with TFT
+#define CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 #include <Arduino.h>
 int ausgewahltesGerat = -1;// Index der Config geräte
 int einweisung = 0;// Wie lnge eine Einweisung noch vorhanden ist
 int sicherheitsbelehrung = 0;// Wie lange eine Sicherheitsbelehrung noch vorhanden ist
 long cardSendTimestamp = 0;//Wann die MQTT nachricht der Karte gesendet wurde
+long lastStatusUpdate = 0;
 String lastCardRead = "";// ID der letzten Karte
 long lastCardReadTimestamp = 0;// Wann das letzte mal eine Karte gelesen wurde
 long mqttDisconnectedTimestamp = 0;// Wann der MQTT teil die verbindung verloren hat
@@ -23,13 +25,14 @@ long mqttDisconnectedTimestamp = 0;// Wann der MQTT teil die verbindung verloren
 //TODO: ersetzen durch frische Config
 void initFilsystem() {
   //Load file system information
-  if (!LittleFS.begin()) {
+  if (!LittleFS.begin(true)) {
     bootLogTFT("An error has occured while initializing littlefs");
   }
 
   File file = LittleFS.open("/device.txt", "r");
   if (!file) {
     bootLogTFT("Failed to open file device.txt");
+    geraet = "Drucker";
   }
   geraet = "";
   char c;
@@ -87,6 +90,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("ESP32 Startet");
   // Init display + Touch
+  initTFT();
   bootLogTFT("Display Initialisiert");
   // init filesystem
   initFilsystem();
@@ -98,14 +102,15 @@ void setup() {
   //set Time
   initTime();
   // Download Config
-  getConfig();
+  //getConfig();
   //    JSON Alle angeschlossenen Geräte
   // connect to mqtt
-  initMQTT();
-  // init cardreader
-  initCard();
+  //initMQTT();
   // Start Touch
   initTouch();
+  handleTouh();
+  // init cardreader
+  initCard();
   // init Images
   TJpgDec.setCallback(onDecode);
   displayStatus = 1;// Menue
@@ -122,11 +127,11 @@ void loop() {
   //Chck Wlan connection and reconnect
   checkWifi();
   //MQTT Get Device state and Update time and User
-  checkMQTT();
+  //checkMQTT();
   //Touch on Device, switch to Image and Menue(Frischalten/Freigeben, Sperren, Kosten Info, Zurück)-> bestätigung durch Karte
   handleTouh();
   //Check card -> New Card -> Display Name Einweisungen kompatible und Sicherheitsbelehrung.(zurück Button)
-  if (lastCardReadTimestamp + 10000 > millis() && !readTag()) {//Keine Karte seit 10 Sekunden
+  if (lastCardReadTimestamp + 10000 < millis() && !readTag()) {//Keine Karte seit 10 Sekunden
     // Karte weg
     if (displayStatus == 2) {
       displayStatus = 1;
@@ -135,5 +140,8 @@ void loop() {
   handleDisplayMenue();
   ArduinoOTA.handle();
   //Display signal strenth, MQTT Status, Zeit, Name
-  displayStatusBar();
+  if (millis() > lastStatusUpdate + 1000) {
+    displayStatusBar();
+    lastStatusUpdate = millis();
+  }
 }

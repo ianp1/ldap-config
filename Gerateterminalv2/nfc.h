@@ -22,7 +22,7 @@ boolean readTag(){
   uint8_t success;
   uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
   uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
-  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 10);//Warte 10 ms auf eine neue Karte
+  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 100);//Warte 100 ms auf eine neue Karte
   if (success) {
     varRet = true;
     Serial.println("Found an ISO14443A card");
@@ -48,6 +48,8 @@ boolean readTag(){
         checkCard(content);
       }
       lastCardReadTimestamp = millis();
+  }else {
+    Serial.println("Card read:");
   }
   return varRet;
 }

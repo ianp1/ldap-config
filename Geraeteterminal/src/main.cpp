@@ -1,17 +1,12 @@
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
 #include <time.h>
-#include "FastLED.h"
-#include <MFRC522.h>
 #include <SPI.h>
 #include <ArduinoJson.h>
 #include <MQTT.h>
 #include <LittleFS.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
 
 #define NUM_LEDS 4
 #define FASTLED_ESP8266_RAW_PIN_ORDER
