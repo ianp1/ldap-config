@@ -41,7 +41,7 @@
             formControlName="geburtsdatum"
             [matDatepicker]="geburtsdatumPicker"
         >
-        <mat-datepicker #geburtsdatumPicker>
+        <mat-datepicker #geburtsdatumPicker [disabled]="sicherheitControls.geburtsdatum.disabled">
         </mat-datepicker>
 
         <mat-datepicker-toggle matSuffix [for]="geburtsdatumPicker"></mat-datepicker-toggle>

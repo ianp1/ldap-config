@@ -1,0 +1,66 @@
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+replace: olcAccess
+#Admins
+olcAccess: to * by dn.base="cn=admin,dc=ldap-provider,dc=fablab-luebeck" manage by group.exact="cn=ldap-admin,ou=group,dc=ldap-provider,dc=fablab-luebeck" manage by * break
+#Root
+olcAccess: to dn.base="dc=ldap-provider,dc=fablab-luebeck" by * read 
+#passwords
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by dn.exact="cn=selfservice,ou=bot,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by self write by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * auth 
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" filter=(objectClass=posixAccount) attrs=entry,uid,objectClass,uidNumber,gidNumber,homeDirectory,loginShell,sshPublicKey by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
+#config
+olcAccess: to dn.base="ou=config,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="cn=nextUID,ou=config,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" write by * break
+#bots
+olcAccess: to dn.base="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=group,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=posixGroups,ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=posixGroups,ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=bot,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by anonymous auth by * break
+olcAccess: to dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" by anonymous auth by self read by * break
+olcAccess: to dn.children="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=masterterminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=masterterminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=masterterminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=kontaktverfolgung,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,uid,rfid,sicherheitsbelehrung by dn.exact="cn=terminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=masterterminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn by dn.exact="cn=masterterminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,cn,sn,uid,mail,ort,strasse,plz,homePhone,rfid by dn.exact="cn=kontaktverfolgung,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,cn,sn,uid,discordName by dn.exact="cn=discordbot,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+#finanzen 
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=mitgliedsart,mitgliedsnummer,cn,sn,beginn,ende,aktiv,kontoinhaber,entry,objectClass,uid,iban,bic,anrede,title,beitragsanpassung,beitragsanpassungBis by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=users,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+#mitgliederverwaltung
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn,beginn,ende,aktiv,entry,uid,objectClass,givenName,mail,mitgliedsnummer,mitgliedsart,beitragsanpassung,beitragsanpassungBis,geburtstag,anrede,plz,ort,strasse,notfallkontakt,iban,bic,kontoinhaber,description,title,mail,homePhone,geteiltMit,zahltPerRechnung by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+#einweisungen
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=sicherheitsbelehrung by self read by * break
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=entry by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=rfid,sicherheitsbelehrung,belehrtVon,aktiviert,kommentar by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=uid,entry,cn,sn,uid,geburtstag,objectClass,rfid,sicherheitsbelehrung by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.regex="^([^,]+),geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" by dnattr=eingewiesener read by * break
+olcAccess: to dn.regex="^geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" attrs=children by group.expand="geraetname=$1,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.regex="^([^,]+),geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" by group.expand="geraetname=$2,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.regex="^([^,]+),geraetname=([^,]+),ou=einweisung,dc=ldap-provider,dc=fablab-luebeck$" by group.exact="cn=geraetementor,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * read
+olcAccess: to dn.base="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by * read
+olcAccess: to dn.one="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * read
+olcAccess: to dn.subtree="ou=einweisung,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+olcAccess: to dn.subtree="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=uid,objectClass,cn,sn,givenName by group.exact="cn=einweisungverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
+#selbst
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn,mail,userPassword,givenName,entry,mail,notfallkontakt,ort,plz,strasse,homePhone,discordName by self write by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" by self read by * break 
+# php password self service
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,uid,entry,mail by dn.exact="cn=selfservice,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+#pwm attributes
+#olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword,objectClass,pwmEventLog,pwmLastPwdUpdate,pwmOtpSecret,pwmResponseSet by group.exact="cn=pwm-admin,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by self write by * break
+#olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=children by group.exact="cn=pwm-admin,ou=group,dc=ldap-provider,dc=fablab-luebeck" write by * break
+#maschinen
+olcAccess: to dn.subtree="ou=maschine,dc=ldap-provider,dc=fablab-luebeck" by * read 
+#UserRoot
+olcAccess: to dn.base="ou=user,dc=ldap-provider,dc=fablab-luebeck" by users read by * break
+#abschluss
+olcAccess: to * by * none

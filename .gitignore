@@ -4,3 +4,8 @@
 **/*.swp
 **/vendor
 **/node_modules
+
+
+structure/persistence/*
+structure/backups/*
+!**/.gitkeep

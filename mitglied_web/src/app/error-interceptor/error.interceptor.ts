@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { AppComponent } from '../app.component';
 
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -26,7 +26,7 @@ export class ErrorInterceptor implements HttpInterceptor {
       x.subscribe(data => {
         observer.next(data);
       }, error => {
-        if (error.status !== 404 && error.status !== 401) {
+        if (error.status !== 404 && error.status !== 401 && error.status !== 400) {
 
 
           const dialogRef = this.dialog.open(ErrorDialog);

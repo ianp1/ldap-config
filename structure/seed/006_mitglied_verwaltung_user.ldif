@@ -1,0 +1,9 @@
+dn: uid=mitgliedv,ou=user,dc=ldap-provider,dc=fablab-luebeck
+objectClass: inetOrgPerson
+objectClass: fablabPerson
+uid: mitgliedv
+userPassword: mitgliedv
+cn: mitgliederverwaltung
+geburtstag: 20200301225443Z
+sicherheitsbelehrung: 20200301225443Z
+sn: mitgliedv

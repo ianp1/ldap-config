@@ -11,6 +11,7 @@
           <user-search
             [eingewiesenerControl]="'neuesMitglied'"
             [formGroup]="loginForm"
+            [filter]="{'notObjectClass':'mitgliedTeilhaber'}"
             (userSelected)="prefillMitglied($event)"
           >
           </user-search>
@@ -26,16 +27,16 @@
               <mat-option value="ehrenmitgliedschaft" selected>
                 Ehrenmitgliedschaft
               </mat-option>
-              <mat-option value="fördermitgliedschaft">
+              <mat-option value="foerdermitgliedschaft">
                 Fördermitgliedschaft
               </mat-option>
-              <mat-option value="fördermitgliedschaft (familie)">
+              <mat-option value="foerdermitgliedschaft_familie">
                 Fördermitgliedschaft (Familie)
               </mat-option>
-              <mat-option value="fördermitgliedschaft (firma)">
+              <mat-option value="foerdermitgliedschaft_firma">
                 Fördermitgliedschaft (Firma)
               </mat-option>
-              <mat-option value="ordentliche mitgliedschaft">
+              <mat-option value="ordentliche_mitgliedschaft">
                 Ordentliche Mitgliedschaft
               </mat-option>
             </mat-select>
@@ -113,7 +114,7 @@
             <mat-form-field>
               <input matInput
                   placeholder="Straße"
-                  formControlName="straße"
+                  formControlName="strasse"
                   required
               >
             </mat-form-field>
@@ -181,21 +182,22 @@
             </h3><br>
             <mat-form-field>
               <input matInput
-                  placeholder="Beitragsreduzierung"
-                  formControlName="beitragsreduzierung"
+                  placeholder="Beitragsanpassung"
+                  formControlName="beitragsanpassung"
+                  type="number"
               >
             </mat-form-field>
 
             <mat-form-field>
               <input matInput
                   placeholder="Enddatum der Reduzierung"
-                  formControlName="ermaessigtBis"
-                  [matDatepicker]="ermaessigungPicker"
+                  formControlName="beitragsanpassungBis"
+                  [matDatepicker]="beitragsanpassungPicker"
               >
-              <mat-datepicker #ermaessigungPicker>
+              <mat-datepicker #beitragsanpassungPicker>
               </mat-datepicker>
 
-              <mat-datepicker-toggle matSuffix [for]="ermaessigungPicker"></mat-datepicker-toggle>
+              <mat-datepicker-toggle matSuffix [for]="beitragsanpassungPicker"></mat-datepicker-toggle>
 
             </mat-form-field>
           </div>
@@ -215,6 +217,18 @@
 
               <mat-datepicker-toggle matSuffix [for]="beginnPicker"></mat-datepicker-toggle>
 
+            </mat-form-field>
+          </div>
+          <div class="Sonstiges">
+            <h3>
+              Sonstiges:
+            </h3>
+
+            <mat-form-field>
+              <textarea matInput
+                  placeholder="Kommentar"
+                  formControlName="kommentar"
+              ></textarea>
             </mat-form-field>
           </div>
           <button type="submit" mat-raised-button color="accent" (click)="mitgliedEintragen()">

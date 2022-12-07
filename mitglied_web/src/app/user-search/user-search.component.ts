@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 
 import { AppComponent } from '../app.component';
 
@@ -9,6 +9,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { LoginService } from '../login/login.service';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'user-search',
@@ -22,6 +23,8 @@ export class UserSearchComponent implements OnInit {
   formGroup : FormGroup;
   @Input()
   eingewiesenerControl : string;
+  @Input()
+  filter: object;
 
   @Output()
   userSelected = new EventEmitter<any>();
@@ -31,6 +34,11 @@ export class UserSearchComponent implements OnInit {
   users : any;
 
   validUser : boolean;
+
+  emptySearchResult : boolean = false;
+
+  @ViewChild('searchfield', {static: false})
+  searchField;
 
   constructor(public appComponent:AppComponent, public http:HttpClient,
               private loginService:LoginService) { }
@@ -54,12 +62,16 @@ export class UserSearchComponent implements OnInit {
             var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.formGroup.value[this.eingewiesenerControl]));
 
             if (searchTerm != "") {
+              this.emptySearchResult = false;
               this.searching = true;
 
               var headers = new HttpHeaders();
               var params = new HttpParams();
               params = params.append('author_user', user);
               params = params.append('author_password', passw);
+              if (this.filter) {
+                params = params.append('filter', JSON.stringify(this.filter));
+              }
 
               this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
                 headers: headers,
@@ -68,14 +80,17 @@ export class UserSearchComponent implements OnInit {
                 console.log("changing rfid codes: ", data);
                 for (var j = 0; j < (<Array<any>>data).length; j++) {
                   var cUser = data[j];
-                  if (cUser["rfid"] != null) {
+                  /*if (cUser["rfid"] != null) {
                     console.log("user is ", cUser);
                     for (var i = 2; i < cUser["rfid"].length; i+= 3) {
                       cUser["rfid"] = cUser["rfid"].substr(0, i)+"_"+cUser["rfid"].substr(i);
                     }
-                  }
+                  }*/
                 }
                 this.users = data;
+                if (this.users.length === 0) {
+                  this.emptySearchResult = true;
+                }
                 this.searching = false;
               }, error => {
                 this.searching = false;
@@ -98,6 +113,10 @@ export class UserSearchComponent implements OnInit {
 
   fetchUsers() {
     this.userQueryChanged.next('');
+  }
+
+  public select() {
+    this.searchField.nativeElement.focus();
   }
 
 }

@@ -1,0 +1,66 @@
+<div class="input-mask">
+  
+  <form [formGroup]="pricesForm">
+    <h3>Abrechnungsdatum</h3>
+    <mat-form-field>
+      <input matInput
+          placeholder="Abrechnungsdatum"
+          formControlName="abrechnungsdatum"
+          [matDatepicker]="datumPicker"
+          required
+      >
+      <mat-datepicker #datumPicker>
+      </mat-datepicker>
+
+      <mat-datepicker-toggle matSuffix [for]="datumPicker"></mat-datepicker-toggle>
+    </mat-form-field>
+    <br>
+    <h3>Beiträge</h3>
+    <mat-form-field>
+      <input matInput
+          placeholder="Beitrag Fördermitgliedschaft"
+          value="60"
+          formControlName="foerdermitgliedschaft"
+          required
+      >
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      <input matInput
+          placeholder="Beitrag Familienmitgliedschaft"
+          value="80"
+          formControlName="foerdermitgliedschaft_familie"
+          required
+      >
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput
+          placeholder="Beitrag Firmenmitgliedschaft"
+          value="50"
+          formControlName="foerdermitgliedschaft_firma"
+          required
+      >
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      <input matInput
+          placeholder="Beitrag Ordentliche Mitgliedschaft"
+          value="10"
+          formControlName="ordentliche_mitgliedschaft"
+          required
+      >
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput
+          placeholder="Beitrag Ehrenmitgliedschaft"
+          value="10"
+          formControlName="ehrenmitgliedschaft"
+          required
+      >
+    </mat-form-field>
+    <br>
+    <button mat-raised-button color="accent" (click)="download()">
+      Einzugsliste herunterladen
+    </button>
+  </form>
+</div>

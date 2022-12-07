@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -7,7 +7,7 @@ import { debounceTime, map } from 'rxjs/operators';
 
 import { FormGroup, FormControl, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
@@ -28,6 +28,9 @@ export class RfidEintragenComponent implements OnInit {
   searching:boolean = false;
   users:any = [];
 
+  @ViewChild('usersearch', {static: false})
+  userSearch;
+
   constructor(public dialog: MatDialog, private appComponent:AppComponent,
               private http:HttpClient, private formBuilder: FormBuilder,
               private loginService:LoginService) { }
@@ -35,7 +38,7 @@ export class RfidEintragenComponent implements OnInit {
   initForm() {
     this.loginForm = this.formBuilder.group({
       eingewiesener: [''],
-      rfid: ['', [Validators.required, this.regexValidator(/^([0-9a-fA-F]{1,2}[\_\ ][0-9a-fA-F]{1,2}[\_\ ][0-9a-fA-F]{1,2}[\_\ ][0-9a-fA-F]{1,2}|[0-9a-fA-F]{4,8})$/im)]]
+      rfid: ['', [Validators.required, this.regexValidator(/^(([0-9a-fA-F]{1,2}[\_\ ]){3}[0-9a-fA-F]{1,2}|[0-9a-fA-F]{4,8}|(([0-9a-fA-F]{1,2}[\_\ ]){6}[0-9a-fA-F]{1,2}))$/im)]]
     });
   }
 
@@ -48,7 +51,9 @@ export class RfidEintragenComponent implements OnInit {
     var passw = this.appComponent.sanitize(this.loginService.password);
     var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
     var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
-
+    console.log(this.loginForm.value['rfid']);
+    console.log(this.appComponent.sanitize(this.loginForm.value['rfid']));
+    console.log(updateRfid);
     var headers = new HttpHeaders();
     var params = new HttpParams();
     params = params.append('author_user', user);
@@ -85,7 +90,7 @@ export class RfidEintragenComponent implements OnInit {
     this.userSelected = user;
     if (typeof user.rfid !== 'undefined' && user.rfid != '' && user.rfid !== null) {
       this.showRfidWarning = true;
-
+      console.log(user.rfid);
       this.loginForm.patchValue({
         'rfid':user.rfid
       });
@@ -116,6 +121,7 @@ export class RfidEintragenComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe(data => {
           this.initForm();
+          this.userSearch.select();
         });
       }, error => {
 

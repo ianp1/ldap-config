@@ -1,0 +1,3 @@
+dn: cn=nextUID,ou=config,dc=ldap-provider,dc=fablab-luebeck
+objectClass: nextUID
+uidNumber: 1000

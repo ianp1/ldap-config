@@ -1,0 +1,4 @@
+dn: cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck
+objectClass: groupOfNames
+cn: mitgliedverwaltung
+member: uid=mitgliedv,ou=user,dc=ldap-provider,dc=fablab-luebeck

@@ -11,12 +11,24 @@
     [mode]="(isHandset$) ? 'over' : 'side'"-->
     <mat-nav-list>
       <a mat-list-item (click)="selectEntry('start')" class="link-home"><i class="material-icons">home</i>Startseite</a>
+      
+
+      <h3>
+        Meine Daten
+      </h3>
+      <a mat-list-item (click)="selectEntry('meine-daten')">Meine Daten bearbeiten</a>
+
       <h3>
         Einweisungen
       </h3>
       <a mat-list-item (click)="selectEntry('sicherheitsbelehrung')">Neue Sicherheitsbelehrung eintragen</a>
       <a mat-list-item (click)="selectEntry('einweisungen-einsehen')">Einweisungen abfragen</a>
       <a mat-list-item (click)="selectEntry('neue-einweisung')">Neue Einweisung eintragen</a>
+      <div *ngIf="showTieredMenu">
+        <a mat-list-item (click)="selectEntry('staffeleinweisung-bearbeiten')">
+          Gestaffelte Einweisung verwalten
+        </a>
+      </div>
       <h3>
         RFID-Karten
       </h3>
@@ -27,6 +39,8 @@
           Mitgliedsverwaltung
         </h3>
         <a mat-list-item (click)="selectEntry('neues-mitglied')">Neues Mitglied eintragen</a>
+        <a mat-list-item (click)="selectEntry('mitglied-teil')">Neuen Mitgliedschaftsteilhaber eintragen</a>
+        <a mat-list-item (click)="selectEntry('abrechnung-exportieren')">Abrechnung exportieren</a>
       </div>
       <h3>
         Überprüfen
@@ -47,7 +61,21 @@
         Menü
       </button>
       <span id="apptitle">{{this.title}}</span>
-      <span id="timeout" *ngIf="appComponent.userInactive">Abmeldung in {{appComponent.userTimeoutCounter}}s</span>
+      <div id="logout_fields">
+        <span
+          id="timeout"
+          *ngIf="appComponent.userInactive"
+        >
+          Automatische Abmeldung in {{appComponent.userTimeoutCounter}}s
+        </span>
+        <br
+          style="display:block;margin-top:-10px"
+          *ngIf="appComponent.userInactive"
+        >
+        <div id="logout_button">
+          <a (click)="logout()">Logout</a>
+        </div>
+      </div>
     </mat-toolbar>
     <mat-card class="page_container">
       <div *ngIf="entry!='start'">
@@ -83,6 +111,24 @@
           <div *ngIf="entry=='summary-page'">
             <summary-page>
             </summary-page>
+          </div>
+          <div *ngIf="entry=='staffeleinweisung-bearbeiten'">
+            <staffeleinweisung>
+            </staffeleinweisung>
+          </div>
+
+          <div *ngIf="entry=='meine-daten'">
+            <meine-daten>
+            </meine-daten>
+          </div>
+
+          <div *ngIf="entry=='mitglied-teil'">
+            <mitglied-teil>
+            </mitglied-teil>
+          </div>
+          <div *ngIf="entry=='abrechnung-exportieren'">
+            <abrechnung-exportieren>
+            </abrechnung-exportieren>
           </div>
         </div>
       </div>

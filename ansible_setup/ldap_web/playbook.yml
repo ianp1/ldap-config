@@ -1,28 +1,30 @@
 ---
 - name: Setup LDAP-Webinterface
-  hosts: ldap-web
+  hosts: ldap-web:ldap-provider
   become: yes
   vars:
     domains:
 # Remember to place a dns rebind protection exception in your router!
     - domain: login.fablab-luebeck.de
-      target_ip: 192.168.2.201
+      target_ip: 192.168.8.211
       certificate: yes
     - domain: einweisungen.fablab-luebeck.de
-      target_ip: 192.168.2.201
+      target_ip: 192.168.8.211
       certificate: yes
-    - domain: robot.fablab-luebeck.de
-      target_ip: 192.168.2.35
+    - domain: ldap-provider.fablab-luebeck.de
+      target_ip: 192.168.8.211
+      certificate: yes
+    - domain: mqtt.fablab-luebeck.de
+      target_ip: 192.168.8.202
       certificate: no
-    - domain: lumos.fablab-luebeck.de
-      target_ip: 192.168.2.222
-      certificate: no
-    bind9count: 01
+    bind9count: 03
+    mqtt: no
   tasks:
     - name: Add apt repositories
       apt_repository:
         repo: ppa:ondrej/php
         state: present
+      when: inventory_hostname in groups['ldap-web']
     - name: Install packages
       apt:
         name: "{{ packages }}"
@@ -37,17 +39,20 @@
         - tomcat8
         - maven
         - bind9
+      when: inventory_hostname in groups['ldap-web']
     - name: Setup custom domains in bind9
       template:
         src: bind9.j2
         dest: /etc/bind/db.{{item.domain}}
       loop: "{{ domains }}"
       notify: restart services
+      when: inventory_hostname in groups['ldap-web']
     - name: Install new Zone in bind9
       template:
         src: named.conf.local.j2
         dest: /etc/bind/named.conf.local
       notify: restart services
+      when: inventory_hostname in groups['ldap-web']
     - name: Ensure DNS forwarding
       lineinfile:
         path: /etc/bind/named.conf.options
@@ -56,6 +61,7 @@
         #firstmatch: yes
         line: "forwarders {8.8.8.8;};"
       notify: restart services
+      when: inventory_hostname in groups['ldap-web']
     - name: Ensure recursive DNS
       lineinfile:
         path: /etc/bind/named.conf.options
@@ -63,6 +69,7 @@
         insertafter: "options {"
         line: "allow-recursion {any;};"
       notify: restart services
+      when: inventory_hostname in groups['ldap-web']
     - name: Create script path
       file:
         path: /root/scripts
@@ -72,7 +79,7 @@
         state: directory
     - name: Place certificate download script
       template:
-        src: downloadCertificates.sh.j2
+        src: ../downloadCertificates.sh.j2
         dest: /root/scripts/downloadCertificates.sh
     - name: Update script permissions
       file:
@@ -94,3 +101,4 @@
         state: restarted
       with_items:
         - bind9
+      when: inventory_hostname in groups['ldap-web']

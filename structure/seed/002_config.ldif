@@ -1,0 +1,3 @@
+dn: ou=config,dc=ldap-provider,dc=fablab-luebeck
+objectClass: organizationalUnit
+ou: config

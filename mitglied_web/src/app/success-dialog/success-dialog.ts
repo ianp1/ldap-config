@@ -1,4 +1,4 @@
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Injectable, Component, Inject } from '@angular/core';
 
 

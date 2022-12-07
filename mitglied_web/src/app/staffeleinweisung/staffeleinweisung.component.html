@@ -1,0 +1,52 @@
+<div>
+  <div class="input-mask">
+    Bitte wähle die Maschine aus, für die du eine gestaffelte Einweisung verwalten möchtest
+    <form [formGroup]="loginForm">
+      <mat-form-field id="machine-selection">
+        <mat-select
+            placeholder="Gerät"
+            formControlName="maschine"
+            required
+          >
+          <mat-option *ngFor="let maschine of maschinen" [value]="maschine.dn">
+          {{maschine.cn}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <br>
+      <div *ngIf="loginForm.value['maschine']!=null && loginForm.value['maschine']!=''">
+        Verwalteter Nutzer:
+        <user-search
+          [eingewiesenerControl]="'eingewiesener'"
+          [formGroup]="loginForm"
+          (userSelected)="selectUser($event)"
+          [filter]="{'maschine':loginForm.value['maschine']}"
+        >
+        </user-search>
+      </div>
+      <div *ngIf="userSelected!=null">
+        <mat-checkbox
+          formControlName="aktiviert"
+        >
+          Einweisung für eigenständige Nutzung freischalten
+        </mat-checkbox>
+        <br>
+        <mat-form-field id="kommentar">
+          <mat-label>
+            Kommentare zur Einweisung
+          </mat-label>
+          <textarea
+            matInput
+            cdkTextareaAutosize
+            #autosize="cdkTextareaAutosize"
+            formControlName="kommentar">
+          </textarea>
+        </mat-form-field>
+        <br>
+        <button mat-raised-button color="accent" (click)="updateEntry()">
+          Einweisung aktualisieren
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

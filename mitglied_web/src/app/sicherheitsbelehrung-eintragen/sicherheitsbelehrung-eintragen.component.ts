@@ -7,7 +7,7 @@ import { debounceTime, map } from 'rxjs/operators';
 
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
 import { LoginService } from '../login/login.service';
@@ -35,17 +35,19 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var password = "";
     var useCurrentDate = true;
     var date = new Date();
+    var refresh = false;
 
     if (typeof this.sicherheitForm !== 'undefined') {
       useCurrentDate = this.sicherheitForm.value["useCurrentDate"];
       date = this.sicherheitForm.value["selectedDate"];
+      refresh = this.sicherheitForm.value["refresh"];
     }
 
     this.sicherheitForm = this.formBuilder.group({
       vorname: [''],
       nachname: [''],
       geburtsdatum: [''],
-      refresh: [''],
+      refresh: [refresh],
       refreshUser: [''],
       useCurrentDate: [useCurrentDate],
       selectedDate: [date]
@@ -60,9 +62,15 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
     var user = this.appComponent.sanitize(this.loginService.username);
     var passw = this.appComponent.sanitize(this.loginService.password);
 
-    var vorname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['vorname']));
-    var nachname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['nachname']));
-    var geburtsdatum = this.appComponent.sanitize(this.sicherheitForm.value['geburtsdatum']);
+    var vorname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.getRawValue()['vorname']));
+    var nachname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.getRawValue()['nachname']));
+    var geburtsdatum = this.appComponent.sanitize(this.sicherheitForm.getRawValue()['geburtsdatum']);
+
+    console.log("trying to enter sicherheitsbelehrung: ");
+    console.log(vorname);
+    console.log(nachname);
+    console.log(geburtsdatum);
+
 
     geburtsdatum = this.appComponent.formatLDAPDate(geburtsdatum);
 
@@ -129,13 +137,44 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
   prefill(user) {
     if (user) {
-      console.log(user);
-      console.log(new Date(this.appComponent.reformatLDAPDate(user.geburtstag)));
+      /*
+      let useCurrentDate = false;
+      let selectedDate = new Date();
+      let refreshUser = '';
+      if (typeof this.sicherheitForm !== 'undefined') {
+        useCurrentDate = this.sicherheitForm.value["useCurrentDate"];
+        selectedDate = this.sicherheitForm.value["selectedDate"];
+        refreshUser = this.sicherheitForm.value["refreshUser"];
+      }
+      this.sicherheitForm = this.formBuilder.group({
+        vorname: [{value: user.vorname, disabled: true}],
+        nachname: [{value: user.nachname, disabled: true}],
+        geburtsdatum: [{value: new Date(this.appComponent.reformatLDAPDate(user.geburtstag)), disabled: true}],
+        refresh: [true],
+        refreshUser: [refreshUser],
+        useCurrentDate: [useCurrentDate],
+        selectedDate: [selectedDate]
+      });*/
+
+
       this.sicherheitForm.patchValue({
         vorname: user.vorname,
         nachname: user.nachname,
         geburtsdatum: new Date(this.appComponent.reformatLDAPDate(user.geburtstag))
       });
+      this.sicherheitForm.get('vorname').disable();
+      this.sicherheitForm.get('nachname').disable();
+      this.sicherheitForm.get('geburtsdatum').disable();
+    } else {
+      this.sicherheitForm.patchValue({
+        vorname: '',
+        nachname: '',
+        geburtsdatum: ''
+      });
+
+      this.sicherheitForm.get('vorname').enable();
+      this.sicherheitForm.get('nachname').enable();
+      this.sicherheitForm.get('geburtsdatum').enable();
     }
   }
 
@@ -145,9 +184,9 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
 
     var date = this.getSelectedDate();
 
-    var vorname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['vorname']));
-    var nachname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.value['nachname']));
-    var geburtsdatum = this.appComponent.sanitize(this.sicherheitForm.value['geburtsdatum']);
+    var vorname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.getRawValue()['vorname']));
+    var nachname = this.appComponent.encodeURL(this.appComponent.sanitize(this.sicherheitForm.getRawValue()['nachname']));
+    var geburtsdatum = this.appComponent.sanitize(this.sicherheitForm.getRawValue()['geburtsdatum']);
 
     geburtsdatum = this.appComponent.formatLDAPDate(geburtsdatum);
 

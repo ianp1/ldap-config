@@ -1,17 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppComponent } from '../app.component';
-import { Subject } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
 import { LdapDatePipe } from '../ldap-date.pipe'
 import { DatePipe } from '@angular/common';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
 import { LoginService } from '../login/login.service';
+import { UserSearchComponent } from '../user-search/user-search.component';
 
 @Component({
   selector: 'neue-einweisung',
@@ -28,6 +27,9 @@ export class EinweisungenEintragenComponent implements OnInit {
   userSelected: any;
 
   loginForm: FormGroup;
+
+  @ViewChild('usersearch', {static: false})
+  usersearch:UserSearchComponent;
 
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
@@ -127,6 +129,7 @@ export class EinweisungenEintragenComponent implements OnInit {
         if (typeof(data['status'] === 'undefined') && data['status'] !== "not updating") {
           dialogRef = this.dialog.open(SuccessDialog);
           dialogRef.afterClosed().subscribe(data => {
+            this.usersearch.select();
             this.initForm();
           });
         } else {
@@ -147,6 +150,7 @@ export class EinweisungenEintragenComponent implements OnInit {
               ).subscribe(postData => {
                 dialogRef = this.dialog.open(SuccessDialog);
                 dialogRef.afterClosed().subscribe(data => {
+                  this.usersearch.select();
                   this.initForm();
                 });
               });

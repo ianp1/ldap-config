@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -8,6 +8,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 import { LoginService } from '../login/login.service';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'rfid-besitzer-finden',
@@ -27,6 +28,8 @@ export class RfidPruefenComponent implements OnInit {
 
   found_users:any;
   noUsersFound:boolean = false;
+  @ViewChild('rfidinput', {static: false})
+  rfidInput;
 
   constructor(public appComponent:AppComponent, private http:HttpClient,
               private loginService:LoginService) { }
@@ -54,7 +57,8 @@ export class RfidPruefenComponent implements OnInit {
             this.noUsersFound = false;
             this.searching = false;
 
-
+            this.rfidInput.nativeElement.select();
+            //this.rfidInput.;
           }, error => {
             this.found_users = null;
             this.noUsersFound = true;

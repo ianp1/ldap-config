@@ -24,6 +24,7 @@ export class CustomNavComponent {
   title = "Einweisungsverwaltung";
 
   showMemberMenu = false;
+  showTieredMenu = false;
 
   titles = {
     "start":"Einweisungsverwaltung",
@@ -31,14 +32,16 @@ export class CustomNavComponent {
     "einweisungen-einsehen":"Einweisungen abfragen",
     "neue-einweisung":"Neue Einweisung eintragen",
     "neues-mitglied":"Neues Mitglied eintragen",
+    "abrechnung-exportieren":"Abrechnung exportieren",
     "rfid-vergeben":"RFID-Karte vergeben",
     "rfid-besitzer-finden":"RFID-Kartenbesitzer finden",
-    "summary-page":"Aktuelle Änderungen"
+    "summary-page":"Aktuelle Änderungen",
+    "mitglied-teil":"Neuen Mitgliedschaftsteilhaber eintragen"
   };
 
   isHandsetLocal:boolean = false;
 
-  @ViewChild('drawer')
+  @ViewChild('drawer', {static: false})
   sidenav : MatSidenav;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -75,6 +78,7 @@ export class CustomNavComponent {
   updateMenuEntries() {
     if (!this.valid) {
       this.showMemberMenu = false;
+      this.showTieredMenu = false;
       return;
     }
 
@@ -101,10 +105,21 @@ export class CustomNavComponent {
       }).subscribe(data => {
         this.showMemberMenu = true;
       });
+
+      this.http.get(this.appComponent.url_base+'api/v1.0/index.php/StaffelEinweisung', {
+        headers: headers,
+        params: params
+      }).subscribe(data => {
+        this.showTieredMenu = true;
+      });
     }, error => {
       console.log("menu entries request permission denied");
       this.showMemberMenu = false;
     });
+  }
+
+  logout() {
+    window.location.reload();
   }
 
 }

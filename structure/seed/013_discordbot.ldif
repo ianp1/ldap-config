@@ -1,0 +1,5 @@
+dn: cn=discordbot,ou=bot,dc=ldap-provider,dc=fablab-luebeck
+objectClass: person
+cn: discord
+sn: bot
+userPassword: discordbot

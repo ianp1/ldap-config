@@ -1,0 +1,18 @@
+dn: uid=mentor,ou=user,dc=ldap-provider,dc=fablab-luebeck
+objectClass: fablabMitglied
+objectClass: inetOrgPerson
+uid: mentor
+cn: mentor
+sn: mentor
+mitgliedsart: ordentliches_mitglied
+ort: Luebeck
+plz: 23560
+sicherheitsbelehrung: 20200229230530Z
+geburtstag: 20200229230530Z
+strasse: Sesamstrasse
+anrede: Herr
+beginn: 20200229230530Z
+iban: DE12
+bic: DE12
+kontoinhaber: mentor mentor
+userPassword: mentor

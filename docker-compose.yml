@@ -1,0 +1,22 @@
+version: '3'
+services:
+    web:
+        build: ./mitglied_web
+        ports: 
+            - "8080:80"
+        links:
+            - php
+        volumes:
+            - application:/usr/share/nginx/html
+
+    php:
+        build: ./mitglied_web/docker_php
+        volumes:
+            - application:/usr/share/nginx/html
+
+    ldap-server:
+        build: ./structure
+
+volumes:
+    application:
+        driver: local

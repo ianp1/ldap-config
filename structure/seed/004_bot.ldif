@@ -1,0 +1,3 @@
+dn: ou=bot,dc=ldap-provider,dc=fablab-luebeck
+objectClass: organizationalUnit
+ou: bot

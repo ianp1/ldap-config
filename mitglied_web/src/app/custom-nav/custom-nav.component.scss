@@ -4,11 +4,17 @@
 
 #timeout {
   margin-left: inherit;
-  margin-right: 20px;
   text-align: right;
-  float:right;
-  right: 10px;
-  position: absolute;
+}
+
+#logout_fields {
+  font-size: 10px;
+  text-align: right;
+}
+
+#logout_button {
+  font-size: 18px;
+  cursor:pointer;
 }
 
 .link-home {
