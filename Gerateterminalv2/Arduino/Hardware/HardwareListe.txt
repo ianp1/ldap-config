@@ -6,9 +6,9 @@ https://github.com/adafruit/Adafruit-PN532
 Microcontroller: ESP32 D1
 https://arduino-projekte.info/produkt/d1-mini-esp32-wifi-bluetooth/
 
-Display: ILI9341 2.4"
-https://funduinoshop.com/elektronische-module/displays/tft/2-4-zoll-tft-lcd-touch-display-spi-240x320-mit-ili9341
-https://github.com/adafruit/Adafruit_ILI9341
+Display: ST7789 2.4" 3-5V
+PINOUTS: https://shopofthings.ch/shop/prototyping/hid/2-4-tft-lcd-display-240x320/
+https://github.com/adafruit/Adafruit-ST7735-Library
 https://github.com/adafruit/Adafruit-GFX-Library/releases
 Touch: STMPE610
 https://github.com/adafruit/Adafruit_STMPE610
