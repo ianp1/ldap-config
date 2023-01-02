@@ -1,5 +1,6 @@
 //New Terminal, by Marco with TFT
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #define CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 int ausgewahltesGerat = -1;// Index der Config geräte
 int einweisung = 0;// Wie lnge eine Einweisung noch vorhanden ist
@@ -9,6 +10,7 @@ long lastStatusUpdate = 0;
 String lastCardRead = "";// ID der letzten Karte
 long lastCardReadTimestamp = 0;// Wann das letzte mal eine Karte gelesen wurde
 long mqttDisconnectedTimestamp = 0;// Wann der MQTT teil die verbindung verloren hat
+DynamicJsonDocument docc(1024);
 // Filesystem
 #include "FS.h"
 #include <LittleFS.h>
@@ -25,10 +27,11 @@ long mqttDisconnectedTimestamp = 0;// Wann der MQTT teil die verbindung verloren
 //TODO: ersetzen durch frische Config
 void initFilsystem() {
   //Load file system information
+  
   if (!LittleFS.begin(true)) {
     bootLogTFT("An error has occured while initializing littlefs");
   }
-
+/*
   File file = LittleFS.open("/device.txt", "r");
   if (!file) {
     bootLogTFT("Failed to open file device.txt");
@@ -47,7 +50,8 @@ void initFilsystem() {
     c = file.read();
     mqttChannel += c;
   }
-  mqttChannelCard = mqttChannel + "/card";
+  mqttChannelCard = mqttChannel + "/card
+  ";
 
   mqttUser = "";
   file = LittleFS.open("/mqttuser.txt", "r");
@@ -65,24 +69,33 @@ void initFilsystem() {
   bootLogTFT(geraet);
   bootLogTFT(mqttChannel);
   bootLogTFT(mqttUser);
-  bootLogTFT(mqttPassword);
+  bootLogTFT(mqttPassword);*/
 }
 
-//TODO: implementieren, auch serverseitig
+//TODO: online Update erst ab Version 2 oder nie
 void getConfig() {
+  // Read the file
+  File file = LittleFS.open("/config.json", "r");
+  DeserializationError error = deserializeJson(docc, file);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+  // Varriablen in Json lassen?
+  geraet = docc["name"].as<String>();
+  mqttChannel = docc["mqtt"]["mqttChannel"].as<String>();
+  mqttChannelCard = mqttChannel + "/card";
+  mqttUser = docc["mqtt"]["mqttUser"].as<String>();
+  mqttPassword = docc["mqtt"]["mqttPassword"].as<String>();
+  file.close();
+  bootLogTFT("finished reading filesystem information");
+  bootLogTFT(geraet);
+  bootLogTFT(mqttChannel);
+  bootLogTFT(mqttUser);
+  bootLogTFT(mqttPassword);
+  //serializeJsonPretty(docc, Serial);
   //Download new Config as JSON
-
-  // Save images to filesystem
-  /*
-  for (int c = 0; c<jsonlänge;c++) {
-    if (!LittleFS.exists(jsonImages[c])) {
-      File f = LittleFS.open("/" + jsonImages[c], "w");
-      if (f){
-        http.begin(wifiClient, jsonImagesURL[c]);
-        
-      }
-    }
-  }*/
 }
 
 void setup() {
@@ -94,6 +107,8 @@ void setup() {
   bootLogTFT("Display Initialisiert");
   // init filesystem
   initFilsystem();
+  // Download Config
+  getConfig();
   bootLogTFT("Filsystem Initialisiert");
   // init wlan
   initWlan();
@@ -101,11 +116,9 @@ void setup() {
   initOTA();
   //set Time
   initTime();
-  // Download Config
-  //getConfig();
   //    JSON Alle angeschlossenen Geräte
   // connect to mqtt
-  //initMQTT();
+  initMQTT();
   // Start Touch
   initTouch();
   handleTouh();
@@ -119,15 +132,26 @@ void setup() {
 //TODO: Config Geräte namen mit auswahl an ausgewahltesGerat
 //TODO: Wenn status der Maschine angeschaltet, dann ausschalten -> Eventuell erst abfrage einbauen
 void checkCard(String content) {
-  mqttClient.publish(mqttChannelCard, ("{\"terminalMac\": \""+WiFi.macAddress()+"\",\"machine\": \""+geraet+"\",\"rfid\": \""+content+"\"}").c_str());
-  cardSendTimestamp = millis();
+  String payload = "{\"terminalMac\": \"" + WiFi.macAddress() + "\",\"machine\": \"" + docc["maschines"][ausgewahltesGerat]["einweisungsname"].as<String>() + "\",\"rfid\": \"" + content + "\"}";
+  String topic = String(docc["maschines"][ausgewahltesGerat]["mqttChannel"].as<String>() + "/card");
+  Serial.print("Veröffentliche Nachricht: ");
+  Serial.println(payload);
+  Serial.print("auf Thema: ");
+  Serial.println(topic);
+  bool success = mqttClient.publish(topic, payload.c_str());
+  if (success) {
+    cardSendTimestamp = millis();
+  } else {
+    // Fehlerbehandlung, z.B. Anzeige einer Fehlermeldung auf dem Display oder Protokollierung des Fehlers
+    Serial.println("Fehler beim Veröffentlichen der MQTT-Nachricht: " + payload);
+  }
 }
 
 void loop() {
   //Chck Wlan connection and reconnect
   checkWifi();
   //MQTT Get Device state and Update time and User
-  //checkMQTT();
+  checkMQTT();
   //Touch on Device, switch to Image and Menue(Frischalten/Freigeben, Sperren, Kosten Info, Zurück)-> bestätigung durch Karte
   handleTouh();
   //Check card -> New Card -> Display Name Einweisungen kompatible und Sicherheitsbelehrung.(zurück Button)

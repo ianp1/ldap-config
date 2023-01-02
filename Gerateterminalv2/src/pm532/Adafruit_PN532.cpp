@@ -19,7 +19,7 @@
 
     @section  HISTORY
 
-    v2.2 - Added startPassiveTargetIDDetection() to start card detection and
+    v2.2 - Added startPasfsiveTargetIDDetection() to start card detection and
             readDetectedPassiveTargetID() to read it, useful when using the
             IRQ pin.
 
@@ -122,7 +122,7 @@ static inline uint8_t i2c_recv(void) {
 /**************************************************************************/
 Adafruit_PN532::Adafruit_PN532(uint8_t clk, uint8_t miso, uint8_t mosi,
                                uint8_t ss) {
-  spi_dev = new Adafruit_SPIDevice(ss, clk, miso, mosi, 500000,
+  spi_dev = new Adafruit_SPIDevice(ss, clk, miso, mosi, 100000,
                                    SPI_BITORDER_LSBFIRST, SPI_MODE0);
 }
 
@@ -455,8 +455,10 @@ bool Adafruit_PN532::SAMConfig(void) {
   pn532_packetbuffer[2] = 0x14; // timeout 50ms * 20 = 1 second
   pn532_packetbuffer[3] = 0x01; // use IRQ pin!
 
-  if (!sendCommandCheckAck(pn532_packetbuffer, 4))
+  if (!sendCommandCheckAck(pn532_packetbuffer, 4)){
+    Serial.println("Error ACK");
     return false;
+  }
 
   // read data packet
   readdata(pn532_packetbuffer, 8);

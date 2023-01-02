@@ -1,4 +1,3 @@
-#include <ArduinoJson.h>
 #include <MQTT.h>
 
 const char MQTT_HOST[] = "mqtt.fablab-luebeck.de";
@@ -31,6 +30,7 @@ void messageReceived(String &topic, String &payload) {
     einweisung = -1;
     sicherheitsbelehrung = -1;
     cardSendTimestamp = 0;
+    displayStatus = 2;
   } else {
     Serial.println(doc["einweisung"].as<String>());
     Serial.println(doc["sicherheitsbelehrung"].as<String>());
@@ -40,18 +40,23 @@ void messageReceived(String &topic, String &payload) {
         Serial.println("Einweisung nicht vorhanden");
         einweisung = -1;
         sicherheitsbelehrung = 1;
+        displayStatus = 2;
       } else if (doc["sicherheitsbelehrung"].is<bool>()) {
         Serial.println("Sicherheitsbelehrung nicht vorhanden");
         sicherheitsbelehrung = -1;
         einweisung = 1;
+        displayStatus = 2;
       } else {
         einweisung = doc["einweisung"];
         sicherheitsbelehrung = doc["sicherheitsbelehrung"];
-        
+        int len = strlen("1") + 1;
+        mqttClient.publish(String(docc["maschines"][ausgewahltesGerat]["mqttChannel"].as<String>() + "/active"), "1", len, true);
+        displayStatus = 2;
         Serial.print("Verbleibend: ");
         Serial.print(einweisung);
         Serial.print(" ");
         Serial.println(sicherheitsbelehrung);
+        displayStatus = 4;
       }
       if (ausgewahltesGerat == -1) {
         displayStatus = 2;
@@ -77,11 +82,14 @@ void mqttConnect() {
   }
   Serial.println(mqttClient.lastError());
   Serial.println("connected");
-  mqttClient.subscribe(mqttChannel);
+  JsonArray array = docc["maschines"].as<JsonArray>();
+  for(JsonVariant v : array) {
+      mqttClient.subscribe(v["mqttChannel"].as<String>());
+      Serial.print("listening on mqtt channel ");
+      Serial.println(v["mqttChannel"].as<String>());
+  }
   mqttClient.onMessage(messageReceived);
-
-  Serial.print("listening on mqtt channel ");
-  Serial.println(mqttChannel);
+  
   //subscribe here to topics
 }
 

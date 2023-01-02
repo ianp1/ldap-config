@@ -1,7 +1,7 @@
 #include <WiFi.h>
 extern void bootLogTFT(String s);
-const char* WIFI_SSID = "Seewald";
-const char* WIFI_PASSWORD = "nicoleundgina";
+const char* WIFI_SSID = "fablab";
+const char* WIFI_PASSWORD = "fablabfdm";
 static const char ca_cert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDtTCCAp2gAwIBAgIUXYSEGQA3MzJbuD2XICi4FeRZTKUwDQYJKoZIhvcNAQEN
@@ -57,10 +57,6 @@ mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
 emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 -----END CERTIFICATE-----
 )EOF";
-
-static const String API_AUTH = "?author_bot=terminal&author_password=LwRa2RPYY";
-static const String API_LDAP_SUFFIX = ",ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
-static const String API_BACKEND = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/Einweisung/";
 
 long wifiDisconnectedTimestamp = 0;
 #include <WiFiClientSecure.h>
