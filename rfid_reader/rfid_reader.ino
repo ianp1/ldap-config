@@ -54,13 +54,13 @@ void loop() {
   //Serial.print("ID des RFID-TAGS:");CC598C1F
   String content= "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
-    if (i >= 0) {
+    if (i > 0) {
       content += char('\0'+32);
-      if (mfrc522.uid.uidByte[i] < 0x10) {
-        content.concat(String("0"));
-      }
-      //content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? 0x5F+"0" : 0x5F+""));
     }
+    if (mfrc522.uid.uidByte[i] < 0x10) {
+      content.concat(String("0"));
+    }
+      //content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? 0x5F+"0" : 0x5F+""));
     content.concat(String(mfrc522.uid.uidByte[i], HEX));
   }
   content.toUpperCase(); 

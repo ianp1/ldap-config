@@ -1,0 +1,14 @@
+Kartenterminal:
+Kartenleser: PN532
+https://www.berrybase.de/pn532-nfc-und-rfid-modul-inkl.-karte-dongle
+https://github.com/adafruit/Adafruit-PN532
+
+Microcontroller: ESP32 D1
+https://arduino-projekte.info/produkt/d1-mini-esp32-wifi-bluetooth/
+
+Display: ST7789 2.4" 3-5V
+PINOUTS: https://shopofthings.ch/shop/prototyping/hid/2-4-tft-lcd-display-240x320/
+https://github.com/adafruit/Adafruit-ST7735-Library
+https://github.com/adafruit/Adafruit-GFX-Library/releases
+Touch: STMPE610
+https://github.com/adafruit/Adafruit_STMPE610

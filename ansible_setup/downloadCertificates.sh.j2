@@ -11,3 +11,6 @@ scp -i /root/.ssh/id_certificates -r certificates@fablab-luebeck.de:/etc/letsenc
 
 scp -i /root/.ssh/id_certificates certificates@fablab-luebeck.de:/etc/letsencrypt/options-ssl-apache.conf /etc/ssl/
 /usr/sbin/service apache2 restart
+{% if mqtt %}
+/usr/sbin/service mosquitto restart
+{% endif %}

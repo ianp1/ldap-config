@@ -1339,7 +1339,7 @@
 	}
 
 	function cleanRFIDTag($tag) {
-		$tag = str_replace(" ", "_", $tag);
+		$tag = str_replace(" ", "_", trim($tag));
 		return strtoupper(preg_replace('/(?![0-9a-fA-F_])./', "", $tag));
 	}
 
