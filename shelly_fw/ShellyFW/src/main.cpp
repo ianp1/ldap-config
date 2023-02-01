@@ -15,8 +15,6 @@
 #define PM_PIN                    5
 #define RELAY_PIN                 4
 
-#define MQTT_SERVER               "192.168.8.202"
-#define MQTT_SERVERPORT           1883
 #define CERT_FINGERPRINT          "A5 F1 26 A6 2E 21 18 EF B7 E8 4B 31 DE DD CE D2 EA 90 C8 4A"
 
 #define WIFI_SSID                 "fablab"
