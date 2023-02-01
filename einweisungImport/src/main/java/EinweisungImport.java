@@ -58,7 +58,7 @@ public class EinweisungImport {
         }
         LDAPTestUtils.assertResultCodeEquals(startTLSResult, ResultCode.SUCCESS);
 
-        connection.bind("cn=admin,dc=ldap-provider,dc=fablab-luebeck", "ldFab17!");
+        connection.bind("cn=admin,dc=ldap-provider,dc=fablab-luebeck", "***");
 
         File excelFile = new File("/home/ian/Dokumente/FabLab/Einweisungen/Einweisungen09.06.2018.xlsx");
         FileInputStream fis = new FileInputStream(excelFile);

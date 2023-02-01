@@ -79,7 +79,7 @@ public class KontaktImport {
         }
         LDAPTestUtils.assertResultCodeEquals(startTLSResult, ResultCode.SUCCESS);
 
-        connection.bind("uid=IanPoesse,ou=user,dc=ldap-provider,dc=fablab-luebeck", "temporaer!");
+        connection.bind("uid=IanPoesse,ou=user,dc=ldap-provider,dc=fablab-luebeck", "***");
 
         File excelFile = new File("/home/ian/Downloads/20210331_mitgliederverwaltung-data.xlsx");
         FileInputStream fis = new FileInputStream(excelFile);
