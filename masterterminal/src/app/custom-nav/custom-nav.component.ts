@@ -39,9 +39,9 @@ export class CustomNavComponent {
 
   isHandsetLocal:boolean = false;
 
-  @ViewChild('drawer', {static: false})
+  @ViewChild('drawer')
   sidenav : MatSidenav;
-  @ViewChild(EigeneEinweisungenComponent, {static: false})
+  @ViewChild(EigeneEinweisungenComponent)
   einweisung: EigeneEinweisungenComponent;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
