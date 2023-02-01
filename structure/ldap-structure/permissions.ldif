@@ -28,7 +28,7 @@ olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=obj
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=cn,sn by dn.exact="cn=masterterminal,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,cn,sn,uid,mail,ort,strasse,plz,homePhone,rfid by dn.exact="cn=kontaktverfolgung,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,cn,sn,uid,discordName by dn.exact="cn=discordbot,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
-olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,cn,sn,uid,mail by dn.exact="cn=nextcloud,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=objectClass,entry,cn,sn,uid,mail,memberOf by dn.exact="cn=nextcloud,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 #finanzen 
 olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" attrs=mitgliedsart,mitgliedsnummer,cn,sn,beginn,ende,aktiv,kontoinhaber,entry,objectClass,uid,iban,bic,anrede,title,beitragsanpassung,beitragsanpassungBis by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="ou=users,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry by group.exact="cn=finanzverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
