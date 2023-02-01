@@ -1,0 +1,15 @@
+DEBUG Output
+https://shelly-api-docs.shelly.cloud/gen2/Scripts/Tutorial/
+wscat --connect ws://${SHELLY}/debug/log
+
+ScriptFeatures: https://shelly-api-docs.shelly.cloud/gen2/Scripts/ShellyScriptLanguageFeatures/
+MQTT: https://shelly-api-docs.shelly.cloud/gen2/Scripts/ShellyScriptLanguageFeatures#mqttpublish
+SetRelay: https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Switch/#http-endpoint-relayid
+
+Examples: https://github.com/ALLTERCO/shelly-script-examples
+
+Structs:
+Switch-GetStatus: https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Switch/#switchgetstatus-example
+	- http://192.168.13.160/rpc/Switch.GetStatus?id=0
+System: http://192.168.13.160/rpc/Sys.GetStatus
+

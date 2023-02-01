@@ -1,0 +1,50 @@
+{
+	"maschines": [{
+			"name": "Heldenhelfer",
+			"img": "Heldenhelfer.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "PrusaMK3",
+			"mqttChannel": "machines/v2/Heldenhelfer"
+		},
+		{
+			"name": "Prusa mini",
+			"img": "Prusamini.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "PrusaMK3",
+			"mqttChannel": "xy"
+		},
+		{
+			"name": "Prusa 0.6",
+			"img": "Prusa.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "PrusaMK3",
+			"mqttChannel": "xy"
+		},
+		{
+			"name": "Prusa",
+			"img": "Prusa.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "PrusaMK3",
+			"mqttChannel": "xy"
+		},
+		{
+			"name": "Luna",
+			"img": "Prusa.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "PrusaMK3",
+			"mqttChannel": "xy"
+		},
+		{
+			"name": "Ultimaker 3",
+			"img": "Prusa.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "PrusaMK3",
+			"mqttChannel": "xy"
+		}
+	],
+	"name": "FDM Terminal",
+	"mqtt": {
+		"mqttUser": "FDMTerminal",
+		"mqttPassword": "MN3inkHl9azkUQvz2ZBy"
+	}
+}

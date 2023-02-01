@@ -18,6 +18,7 @@ client.on('connect', function() {
     console.log("connected");
     //TODO: Remove
     client.subscribe('machines/+/card');
+    client.subscribe('machines/v2/+/card');
     //client.subscribe('machines/ELab_Tisch_1/card');
     //client.publish('machines/ELab_Tisch_1', 'hi');
 });
@@ -36,9 +37,12 @@ client.on('message', function(topic, message) {
         .then(response => {
             console.log("response is: ", response.data);
 
-            let newTopic = topic.split("/");
-            newTopic = newTopic[0] + "/" + newTopic[1];
+            let newTopicArray = topic.split("/");
+            let newTopic = newTopicArray[0] + "/" + newTopicArray[1];
 
+	    if (topic.startsWith('machines/v2')) {
+	    	newTopic = newTopic + "/" + newTopicArray[2];
+	    }
             if (response.data === false) {
                 console.log("response is false");
                 client.publish(newTopic, JSON.stringify(false));
@@ -54,14 +58,15 @@ client.on('message', function(topic, message) {
                     aktiviert: aktiviert,
                     sicherheitsbelehrung: sicherheitsbelehrung
                 };
-
-                if (aktiviert && einweisung !== false && einweisung > 0 && sicherheitsbelehrung !== false && sicherheitsbelehrung > 0) {
-                    console.log("activate relay");
-                    client.publish(newTopic+"/active", "1");
-                } else {
-                    console.log("dont activate relay:");
-                    console.log(aktiviert, einweisung, sicherheitsbelehrung);
-                }
+		if (!topic.startsWith('machines/v2')) {
+			if (aktiviert && einweisung !== false && einweisung > 0 && sicherheitsbelehrung !== false && sicherheitsbelehrung > 0) {
+			    console.log("activate relay");
+			    client.publish(newTopic+"/active", "1");
+			} else {
+			    console.log("dont activate relay:");
+			    console.log(aktiviert, einweisung, sicherheitsbelehrung);
+			}
+		}
                 client.publish(newTopic, JSON.stringify(payload));
             }
         }).catch(error => {
@@ -73,7 +78,7 @@ client.on('message', function(topic, message) {
             console.log("error requesting data: ", error);
         });
     } catch(e) {
-        //console.log(e);
+        console.log(e);
     }
 });
 

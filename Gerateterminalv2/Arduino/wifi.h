@@ -1,7 +1,7 @@
 #include <WiFi.h>
 extern void bootLogTFT(String s);
-const char* WIFI_SSID = "fablab";
-const char* WIFI_PASSWORD = "fablabfdm";
+const char* WIFI_SSID = "Seewald";
+const char* WIFI_PASSWORD = "nicoleundgina";
 static const char ca_cert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDtTCCAp2gAwIBAgIUXYSEGQA3MzJbuD2XICi4FeRZTKUwDQYJKoZIhvcNAQEN
@@ -97,9 +97,9 @@ void initOTA() {
       else // U_SPIFFS
         type = "filesystem";
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      tft->fillScreen(ILI9341_BLACK);
+      tft->fillScreen(ST77XX_BLACK);
       tft->setCursor(0, 0);
-      tft->setTextColor(ILI9341_WHITE);
+      tft->setTextColor(ST77XX_WHITE);
       bootLogTFT("Start updating " + type);
     })
     .onEnd([]() {

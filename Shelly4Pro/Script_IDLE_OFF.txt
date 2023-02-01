@@ -1,0 +1,59 @@
+let CONFIG = {
+  lastTime: [Shelly.getComponentStatus('sys').unixtime, Shelly.getComponentStatus('sys').unixtime, Shelly.getComponentStatus('sys').unixtime, Shelly.getComponentStatus('sys').unixtime],
+  outputPowerThresholds: [15, 5, 10, 10],
+  MQTTPublishTopics: ['machines/v2/Heldenhelfer/active', 'machines/v2/PrusaMini/active', 'machines/v2/Prusa/active', 'machines/v2/Prusa06/active']
+};
+print(JSON.stringify(CONFIG));
+function disableMessage(index) {
+    MQTT.publish(JSON.stringify(CONFIG.MQTTPublishTopics[index]), JSON.stringify("0"), 0, true);// Type Error
+	Shelly.call("switch.set",
+          { id: index, on: false },
+          function (result, code, msg, ud) {},
+          null
+        );
+}
+
+Shelly.addStatusHandler(function (statusNtf) {
+    //print(JSON.stringify(statusNtf));
+    //print(JSON.stringify(statusNtf.component));
+    //print(JSON.stringify(statusNtf.component).indexOf("witch:"));
+	if (JSON.stringify(statusNtf.component).indexOf("witch:") === -1) return;
+    //print(statusNtf.component);
+	//if (!statusNtf.output) return;
+	let indecCounter = statusNtf.id;
+    //print(indecCounter);
+    //if (!statusNtf.output) return;
+	if (indecCounter < 0 || indecCounter > 3 || indecCounter === "" || indecCounter === "undefined") return;// Irgendein Wert, den wir nicht haben wollen
+	let allData = Shelly.getComponentStatus(statusNtf.component);
+    //print(JSON.stringify(allData));
+    if (!allData.output) {// Wenn aus
+        //print("update Time1");
+        //print(indecCounter);
+        //print(allData.aenergy.minute_ts);
+		CONFIG.lastTime[indecCounter] = allData.aenergy.minute_ts;
+		return;
+	}
+    if (typeof allData.apower === "undefined") return;// Keine power daten, Sollte nicht auftreten
+	if (allData.apower > CONFIG.outputPowerThresholds[indecCounter]) {// Wenn die Power über dem Threshold ist
+        //print("update Time2");
+        //print(indecCounter);
+        //print(allData.aenergy.minute_ts);
+		CONFIG.lastTime[indecCounter] = allData.aenergy.minute_ts;
+		return;
+	}
+    //print(JSON.stringify(allData));
+    //print(JSON.stringify(CONFIG));
+    //print(JSON.stringify(indecCounter));
+    print(allData.aenergy.minute_ts > CONFIG.lastTime[indecCounter] + 60*5);
+    print(allData.aenergy.minute_ts - CONFIG.lastTime[indecCounter] + 60*5);
+	if (allData.apower === 0 && allData.aenergy.minute_ts > CONFIG.lastTime[indecCounter] + 60) {// Wenn das Gerät ausgeschaltet ist
+		disableMessage(indecCounter);
+        print("########################################## AUS #######################################");
+		return;
+	}
+	if(allData.aenergy.minute_ts > CONFIG.lastTime[indecCounter] + 60*5) {// 5 minuten nach dem 
+		disableMessage(indecCounter);
+        print("########################################## AUS #######################################");
+		return;
+	}
+});

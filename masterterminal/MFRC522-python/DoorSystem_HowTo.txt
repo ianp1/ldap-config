@@ -1,0 +1,242 @@
+1 - Enable SPI
+    sudo raspi-config
+
+2-  Download MFCR522-python
+    git clone https://github.com/danjperron/MFRC522-python
+
+3-  Connect the reader according to the README.md of the github
+
+4-  Check if the reader is able to read a card
+    
+    cd MFRC522-python
+    python Read.py
+
+    now approach a card to the reader
+
+5-  install mariadb mysql server
+     sudo apt-get update
+     sudo apt-get install mysql-server python-mysqldb
+
+
+6-  create your data base access
+     sudo mysql -u root -p       (set root password)
+
+     create dabase rfidcardsdb and user
+
+    MariaDB [(none)]> create database rfidcardsdb;
+    MariaDB [(none)]> create user 'rfidreader'@localhost identified by 'password';
+    MariaDB [(none)]> grant all on rfidcardsdb.* to 'rfidreader' identified by 'password';
+    MariaDB [(none)]> exit
+
+
+    P.S. change password to a real password
+
+    // now set the password for rfidreader
+
+
+7-  create the database structure with specific fields
+
+pi@Pi2:~/MFRC522-python $ mysql -u rfidreader  -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 26
+Server version: 10.1.23-MariaDB-9+deb9u1 Raspbian 9.0
+
+Copyright (c) 2000, 2017, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> use rfidcardsdb
+Database changed
+MariaDB [rfidcardsdb]> CREATE TABLE `cards` (
+    -> `card_id` int(11) NOT NULL AUTO_INCREMENT,
+    -> `serial_no` varchar(20) NOT NULL,
+    -> `user_id` int(11) NOT NULL,
+    -> `valid` tinyint(1) NOT NULL DEFAULT '0',
+    -> `expire` datetime  NOT NULL,
+    -> `zones_access` int(11) NOT NULL,
+    -> PRIMARY KEY (`card_id`));
+Query OK, 0 rows affected (3.37 sec)
+
+8- Create user_tbl  and log_tbl table
+
+MariaDB [rfidcardsdb]> CREATE TABLE `user_tbl` (
+    -> `user_id` int(11) NOT NULL AUTO_INCREMENT,
+    -> `firstName` varchar(256) NOT NULL,
+    -> `lastName` varchar(256) NOT NULL,
+    -> `zones_access` smallint(11) NOT NULL,
+    -> `expired_date` datetime NOT NULL,
+    -> PRIMARY KEY (`user_id`));
+
+
+MariaDB [rfidcardsdb]> CREATE TABLE `reader_tbl` (
+    -> `reader_id` int(11) NOT NULL AUTO_INCREMENT,
+    -> `reader_name` varchar(256) NOT NULL,
+    -> `enable` ttinyint(1) NOT NULL,
+    -> `zones_access` int(11) NOT NULL);
+   
+    
+    
+ 
+    
+MariaDB [rfidcardsdb]> CREATE TABLE `log_tbl` (
+    -> `serial_no` varchar(20) NOT NULL,
+    -> `card_id` int(11) NOT NULL,
+    -> `date_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    -> `reader` int(11) NOT NULL,
+    -> `action` tinyint(4) NOT NULL);
+
+    MariaDB [rfidcardsdb]> describe cards;
+    +--------------+-------------+------+-----+---------+----------------+
+    | Field        | Type        | Null | Key | Default | Extra          |
+    +--------------+-------------+------+-----+---------+----------------+
+    | card_id      | int(11)     | NO   | PRI | NULL    | auto_increment |
+    | user_id      | int(11)     | NO   |     | NULL    |                |
+    | serial_no    | varchar(20) | NO   |     | NULL    |                |
+    | valid        | tinyint(1)  | NO   |     | 0       |                |
+    | expire       | datetime    | NO   |     | NULL    |                |
+    | zones_access | int(11)     | NO   |     | NULL    |                |
+    +--------------+-------------+------+-----+---------+----------------+
+    6 rows in set (0.01 sec)
+
+
+    MariaDB [rfidcardsdb]> describe user_tbl;
+    +--------------+------------------+------+-----+---------+----------------+
+    | Field        | Type             | Null | Key | Default | Extra          |
+    +--------------+------------------+------+-----+---------+----------------+
+    | user_id      | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+    | firstName    | varchar(256)     | NO   |     | NULL    |                |
+    | lastName     | varchar(256)     | NO   |     | NULL    |                |
+    | zones_access | smallint(11)     | NO   |     | NULL    |                |
+    | expired_date | datetime         | NO   |     | NULL    |                |
+    +--------------+------------------+------+-----+---------+----------------+
+    5 rows in set (0.00 sec)
+
+    MariaDB [rfidcardsdb]> describe log_tbl;
+    +------------+-------------+------+-----+-------------------+-----------------------------+
+    | Field      | Type        | Null | Key | Default           | Extra                       |
+    +------------+-------------+------+-----+-------------------+-----------------------------+
+    | serial_no  | varchar(20) | NO   |     | NULL              |                             |
+    | card_id    | int(11)     | NO   |     | NULL              |                             |
+    | date_stamp | timestamp   | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
+    | reader     | int(11)     | NO   |     | NULL              |                             |
+    | action     | tinyint(4)  | NO   |     | NULL              |                             |
+    +------------+-------------+------+-----+-------------------+-----------------------------+
+    5 rows in set (0.00 sec)
+
+
+9-  Read the rfid card Id of each cards and store it somewhere. 
+    
+     python Read.py
+     
+10- Create user
+    mysql -u rfidreader -p
+    
+    MariaDB [(none)]> use rfidcardsdb
+    Database changed
+    MariaDB [rfidcardsdb]> describe user_tbl;
+    +--------------+--------------+------+-----+---------+----------------+
+    | Field        | Type         | Null | Key | Default | Extra          |
+    +--------------+--------------+------+-----+---------+----------------+
+    | user_id      | int(11)      | NO   | PRI | NULL    | auto_increment |
+    | firstName    | varchar(256) | NO   |     | NULL    |                |
+    | lastName     | varchar(256) | NO   |     | NULL    |                |
+    | zones_access | smallint(11) | NO   |     | NULL    |                |
+    | expired_date | datetime     | NO   |     | NULL    |                |
+    +--------------+--------------+------+-----+---------+----------------+
+    5 rows in set (0.00 sec)
+
+    create user with different user_id
+
+    dMariaDB [rfidcardsdb]> INSERT INTO user_tbl (user_id,firstName,lastName,zones_access) values("1","Daniel","Perron","1");
+    Query OK, 1 row affected, 1 warning (0.01 sec)
+
+    MariaDB [rfidcardsdb]> INSERT INTO user_tbl (user_id,firstName,lastName,zones_access) values("2","Claude","Tessier","1");
+    Query OK, 1 row affected, 1 warning (0.01 sec)
+
+    do this for all your user.
+
+11- fill the data base 
+    
+    mysql -u rfidreader -p
+
+    MariaDB [(none)]> use rfidcardsdb
+    Database changed
+    
+    MariaDB [rfidcardsdb]> describe reader_tbl;
+    +--------------+--------------+------+-----+---------+----------------+
+    | Field        | Type         | Null | Key | Default | Extra          |
+    +--------------+--------------+------+-----+---------+----------------+
+    | reader_id    | int(11)      | NO   | PRI | NULL    | auto_increment |
+    | reader_name  | varchar(256) | NO   |     | NULL    |                |
+    | enable       | tinyint(1)   | NO   |     | NULL    |                |
+    | zones_access | int(11)      | NO   |     | NULL    |                |
+    +--------------+--------------+------+-----+---------+----------------+
+    4 rows in set (0.00 sec)
+    
+    MariaDB [rfidcardsdb]> INSERT INTO reader_tbl (reader_id,reader_name,enable,zones_access) values("1","reader 1","1","1");
+    Query OK, 1 row affected (0.01 sec)
+    
+    MariaDB [rfidcardsdb]> describe cards;
+    +--------------+-------------+------+-----+---------+----------------+
+    | Field        | Type        | Null | Key | Default | Extra          |
+    +--------------+-------------+------+-----+---------+----------------+
+    | card_id      | int(11)     | NO   | PRI | NULL    | auto_increment |
+    | user_id      | int(11)     | NO   |     | NULL    |                |
+    | serial_no    | varchar(20) | NO   |     | NULL    |                |
+    | valid        | tinyint(1)  | NO   |     | 0       |                |
+    | expire       | datetime    | NO   |     | NULL    |                |
+    | zones_access | int(11)     | NO   |     | NULL    |                |
+    +--------------+-------------+------+-----+---------+----------------+
+    6 rows in set (0.01 sec)
+
+    MariaDB [rfidcardsdb]> INSERT INTO cards (card_id,serial_no,user_id,valid) values("1","803697F280BA04","1","1");
+    Query OK, 1 row affected (0.02 sec)
+    MariaDB [rfidcardsdb]> INSERT INTO cards (card_id,serial_no,user_id,valid) values("2","0658D9A5","2","1");
+    Query OK, 1 row affected (0.02 sec)
+    MariaDB [rfidcardsdb]> INSERT INTO cards (card_id,serial_no,user_id,valid) values("3","0658D555","3","0"); 
+    Query OK, 1 row affected (1.29 sec)
+    MariaDB [rfidcardsdb]> INSERT INTO cards (card_id,serial_no,user_id,valid) values("4","458E812A","4","1");
+    Query OK, 1 row affected (0.02 sec)
+
+    MariaDB [rfidcardsdb]> select * from cards;
+    +---------+---------+-----------+-------+---------------------+--------------+
+    | card_id | user_id | serial_no | valid | expire              | zones_access |
+    +---------+---------+-----------+-------+---------------------+--------------+
+    |       1 |       1 | 2BDEFC25  |     1 | 0000-00-00 00:00:00 |            1 |
+    |       2 |       3 | 2BFFEC95  |     1 | 0000-00-00 00:00:00 |            3 |
+    |       3 |       2 | 0658D555  |     0 | 0000-00-00 00:00:00 |            2 |
+    |       4 |       4 | 458E812A  |     1 | 0000-00-00 00:00:00 |            1 |
+    +---------+---------+-----------+-------+---------------------+--------------+
+    4 rows in set (0.01 sec)
+
+
+12- Create reader table
+
+
+
+
+13- Let's install pymsql for python3
+
+    sudo pip3 install PyMySQL
+
+14 - And run DoorSystem
+
+pi@Pi2:~/MFRC522-python $ python3 DoorSystem.py
+Door System using Raspberry Pi
+Press Ctrl-C to stop.
+Card 1:803697F280BA04 from user Daniel Accepted!
+Card ?:024CD43C from unknown  Refused!
+Card 3:0658D555 from user Gilbert Invalid
+Card 4:458E812A from user Chantal Accepted!
+Card 2:0658D9A5 from user Claude Accepted!
+
+ 
+
+
+
+
+
+
+
+    
