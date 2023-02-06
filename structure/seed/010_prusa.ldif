@@ -1,4 +1,4 @@
-dn: geraetname=prusa,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
+dn: cn=prusa,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
 objectClass: geraet
 objectClass: groupOfNames
 geraetname: prusa

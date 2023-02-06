@@ -29,7 +29,7 @@ client.on('message', function(topic, message) {
 
     try {
         let details = JSON.parse(message);
-        let machine = "geraetname="+details.machine+",ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
+        let machine = "cn="+details.machine+",ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
         let sourceMac = details.terminalMac;
         let rfid = details.rfid;
         
