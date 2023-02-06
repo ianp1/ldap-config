@@ -19,6 +19,7 @@
         - nslcd
         - vim
         - sssd
+        - libsss-sudo
         - libpam-ssh
     - name: Install sssd-common for mint systems
       apt:

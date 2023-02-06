@@ -40,3 +40,13 @@
       template:
         src: ldap-permissions.j2
         dest: /etc/sudoers.d/ldap-permission
+- name: Setup LDAP-Permissions for linux-servers
+  hosts: fablab-linux-servers
+  become: yes
+  vars:
+    sudoersgroup: ldap-admin
+  tasks:
+    - name: Enable Custom sudoers rules
+      template:
+        src: ldap-permissions.j2
+        dest: /etc/sudoers.d/ldap-permission
