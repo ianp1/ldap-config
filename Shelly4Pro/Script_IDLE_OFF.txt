@@ -16,7 +16,7 @@ function disableMessage(index) {
 function notify(index) {
   Shelly.call(
     'HTTP.POST',
-    {url:CONFIG.httpEndpoint,
+    {url:"http://192.168.110.56/api/speach",
 	body:"Dein Druck ist fertig"}
   )
 }
@@ -56,13 +56,13 @@ Shelly.addStatusHandler(function (statusNtf) {
     print(allData.aenergy.minute_ts - CONFIG.lastTime[indecCounter] + 60*5);
 	if (allData.apower === 0 && allData.aenergy.minute_ts > CONFIG.lastTime[indecCounter] + 60) {// Wenn das Gerät ausgeschaltet ist
 		disableMessage(indecCounter);
-		notify(indecCounter);
+		//notify(indecCounter);
         print("########################################## AUS #######################################");
 		return;
 	}
 	if(allData.aenergy.minute_ts > CONFIG.lastTime[indecCounter] + 60*5) {// 5 minuten nach dem 
 		disableMessage(indecCounter);
-		notify(indecCounter);
+		//notify(indecCounter);
         print("########################################## AUS #######################################");
 		return;
 	}
