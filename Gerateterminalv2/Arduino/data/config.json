@@ -4,42 +4,54 @@
 			"img": "Heldenhelfer.jpg",
 			"cost": "1EURO/h",
 			"einweisungsname": "PrusaMK3",
-			"mqttChannel": "machines/v2/Heldenhelfer"
+			"mqttChannel": "machines/v2/Heldenhelfer",
+			"mqttChannelShelly": "machines/v2/Heldenhelfer/rpc",
+			"mqttID": "0"
 		},
 		{
 			"name": "Prusa mini",
 			"img": "Prusamini.jpg",
 			"cost": "1EURO/h",
 			"einweisungsname": "PrusaMK3",
-			"mqttChannel": "xy"
+			"mqttChannel": "machines/v2/Heldenhelfer",
+			"mqttChannelShelly": "machines/v2/Heldenhelfer/rpc",
+			"mqttID": "1"
+		},
+		{
+			"name": "Prusa 0.4",
+			"img": "Prusa.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "PrusaMK3",
+			"mqttChannel": "machines/v2/Heldenhelfer",
+			"mqttChannelShelly": "machines/v2/Heldenhelfer/rpc",
+			"mqttID": "2"
 		},
 		{
 			"name": "Prusa 0.6",
 			"img": "Prusa.jpg",
 			"cost": "1EURO/h",
 			"einweisungsname": "PrusaMK3",
-			"mqttChannel": "xy"
-		},
-		{
-			"name": "Prusa",
-			"img": "Prusa.jpg",
-			"cost": "1EURO/h",
-			"einweisungsname": "PrusaMK3",
-			"mqttChannel": "xy"
+			"mqttChannel": "machines/v2/Heldenhelfer",
+			"mqttChannelShelly": "machines/v2/Heldenhelfer/rpc",
+			"mqttID": "3"
 		},
 		{
 			"name": "Luna",
 			"img": "Prusa.jpg",
 			"cost": "1EURO/h",
 			"einweisungsname": "PrusaMK3",
-			"mqttChannel": "xy"
+			"mqttChannel": "machines/v2/Heldenhelfer",
+			"mqttChannelShelly": "machines/v2/Heldenhelfer/rpc",
+			"mqttID": "4"
 		},
 		{
 			"name": "Ultimaker 3",
 			"img": "Prusa.jpg",
 			"cost": "1EURO/h",
 			"einweisungsname": "PrusaMK3",
-			"mqttChannel": "xy"
+			"mqttChannel": "machines/v2/Heldenhelfer",
+			"mqttChannelShelly": "machines/v2/Heldenhelfer/rpc",
+			"mqttID": "5"
 		}
 	],
 	"name": "FDM Terminal",
