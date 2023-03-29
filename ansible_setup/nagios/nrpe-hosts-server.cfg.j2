@@ -25,6 +25,68 @@ define host{
         register                0; dont show in register - its a template
 }
 
+define hostgroup {
+        hostgroup_name          ansible-hosts
+        alias                   Ansible hosts
+        members                 {{ groups['nagios-monitoring']|join(',') }}
+}
+
+define servicegroup {
+        servicegroup_name       ansible-hosts-services
+        alias                   Services for ansible hosts
+}
+
+
+define service {
+        use                     generic-service
+        servicegroups           ansible-hosts-services
+        hostgroup_name          ansible-hosts
+        service_description     PING
+        check_command           check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+        use                     generic-service
+        servicegroups           ansible-hosts-services
+        hostgroup_name          ansible-hosts
+        service_description     Current Load
+        check_command           check_nrpe!check_load
+}
+
+define service {
+        use                     generic-service
+        servicegroups           ansible-hosts-services
+        hostgroup_name          ansible-hosts
+        service_description     Total processes
+        check_command           check_nrpe!check_procs
+}
+
+
+define service {
+        use                     generic-service
+        servicegroups           ansible-hosts-services
+        hostgroup_name          ansible-hosts
+        service_description     Root partition
+        check_command           check_nrpe!check_disk
+}
+
+
+define service {
+        use                     generic-service
+        servicegroups           ansible-hosts-services
+        hostgroup_name          ansible-hosts
+        service_description     Local swap
+        check_command           check_nrpe!check_swap
+}
+
+define service {
+        use                     generic-service
+        servicegroups           ansible-hosts-services
+        hostgroup_name          ansible-hosts
+        service_description     SSH
+        check_command           check_ssh
+}
+
 {% for nagios_host in groups['nagios-monitoring'] %}
 define host {
         use                     fablab-servers
@@ -32,11 +94,15 @@ define host {
         address                 {{hostvars[nagios_host].ansible_host}}
 }
 
+{% if "nagios_https_host" in hostvars[nagios_host] %}
+
 define service {
         use                     generic-service
         host_name               {{nagios_host}}
-        service_description     CPU Load
-        check_command           check_nrpe!check_load
+        service_description     HTTPS
+        check_command           check_http_vars!-I {{hostvars[nagios_host]["nagios_https_host"]}} -S -C 7 {{ "-p " + hostvars[nagios_host]["nagios_https_port"]|string if "nagios_https_port" in hostvars[nagios_host] }}
 }
+
+{% endif %}
 
 {% endfor %}
