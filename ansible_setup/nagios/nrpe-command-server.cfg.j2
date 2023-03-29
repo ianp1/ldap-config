@@ -1,0 +1,18 @@
+###########################################################
+#
+#
+#                   !WARNING!
+#
+#                This file is generated using
+#                Ansible. Do not edit it by hand, as it 
+#                may be overwritten!
+#
+#
+###########################################################
+
+
+
+define command {
+        command_name    check_nrpe
+        command_line    $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}

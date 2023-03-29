@@ -1,0 +1,62 @@
+---
+- name: Setup nagios server and clients
+  hosts: nagios-monitoring,nagios
+  become: yes
+  tasks:
+    - name: Install nrpe on clients
+      when: inventory_hostname in groups["nagios-monitoring"]
+      apt: 
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nagios-nrpe-server
+          - nagios-plugins
+      notify:
+      - restart client services
+    - name: Configure nrpe on clients
+      when: inventory_hostname in groups["nagios-monitoring"]
+      template:
+        src: nrpe-client.conf.j2
+        dest: /etc/nagios/nrpe.cfg
+      notify:
+      - restart client services
+    - name: Add nrpe command on server
+      when: inventory_hostname == "nagios"
+      template:
+        src: nrpe-command-server.cfg.j2
+        dest: /usr/local/nagios/etc/objects/nrpe-command.cfg
+      notify:
+      - restart server services
+    - name: Add nrpe hosts configuration on server
+      when: inventory_hostname == "nagios"
+      template:
+        src: nrpe-hosts-server.cfg.j2
+        dest: /usr/local/nagios/etc/objects/ansible-hosts.cfg
+      notify:
+      - restart server services
+    - name: Enable additional nagios config files
+      when: inventory_hostname == "nagios"
+      lineinfile:
+        path: /usr/local/nagios/etc/nagios.cfg
+        insertafter: ^cfg_file=\/usr\/local\/nagios\/etc\/objects\/hosts\.cfg$
+        line: cfg_file=/usr/local/nagios/etc/objects/{{ item }}.cfg
+      with_items:
+        - nrpe-command
+        - ansible-hosts
+      notify:
+      - restart server services
+  handlers:
+    - name: restart client services
+      service:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - nagios-nrpe-server
+    - name: restart server services
+      service:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - nagios

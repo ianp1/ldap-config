@@ -1,0 +1,42 @@
+###########################################################
+#
+#
+#                   !WARNING!
+#
+#                This file is generated using
+#                Ansible. Do not edit it by hand, as it 
+#                may be overwritten!
+#
+#
+###########################################################
+
+
+define host{
+        name                    fablab-servers
+        use                     generic-host
+        check_period            24x7
+        check_interval          5
+        retry_interval          1
+        max_check_attempts      10
+        check_command           check-host-alive
+        notification_period     24x7
+        notification_interval   30
+        notification_options    d,r
+        register                0; dont show in register - its a template
+}
+
+{% for nagios_host in groups['nagios-monitoring'] %}
+define host {
+        use                     fablab-servers
+        host_name               {{nagios_host}}
+        address                 {{hostvars[nagios_host].ansible_host}}
+}
+
+define service {
+        use                     generic-service
+        host_name               {{nagios_host}}
+        service_description     CPU Load
+        check_command           check_nrpe!check_load
+}
+
+{% endfor %}
