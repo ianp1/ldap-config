@@ -21,3 +21,13 @@ define command {
         command_name check_http_vars
         command_line $USER1$/check_http $ARG1$
 }
+
+define command {
+        command_name check_ldap_tls
+        command_line $USER1$/check_ldaps -H $ARG1$ -p 389 -b $ARG2$
+}
+
+define command {
+        command_name check_mqtt
+        command_line /usr/bin/python3 /usr/local/check_mqtt/check-mqtt.py -H $ARG1$ -u $ARG2$ -p $ARG3$ -a /usr/local/check_mqtt/ca.crt -P 1883
+}

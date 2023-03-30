@@ -22,6 +22,7 @@ define host{
         notification_period     24x7
         notification_interval   30
         notification_options    d,r
+        contact_groups          Fablab-IT
         register                0; dont show in register - its a template
 }
 
@@ -36,9 +37,17 @@ define servicegroup {
         alias                   Services for ansible hosts
 }
 
-
 define service {
         use                     generic-service
+        name                    ansible-service
+        contact_groups          Fablab-IT
+        check_interval          3
+        retry_interval          1
+        register                0
+}
+
+define service {
+        use                     ansible-service
         servicegroups           ansible-hosts-services
         hostgroup_name          ansible-hosts
         service_description     PING
@@ -46,7 +55,7 @@ define service {
 }
 
 define service {
-        use                     generic-service
+        use                     ansible-service
         servicegroups           ansible-hosts-services
         hostgroup_name          ansible-hosts
         service_description     Current Load
@@ -54,7 +63,7 @@ define service {
 }
 
 define service {
-        use                     generic-service
+        use                     ansible-service
         servicegroups           ansible-hosts-services
         hostgroup_name          ansible-hosts
         service_description     Total processes
@@ -63,16 +72,17 @@ define service {
 
 
 define service {
-        use                     generic-service
+        use                     ansible-service
         servicegroups           ansible-hosts-services
         hostgroup_name          ansible-hosts
         service_description     Root partition
+        notification_options    u,c,r
         check_command           check_nrpe!check_disk
 }
 
 
 define service {
-        use                     generic-service
+        use                     ansible-service
         servicegroups           ansible-hosts-services
         hostgroup_name          ansible-hosts
         service_description     Local swap
@@ -80,7 +90,7 @@ define service {
 }
 
 define service {
-        use                     generic-service
+        use                     ansible-service
         servicegroups           ansible-hosts-services
         hostgroup_name          ansible-hosts
         service_description     SSH
@@ -97,7 +107,7 @@ define host {
 {% if "nagios_https_host" in hostvars[nagios_host] %}
 
 define service {
-        use                     generic-service
+        use                     ansible-service
         host_name               {{nagios_host}}
         service_description     HTTPS
         check_command           check_http_vars!-I {{hostvars[nagios_host]["nagios_https_host"]}} -S -C 7 {{ "-p " + hostvars[nagios_host]["nagios_https_port"]|string if "nagios_https_port" in hostvars[nagios_host] }}
@@ -106,3 +116,39 @@ define service {
 {% endif %}
 
 {% endfor %}
+
+define host {
+        use                     fablab-servers
+        host_name               intranet
+        address                 192.168.24.2
+}
+
+define service {
+        use                     ansible-service
+        host_name               intranet
+        service_description     LDAP StartTLS  
+        check_command           check_ldap_tls!ldap-provider.fablab-luebeck.de!dc=ldap-provider,dc=fablab-luebeck    
+}
+
+define service {
+        use                     ansible-service
+        host_name               intranet
+        service_description     Einweisungs-Website
+        check_command           check_http_vars!-I einweisungen.fablab-luebeck.de -S -C 7 -p 443
+}
+
+
+define service {
+        use                     ansible-service
+        host_name               intranet
+        service_description     Login-Website
+        check_command           check_http_vars!-I login.fablab-luebeck.de -S -C 7 -p 443
+}
+
+
+define service {
+        use                     ansible-service
+        host_name               mqttHost
+        service_description     mqttService
+        check_command           check_mqtt!mqtt.fablab-luebeck.de!nagios!YnoauCxLR7LN7rijCNCq
+}

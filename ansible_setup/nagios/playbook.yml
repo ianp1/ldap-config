@@ -2,6 +2,9 @@
 - name: Setup nagios server and clients
   hosts: nagios-monitoring,nagios
   become: yes
+  vars:
+    contacts:
+      - { name: 'Ian', email: 'poesse@fablab-luebeck.de' }
   tasks:
     - name: Install nrpe on clients
       when: inventory_hostname in groups["nagios-monitoring"]
@@ -33,7 +36,7 @@
         - { command_name: check_swap, command: "/usr/lib/nagios/plugins/check_swap -w 35% -c 20%"}
         - { command_name: check_disk, command: "/usr/lib/nagios/plugins/check_disk -w 25% -c 10% -p /"}
         - { command_name: check_procs, command: "/usr/lib/nagios/plugins/check_procs -w 250 -c 400 -s RSZDT"}
-        - { command_name: check_load, command: "/usr/lib/nagios/plugins/check_load -r -w 60.0,50.0,40.0 -c 90.0,60.0,50.0"}
+        - { command_name: check_load, command: "/usr/lib/nagios/plugins/check_load -r -w 0.7,0.6,0.5 -c 0.9,0.8,0.7"}
       notify:
       - restart client services
     - name: Add nrpe command on server
@@ -50,6 +53,13 @@
         dest: /usr/local/nagios/etc/objects/ansible-hosts.cfg
       notify:
       - restart server services
+    - name: Add contact configuration on server
+      when: inventory_hostname == "nagios"
+      template:
+        src: contact-groups-server.cfg.j2
+        dest: /usr/local/nagios/etc/objects/ansible-contacts.cfg
+      notify:
+      - restart server services
     - name: Enable additional nagios config files
       when: inventory_hostname == "nagios"
       lineinfile:
@@ -59,8 +69,35 @@
       with_items:
         - nrpe-command
         - ansible-hosts
+        - ansible-contacts
       notify:
       - restart server services
+    - name: Install packages on nagios host
+      when: inventory_hostname == "nagios"
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - git
+          - pip
+    - name: Download check_mqtt plugin from github
+      when: inventory_hostname == "nagios"
+      ansible.builtin.git:
+        repo: https://github.com/jpmens/check-mqtt.git
+        dest: /usr/local/check_mqtt
+    - name: Install python requirements for check_mqtt
+      when: inventory_hostname == "nagios"
+      pip:
+        requirements: /usr/local/check_mqtt/requirements.txt
+    - name: Copy ca.crt file to check_mqtt
+      when: inventory_hostname == "nagios"
+      template:
+        src: ca.crt.j2
+        dest: /usr/local/check_mqtt/ca.crt 
+        owner: nagios
+        group: nagios
   handlers:
     - name: restart client services
       service:
