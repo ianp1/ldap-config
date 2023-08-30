@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include "pm532/Adafruit_PN532.h"
 #define PN532_SS 25
+#define PN532_RST 27
 extern void bootLogTFT(String s);
 extern void checkCard(String content);
 //TODO: RESET einbauen, über Pin
@@ -8,17 +9,22 @@ Adafruit_PN532 nfc(PN532_SS);
 
 void initCard() {
   nfc.begin();
+  delay(1000);
   uint32_t versiondata = nfc.getFirmwareVersion();
+  delay(1000);
+  bool suc = nfc.SAMConfig();
   if (! versiondata) {
     bootLogTFT("Didn't find PN53x board");
-    while (1); // halt
+    delay(1000);
+    ESP.restart();
   }
   bootLogTFT("Found chip PN5" + String((versiondata>>24) & 0xFF, HEX)); 
   bootLogTFT("Firmware ver. " + String((versiondata>>16) & 0xFF, DEC) + '.' + String((versiondata>>8) & 0xFF, DEC));
-  bool suc = nfc.SAMConfig();
   bootLogTFT(String("NFC INIT: " + String(suc)));
   while (!suc) {
-      bool suc = nfc.SAMConfig();
+    bootLogTFT("NFC Error: Restart");
+    delay(1000);
+    ESP.restart();
   }
 }
 
@@ -27,7 +33,7 @@ boolean readTag(){
   uint8_t success;
   uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
   uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
-  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 100);//Warte 500 ms auf eine neue Karte
+  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 50);//Warte 500 ms auf eine neue Karte
   if (success) {
     timestampLastChange = millis();
     varRet = true;
