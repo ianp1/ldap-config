@@ -99,6 +99,9 @@ void showCardInfo() {
 void handleTouh() {
     //Nur alle 300ms akzeptieren
     if (millis() - debounceTouch < 300) {
+        if (ts.touched()) {
+            debounceTouch = millis();
+        }
         return;
     }
     if (ts.touched()) {
@@ -262,6 +265,7 @@ void dimmDisplay() {
     if (is_touched) {
         if (millis() - timestampLastChange >= DIMM_INTERVAL) {  // TODO: Funktioniert noch nicht, touch geht durch
             is_touched = false;
+            debounceTouch = millis();
         }
         timestampLastChange = millis();
     }
