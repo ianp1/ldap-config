@@ -1,6 +1,8 @@
 //New Terminal, by Marco with TFT
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <time.h>
+#include <esp_sleep.h>
 #define CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 int ausgewahltesGerat = -1;// Index der Config geräte
 int einweisung = 0;// Wie lnge eine Einweisung noch vorhanden ist
@@ -10,7 +12,9 @@ long lastStatusUpdate = 0;
 String lastCardRead = "";// ID der letzten Karte
 long lastCardReadTimestamp = 0;// Wann das letzte mal eine Karte gelesen wurde
 long mqttDisconnectedTimestamp = 0;// Wann der MQTT teil die verbindung verloren hat
-DynamicJsonDocument docc(1024);
+const int dailyRestartHour = 4;
+const int restartDelayInMinutes = 10;
+DynamicJsonDocument docc(2048);
 // Filesystem
 #include "FS.h"
 #include <LittleFS.h>
@@ -30,6 +34,8 @@ void initFilsystem() {
   
   if (!LittleFS.begin(true)) {
     bootLogTFT("An error has occured while initializing littlefs");
+    sleep(5000);
+    ESP.restart();
   }
 /*
   File file = LittleFS.open("/device.txt", "r");
@@ -80,20 +86,27 @@ void getConfig() {
   if (error) {
     Serial.print(F("deserializeJson() failed: "));
     Serial.println(error.f_str());
-    return;
+    sleep(5000);
+    ESP.restart();
   }
+  //für alle maschienen setze activstatus auf 0
+  for (int i = 0; i < docc["maschines"].size(); i++) {
+    docc["maschines"][i]["activestart"] = 0;
+  }
+  //docc["maschines"][countter]["activestart"] != 0
   // Varriablen in Json lassen?
   geraet = docc["name"].as<String>();
   mqttChannel = docc["mqtt"]["mqttChannel"].as<String>();
   mqttChannelCard = mqttChannel + "/card";
   mqttUser = docc["mqtt"]["mqttUser"].as<String>();
   mqttPassword = docc["mqtt"]["mqttPassword"].as<String>();
+
   file.close();
   bootLogTFT("finished reading filesystem information");
-  bootLogTFT(geraet);
-  bootLogTFT(mqttChannel);
-  bootLogTFT(mqttUser);
-  bootLogTFT(mqttPassword);
+  //bootLogTFT(geraet);
+  //bootLogTFT(mqttChannel);
+  //bootLogTFT(mqttUser);
+  //bootLogTFT(mqttPassword);
   //serializeJsonPretty(docc, Serial);
   //Download new Config as JSON
 }
@@ -142,8 +155,22 @@ void checkCard(String content) {
   if (success) {
     cardSendTimestamp = millis();
   } else {
+    //lastError()
+    Serial.println(mqttClient.lastError());
     // Fehlerbehandlung, z.B. Anzeige einer Fehlermeldung auf dem Display oder Protokollierung des Fehlers
     Serial.println("Fehler beim Veröffentlichen der MQTT-Nachricht: " + payload);
+  }
+}
+
+
+void restartDailyAtFour() {
+  time_t now = time(nullptr);
+  struct tm timeinfo;
+  localtime_r(&now, &timeinfo);
+
+  if (timeinfo.tm_hour == dailyRestartHour && (now - timestampLastChange) >= (restartDelayInMinutes * 60)) {
+    bootLogTFT("Restarting ESP32 at 4am...");
+    esp_restart();
   }
 }
 
@@ -156,9 +183,10 @@ void loop() {
   handleTouh();
   //Check card -> New Card -> Display Name Einweisungen kompatible und Sicherheitsbelehrung.(zurück Button)
   boolean isCard =  readTag();
-  if (lastCardReadTimestamp + 10000 < millis() && !isCard) {//Keine Karte seit 10 Sekunden
+  if (lastCardReadTimestamp + 2000 < millis() && !isCard) {//Keine Karte seit 10 Sekunden
     // Karte weg
-    if (displayStatus == 2) {
+    lastCardRead = "";
+    if (displayStatus == 2 || displayStatus == 4) {
       displayStatus = 1;
     }
   }
@@ -169,4 +197,5 @@ void loop() {
     displayStatusBar();
     lastStatusUpdate = millis();
   }
+  restartDailyAtFour();
 }

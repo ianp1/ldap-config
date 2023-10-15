@@ -73,13 +73,23 @@ void initWlan() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   //WiFi.setSleep(false);
   bootLogTFT("Verbinde WLAN");
+  int abortCounter = 0;
   while (WiFi.status() != WL_CONNECTED) {
+    abortCounter++;
     delay(500);
     Serial.print(".");
+    if (abortCounter >=20) {
+      bootLogTFT("WLAN verbindet nicht, starte neu.");
+      sleep(5000);
+      ESP.restart();
+      sleep(100);
+      ESP.restart();
+      sleep(100);
+    }
   }
   Serial.println("");
   bootLogTFT("WiFi connected");
-  bootLogTFT(String(WiFi.localIP()));
+  bootLogTFT("IP address: ");
   wifiClient.setCACert(ca_cert);
 }
 
@@ -119,8 +129,9 @@ void initOTA() {
  * Sets ntp up, needed for ssl verification
  */
 time_t initTime() {
-  configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
-
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+  setenv("TZ", "CET-1CEST-2,M3.5.0/2,M10.5.0/3", 1);
+  tzset();
   bootLogTFT("Waiting for NTP time sync: ");
   int cT = 0;
   time_t now = time(nullptr);
@@ -130,6 +141,11 @@ time_t initTime() {
     cT++;
     if (cT%10 == 0) {
       bootLogTFT("Sync in Progress");
+    }
+    if (cT >= 150){// nach 15 Sekunden
+      bootLogTFT("Zeitserver braucht zu lange");
+      sleep(5000);
+      ESP.restart();
     }
   }
   struct tm timeinfo;

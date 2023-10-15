@@ -1,0 +1,44 @@
+{
+	"maschines": [{
+			"name": "Standbohrmaschine",
+			"img": "Bohrmaschine.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "Tischbohrmaschine",
+			"mqttChannel": "machines/v2/Standbohrmaschine",
+			"mqttChannelShelly": "machines/v2/Standbohrmaschine/rpc",
+			"mqttID": "0"
+		},
+		{
+			"name": "Bandsage",
+			"img": "Bandsage.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "Bandsaege",
+			"mqttChannel": "machines/v2/Bandsaege",
+			"mqttChannelShelly": "machines/v2/Bandsaege/rpc",
+			"mqttID": "0"
+		},
+		{
+			"name": "Kapsage",
+			"img": "Kapsage.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "Kappsaege",
+			"mqttChannel": "machines/v2/KappGehrungssaege",
+			"mqttChannelShelly": "machines/v2/KappGehrungssaege/rpc",
+			"mqttID": "0"
+		},
+		{
+			"name": "Schleifmaschine",
+			"img": "sb.jpg",
+			"cost": "1EURO/h",
+			"einweisungsname": "Schleifblock",
+			"mqttChannel": "machines/v2/Schleifblock",
+			"mqttChannelShelly": "machines/v2/Schleifblock/rpc",
+			"mqttID": "0"
+		}
+	],
+	"name": "HolzTerminal",
+	"mqtt": {
+		"mqttUser": "HolzTerminal",
+		"mqttPassword": "AAEh71YFycBtBL8gsBzL"
+	}
+}
