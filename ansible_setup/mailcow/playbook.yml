@@ -1,0 +1,73 @@
+---
+- name: Mailcow
+  hosts: mailcow
+  become: yes
+  vars:
+    mailcow_domain: mail.fablab-luebeck.de
+  tasks:
+    - name: Update package list
+      apt:
+        update_cache: yes
+    - name: Install docker dependencies
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg2
+        - software-properties-common
+    - name: Add docker gpg key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present  
+    - name: Add docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+    - name: Install docker
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-compose-plugin
+        - docker-buildx-plugin
+    - name: Add service user to docker group
+      user:
+        name: "{{ ansible_user_id }}"
+        groups: docker
+        append: yes
+    - name: Create mailcow directory
+      file:
+        path: /opt/mailcow
+        state: directory
+    - name: Clone mailcow repository
+      git:
+        repo: https://github.com/mailcow/mailcow-dockerized
+        dest: /opt/mailcow/mailcow-dockerized
+    - name: set cert.pem and key.pem to assume unchanged
+      command: git update-index --assume-unchanged {{ item }}
+      args:
+        chdir: /opt/mailcow/mailcow-dockerized/data/assets/ssl-example
+      with_items:
+        - cert.pem
+        - key.pem
+    - name: Run setup script and enable nightly build
+      expect: 
+        chdir: /opt/mailcow/mailcow-dockerized
+        command: /opt/mailcow/mailcow-dockerized/generate_config.sh
+        responses: 
+          "Mail server hostname": "{{ mailcow_domain }}"
+          "Timezone": "Etc"
+          "Choose the Branch": "2"            #<------------- change to 1 for stable build
+          "A config file exists": "y"
+    - name: Start mailcow
+      command: docker compose up -d --build
+      args:
+        chdir: /opt/mailcow/mailcow-dockerized
