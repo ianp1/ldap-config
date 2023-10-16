@@ -1,0 +1,86 @@
+fablab_linux: # describes linux pcs and laptops, for servers see #fablab_linux_servers
+  hosts:
+    FabLabLaptopMint:
+    fablab-02:
+    fablab-03:
+  vars:
+    host_system: mint
+    ldap_host: ldap-provider.fablab-luebeck.de
+    ldap_bind_dn: "{{vault_ldap_bind_dn}}"
+    ldap_bind_pw: "{{vault_ldap_bind_pw}}"
+###########
+# describes linux servers 
+#
+fablab_linux_servers:
+  hosts:
+    mqttHost:
+      ansible_host: 192.168.24.4
+    nextcloud:
+      ansible_host: 192.168.24.101
+      nagios_https_host: cloud.fablab-luebeck.de
+    nodered:
+      ansible_host: 192.168.24.102
+      nagios_https_host: 192.168.24.100
+      nagios_https_port: 8006
+    nginxproxy:
+      ansible_host: 192.168.24.103
+    nagios:
+      ansible_host: 192.168.24.104
+    mailcow:
+      ansible_host: 192.168.24.105
+    rfid-masterterminal:
+      ansible_host: 192.168.25.21
+    ldap-web:
+      ansible_host: 192.168.16.5
+    ldap-provider:
+      ansible_host: 192.168.16.4
+  vars:
+##########
+# describes all linux servers within the fablab network (external, not intranet)
+#
+fablab_network_servers:
+  hosts:
+    mqttHost:
+    nextcloud:
+    nodered:
+    nginxproxy:
+    nagios:
+    mailcow:
+  vars:
+    ldap_host: ldap-provider.fablab-luebeck.de 
+    ldap_bind_dn: "{{vault_ldap_bind_dn}}"
+    ldap_bind_pw: "{{vault_ldap_bind_pw}}"
+##########
+# describes all linux servers within the fablab intranet (not external)
+#
+fablab_intranet_servers:
+  hosts:
+    ldap-web:
+    ldap-provider:
+  vars:
+    ldap_host: ldap-provider.fablab-luebeck.de
+    ldap_bind_dn: "{{vault_ldap_bind_dn}}"
+    ldap_bind_pw: "{{vault_ldap_bind_pw}}"
+###########
+# describes machines, that should be monitored by nagios
+#
+nagios_monitoring:
+  hosts:
+    mqttHost:
+    nextcloud:
+    nodered:
+    nginxproxy:
+##########
+# describes printstream machines
+#
+printstream:
+  hosts:
+    prusadagobertlink:
+      ansible_host: 172.18.87.102
+  vars:
+    host_system=raspbian
+#ansible-test.fritz.box ansible_host=192.168.2.18
+#printstream01 ansible_host=172.18.87.132
+#prusa_luigimario ansible_host=172.18.87.37
+#prusafablab ansible_host=172.18.87.105
+#prusa_dimpfelmoserpumuckl ansible_host=172.18.87.106
