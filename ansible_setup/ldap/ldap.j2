@@ -6,7 +6,7 @@ URI ldap://{{ldap_host}}
 ssl start_tls
 SASL_MECH LOGIN
 
-TLS_REQCERT NEVER
+TLS_CACERT /etc/ssl/certs/ca-certificates.crt
 
 ldap_version 3
 
