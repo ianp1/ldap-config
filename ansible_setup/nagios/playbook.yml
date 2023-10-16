@@ -1,13 +1,13 @@
 ---
 - name: Setup nagios server and clients
-  hosts: nagios-monitoring,nagios
+  hosts: nagios_monitoring,nagios
   become: yes
   vars:
     contacts:
       - { name: 'Ian', email: 'poesse@fablab-luebeck.de' }
   tasks:
     - name: Install nrpe on clients
-      when: inventory_hostname in groups["nagios-monitoring"]
+      when: inventory_hostname in groups["nagios_monitoring"]
       apt: 
         name: "{{ packages }}"
         state: present
@@ -19,14 +19,14 @@
       notify:
       - restart client services
     - name: Configure nrpe on clients
-      when: inventory_hostname in groups["nagios-monitoring"]
+      when: inventory_hostname in groups["nagios_monitoring"]
       template:
         src: nrpe-client.conf.j2
         dest: /etc/nagios/nrpe.cfg
       notify:
       - restart client services
     - name: Add nrpe commands to clients
-      when: inventory_hostname in groups["nagios-monitoring"]
+      when: inventory_hostname in groups["nagios_monitoring"]
       lineinfile:
         path: /etc/nagios/nrpe.cfg
         insertafter: ^command\[check_total_procs\]

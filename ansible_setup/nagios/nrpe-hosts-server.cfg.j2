@@ -29,7 +29,7 @@ define host{
 define hostgroup {
         hostgroup_name          ansible-hosts
         alias                   Ansible hosts
-        members                 {{ groups['nagios-monitoring']|join(',') }}
+        members                 {{ groups['nagios_monitoring']|join(',') }}
 }
 
 define servicegroup {
@@ -97,7 +97,7 @@ define service {
         check_command           check_ssh
 }
 
-{% for nagios_host in groups['nagios-monitoring'] %}
+{% for nagios_host in groups['nagios_monitoring'] %}
 define host {
         use                     fablab-servers
         host_name               {{nagios_host}}

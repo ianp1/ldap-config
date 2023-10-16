@@ -31,7 +31,7 @@
         src: ldap-permissions.j2
         dest: /etc/sudoers.d/ldap-permission
 - name: Setup LDAP-Permissions for linux-pcs
-  hosts: fablab-linux
+  hosts: fablab_linux
   become: yes
   vars:
     sudoersgroup: ldap-admin
@@ -41,7 +41,7 @@
         src: ldap-permissions.j2
         dest: /etc/sudoers.d/ldap-permission
 - name: Setup LDAP-Permissions for linux-servers
-  hosts: fablab-linux-servers
+  hosts: fablab_linux_servers
   become: yes
   vars:
     sudoersgroup: ldap-admin
