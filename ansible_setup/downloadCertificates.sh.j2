@@ -10,7 +10,10 @@ scp -i /root/.ssh/id_certificates -r certificates@fablab-luebeck.de:/etc/letsenc
 {% endfor %}
 
 scp -i /root/.ssh/id_certificates certificates@fablab-luebeck.de:/etc/letsencrypt/options-ssl-apache.conf /etc/ssl/
+# if apache is set, default to true
+{% if apache is not defined or apache %}
 /usr/sbin/service apache2 restart
+{% endif %}
 {% if mqtt %}
 /usr/sbin/service mosquitto restart
 {% endif %}
