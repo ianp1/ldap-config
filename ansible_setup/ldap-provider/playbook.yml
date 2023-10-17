@@ -85,7 +85,7 @@
       - download certificates
     - name: Copy certificate
       copy:
-        src: id_certificates
+        src: ../id_certificates
         dest: /root/.ssh/id_certificates
         owner: root
         group: root
