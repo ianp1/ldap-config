@@ -34,6 +34,8 @@ fablab_linux_servers:
       ansible_host: 192.168.16.5
     ldap-provider:
       ansible_host: 192.168.16.4
+    ldap-provider-rep:
+      ansible_host: 192.168.24.106
   vars:
 ##########
 # describes all linux servers within the fablab network (external, not intranet)
@@ -57,6 +59,7 @@ fablab_intranet_servers:
   hosts:
     ldap-web:
     ldap-provider:
+    ldap-provider-rep:
   vars:
     ldap_host: ldap-provider.fablab-luebeck.de
     ldap_bind_dn: "{{vault_ldap_bind_dn}}"

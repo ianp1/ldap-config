@@ -1,18 +1,71 @@
----
+--- # setup the OpenLDAP-Server and adjust necessary settings
 - name: Setup LDAP-provider
-  hosts: ldap-provider
+  hosts: ldap-provider-rep
   become: yes
   vars:
     domains:
-      - domain: ldap-provider.fablab-luebeck.de
+      - domain: ldap-provider-rep.fablab-luebeck.de
         target_ip: 192.168.8.211
         certificate: yes
     mqtt: no
+    apache: no
   tasks:
+    - name: Update package list
+      apt:
+        update_cache: yes
+    - name: Install necessary software
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+        - slapd
+        - ldap-utils
+    - name: "Configure slapd"
+      debconf:
+        name: slapd
+        question: "{{ item.question }}"
+        value: "{{ item.value }}"
+        vtype: "{{ item.type }}"
+      loop: "{{ values }}"
+      vars:
+        values:
+        - question: "slapd/no_configuration"
+          value: "false"
+          type: boolean
+        - question: "slapd/domain"
+          value: "ldap-provider-rep.fablab-luebeck.de"
+          type: text
+        - question: "slapd/move_old_database"
+          value: "true"
+          type: boolean
+        - question: "slapd/purge_database"
+          value: "false"
+          type: boolean
+        - question: "shared/organization"
+          value: "FabLab Luebeck e.V."
+          type: text
+        - question: "slapd/password1"
+          value: "{{ vault_ldap_admin_password }}"
+          type: password
+        - question: "slapd/password2"
+          value: "{{ vault_ldap_admin_password }}"
+          type: password
+      notify:
+      - reconfigure slapd
+    - name: Create scripts folder
+      file:
+        path: /root/scripts
+        state: directory
+        owner: root
+        group: root
+        mode: 0750
     - name: Place certificate download script
       template:
         src: ../downloadCertificates.sh.j2
         dest: /root/scripts/downloadCertificates.sh
+      notify:
+      - download certificates
     - name: Update script permissions
       file:
         path: /root/scripts/downloadCertificates.sh
@@ -20,9 +73,38 @@
         owner: root
         group: root
         state: file
+      notify:
+      - download certificates
     - name: Enable certificate downloads
       cron:
         name: certificates download
         minute: 0
         hour: 0
         job: "/root/scripts/downloadCertificates.sh > /var/log/downloadCertificate.log 2>&1 && /usr/sbin/service slapd restart"
+      notify:
+      - download certificates
+    - name: Copy certificate
+      copy:
+        src: id_certificates
+        dest: /root/.ssh/id_certificates
+        owner: root
+        group: root
+        mode: 0700
+        decrypt: yes
+      notify:
+      - download certificates
+  handlers:
+    - name: reconfigure slapd
+      command: dpkg-reconfigure -f noninteractive slapd
+      notify:
+      - restart slapd
+    - name: restart slapd
+      service:
+        name: slapd
+        state: restarted  
+    - name: download certificates
+      expect:
+        chdir: /root/scripts
+        command: /root/scripts/downloadCertificates.sh
+        responses:
+          "Are you sure you want to continue connecting": "yes"
