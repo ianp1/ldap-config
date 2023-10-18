@@ -1,5 +1,5 @@
 ---
-- name: Setup LDAP-Webinterface
+- name: Setup old LDAP-Webinterface and dns server
   hosts: ldap-web:ldap-provider
   become: yes
   vars:
