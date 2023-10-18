@@ -1,0 +1,41 @@
+<?php
+//General setup
+	$lang = "de";
+	$keyphrase = "{{vault_ssp_passphrase}}";
+
+	$default_action = "sendtoken";
+	$use_change = false;
+	$show_menu = false;
+
+//LDAP setup
+	$ldap_url = "ldap://ldap-provider.fablab-luebeck.de:389";
+	$ldap_starttls = true;
+
+	$ldap_base = "ou=user,dc=ldap-provider,dc=fablab-luebeck";
+	$ldap_filter = "(&(objectClass=inetOrgPerson)(uid={login}))";
+
+	$ldap_binddn = "{{vault_ssp_ldap_bind_dn}}";
+	$ldap_bindpw = "{{vault_ssp_ldap_bind_pw}}";
+
+//Encryption
+	$hash = "CRYPT";
+	$hash_options['crypt_salt_prefix'] = "$6$";
+	$pwd_min_length = 5;
+
+//Mail reset setup
+	$crypt_tokens = true;
+	$token_lifetime = "3600";
+
+//Mail settings
+	$mail_from = "team@fablab-luebeck.de";
+	$mail_from_name = "FabLab Password Service";
+
+	$mail_smtp_host = 'w011e2a4.kasserver.com';
+	$mail_smtp_auth = true;
+	$mail_smtp_user = '{{vault_ssp_smtp_user}}';
+	$mail_smtp_pass = '{{vault_ssp_smtp_pw}}';
+	$mail_smtp_port = 587;
+//Customization
+	$custom_css = "css/custom.css";
+	$logo = "images/LogoFablabLuebeckBig.svg";
+?>
