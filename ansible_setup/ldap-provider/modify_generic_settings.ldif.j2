@@ -1,0 +1,7 @@
+dn: cn=config
+changetype: modify
+replace: olcPasswordCryptSaltFormat
+olcPasswordCryptSaltFormat: $6$%.16s 
+-
+replace: olcPasswordHash
+olcPasswordHash: {CRYPT}

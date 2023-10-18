@@ -1,0 +1,13 @@
+dn: cn=config
+changetype: modify
+replace: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/ssl/{{ openldap_server_domain }}/cert.pem
+-
+replace: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/ssl/{{ openldap_server_domain }}/privkey.pem
+-
+replace: olcTLSCACertificateFile
+olcTLSCACertificateFile: /etc/ssl/{{ openldap_server_domain }}/fullchain.pem
+-
+add: olcSecurity
+olcSecurity: tls=1
