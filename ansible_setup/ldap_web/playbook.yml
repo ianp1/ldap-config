@@ -39,6 +39,18 @@
           identifier: ldap_module
         - name: ssl
           identifier: ssl_module
+        - name: rewrite
+          identifier: rewrite_module
+    - name: Enable .htaccess for webinterface
+      blockinfile:
+        path: /etc/apache2/apache2.conf
+        marker: "# {mark} ldap_web ANSIBLE MANAGED BLOCK - DO NOT EDIT THIS BLOCK"
+        block: |
+          <Directory /var/www/html/mitglied-web>
+            AllowOverride All
+          </Directory>
+      notify:
+        - restart apache
     - name: Copy ldap-webinterface files
       synchronize:
         src: "../../mitglied_web/dist/mitglied-web"
