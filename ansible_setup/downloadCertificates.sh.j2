@@ -14,6 +14,6 @@ scp -i /root/.ssh/id_certificates certificates@fablab-luebeck.de:/etc/letsencryp
 {% if apache is not defined or apache %}
 /usr/sbin/service apache2 restart
 {% endif %}
-{% if mqtt %}
+{% if mqtt is defined and mqtt %}
 /usr/sbin/service mosquitto restart
 {% endif %}
