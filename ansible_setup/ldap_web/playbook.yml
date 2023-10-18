@@ -1,0 +1,124 @@
+---
+- name: Setup replacement ldap-webinterface
+  hosts: ldap-web-rep
+  become: yes
+  vars:
+    domains:
+# Remember to place a dns rebind protection exception in your router!
+    - domain: login-rep.fablab-luebeck.de
+      target_ip: 192.168.8.211
+      certificate: yes
+    - domain: einweisungen-rep.fablab-luebeck.de
+      target_ip: 192.168.8.211
+      certificate: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+    - name: Install packages
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+        - apache2
+        - php8.1
+        - libapache2-mod-php8.1
+        - php8.1-ldap
+    - name: Enable apache modules
+      apache2_module:
+        name: "{{ item.name }}"
+        identifier: "{{ item.identifier }}"
+        state: present
+      loop: "{{ modules }}"
+      vars:
+        modules:
+        - name: php8.1
+          identifier: php_module
+        - name: ldap
+          identifier: ldap_module
+        - name: ssl
+          identifier: ssl_module
+    - name: Copy ldap-webinterface files
+      synchronize:
+        src: "../../mitglied_web/dist/mitglied-web"
+        dest: "/var/www/html"
+        mode: push
+    - name: set owner and permission on webinterface files
+      file:
+        path: "/var/www/html"
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: 0755
+        recurse: yes
+    - name: Create scripts folder
+      file:
+        path: /root/scripts
+        state: directory
+        owner: root
+        group: root
+        mode: 0750
+    - name: Place certificate download script
+      template:
+        src: ../downloadCertificates.sh.j2
+        dest: /root/scripts/downloadCertificates.sh
+    - name: Update script permissions
+      file:
+        path: /root/scripts/downloadCertificates.sh
+        mode: 700
+        owner: root
+        group: root
+        state: file
+    - name: Enable certificate downloads
+      cron:
+        name: certificates download
+        minute: 0
+        hour: 0
+        job: "/root/scripts/downloadCertificates.sh > /var/log/downloadCertificate.log 2>&1 && /usr/sbin/service slapd restart"
+    - name: Copy certificate download identity file
+      copy:
+        src: ../id_certificates
+        dest: /root/.ssh/id_certificates
+        owner: root
+        group: root
+        mode: 0700
+        decrypt: yes
+#    - name: download certificates
+#      expect:
+#        chdir: /root/scripts
+#        command: /root/scripts/downloadCertificates.sh
+#        responses:
+#          "Are you sure you want to continue connecting": "yes"
+    - name: setup apache to use einweisung certificates
+      template:
+        src: einweisungen.conf.j2
+        dest: /etc/apache2/sites-available/{{item.id}}-{{item.name}}.conf
+        owner: root
+        group: root
+        mode: 0644
+      loop: "{{ elements }}"
+      vars:
+        elements:
+          - name: "einweisungen"
+            id: "000"
+          - name: "login"
+            id: "001"
+      notify:
+        - restart apache
+    - name: enable apache site
+      command: a2ensite {{item.id}}-{{item.name}}.conf
+      loop: "{{ elements }}"
+      vars:
+        elements:
+          - name: "einweisungen"
+            id: "000"
+          - name: "login"
+            id: "001"
+      notify:
+        - restart apache
+  handlers:
+    - name: restart apache
+      service:
+        name: apache2
+        state: restarted  

@@ -1,0 +1,12 @@
+<IfModule mod_ssl.c>
+	<VirtualHost _default_:443>
+		ServerAdmin webmaster@localhost
+
+		DocumentRoot /var/www/html/mitglied-web
+
+        SSLEngine on
+
+        SSLCertificateFile /etc/ssl/einweisungen-rep.fablab-luebeck.de/cert.pem
+        SSLCertificateKeyFile /etc/ssl/einweisungen-rep.fablab-luebeck.de/privkey.pem
+    </VirtualHost>
+</IfModule>
