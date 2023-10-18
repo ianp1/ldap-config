@@ -72,6 +72,36 @@
                   "maximumError": "5mb"
                 }
               ]
+            },
+            "production-rep":{
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.rep.prod.ts"
+                }
+              ],
+              "optimization":{
+                "scripts": true,
+                "styles": {
+                   "minify": true,
+                   "inlineCritical": false
+                },
+                "fonts": true
+              },
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
             }
           },
           "defaultConfiguration": ""
