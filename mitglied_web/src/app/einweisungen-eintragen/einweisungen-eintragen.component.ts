@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppComponent } from '../app.component';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -28,14 +28,14 @@ export class EinweisungenEintragenComponent implements OnInit {
 
   userSelected: User;
 
-  loginForm: UntypedFormGroup;
+  loginForm: FormGroup;
 
   @ViewChild('usersearch', {static: false})
   usersearch:UserSearchComponent;
 
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
-              private formBuilder:UntypedFormBuilder, public dialog:MatDialog,
+              private formBuilder:FormBuilder, public dialog:MatDialog,
               private loginService:LoginService ) {
   }
 

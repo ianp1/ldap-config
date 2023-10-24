@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { AppComponent } from '../app.component';
 
 import * as fileSaver from 'file-saver';
@@ -12,10 +12,10 @@ import { LoginService } from '../login/login.service';
   styleUrls: ['./abrechnung-exportieren.component.scss']
 })
 export class AbrechnungExportierenComponent implements OnInit {
-  pricesForm : UntypedFormGroup;
+  pricesForm : FormGroup;
 
   constructor(public http: HttpClient, public appComponent: AppComponent, 
-        public loginService: LoginService, private formBuilder: UntypedFormBuilder) { 
+        public loginService: LoginService, private formBuilder: FormBuilder) { 
 
   }
 

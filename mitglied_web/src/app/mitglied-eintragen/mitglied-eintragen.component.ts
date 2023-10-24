@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -18,10 +18,10 @@ import { User } from '../models/user.model';
 export class MitgliedEintragenComponent implements OnInit {
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
-              private formBuilder:UntypedFormBuilder, public dialog:MatDialog,
+              private formBuilder:FormBuilder, public dialog:MatDialog,
               private loginService:LoginService) { }
 
-  loginForm: UntypedFormGroup;
+  loginForm: FormGroup;
   userSelected: User;
   valid: boolean = false;
 

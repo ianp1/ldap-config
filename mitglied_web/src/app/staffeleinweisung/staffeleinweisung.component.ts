@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpHeaders, HttpParams, HttpClient } from '@angular/common/http';
 import { AppComponent } from '../app.component';
 import { LoginService } from '../login/login.service';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { Geraet } from '../models/einweisung.model';
@@ -16,11 +16,11 @@ import { User } from '../models/user.model';
 export class StaffeleinweisungComponent implements OnInit {
 
   constructor(private appComponent:AppComponent, private loginService:LoginService,
-            private http:HttpClient, private formBuilder: UntypedFormBuilder, private dialog: MatDialog) { }
+            private http:HttpClient, private formBuilder: FormBuilder, private dialog: MatDialog) { }
 
   maschinen:Geraet[];
   userSelected: User;
-  loginForm: UntypedFormGroup;
+  loginForm: FormGroup;
 
 
   get loginControls() { return this.loginForm.controls; }

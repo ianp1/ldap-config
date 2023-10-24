@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,12 +16,12 @@ import { User } from '../models/user.model';
 export class MitgliedTeilComponent implements OnInit {
 
 
-  detailForm: UntypedFormGroup;
+  detailForm: FormGroup;
   inhaber: User;
   neuesMitglied: User;
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
-    private formBuilder:UntypedFormBuilder, public dialog:MatDialog,
+    private formBuilder:FormBuilder, public dialog:MatDialog,
     private loginService:LoginService) { }
 
   ngOnInit() {

@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { AppComponent } from '../app.component';
 
@@ -20,13 +20,13 @@ export class LoginComponent implements OnInit {
   loginValid : boolean = false;
   pending : boolean = true;
 
-  formGroup : UntypedFormGroup;
+  formGroup : FormGroup;
 
   @Output()
   validLogin = new EventEmitter<boolean>();
 
   constructor(public appComponent:AppComponent, public http:HttpClient,
-              private formBuilder: UntypedFormBuilder, private loginService: LoginService) {
+              private formBuilder: FormBuilder, private loginService: LoginService) {
 
     this.initForm();
   }

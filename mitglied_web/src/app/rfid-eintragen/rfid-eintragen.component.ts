@@ -3,7 +3,7 @@ import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { UntypedFormGroup, UntypedFormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
@@ -18,7 +18,7 @@ import { User } from '../models/user.model';
   styleUrls: ['./rfid-eintragen.component.scss']
 })
 export class RfidEintragenComponent implements OnInit {
-  loginForm: UntypedFormGroup;
+  loginForm: FormGroup;
 
   userSelected : User;
 
@@ -31,7 +31,7 @@ export class RfidEintragenComponent implements OnInit {
   userSearch;
 
   constructor(public dialog: MatDialog, private appComponent:AppComponent,
-              private http:HttpClient, private formBuilder: UntypedFormBuilder,
+              private http:HttpClient, private formBuilder: FormBuilder,
               private loginService:LoginService) { }
 
   initForm() {

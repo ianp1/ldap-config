@@ -3,7 +3,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
@@ -18,13 +18,13 @@ import { User } from '../models/user.model';
   styleUrls: ['./sicherheitsbelehrung-eintragen.component.scss']
 })
 export class SicherheitsbelehrungEintragenComponent implements OnInit {
-  sicherheitForm: UntypedFormGroup;
+  sicherheitForm: FormGroup;
 
 
   get sicherheitControls() { return this.sicherheitForm.controls; }
 
   constructor(public dialog: MatDialog, private appComponent:AppComponent,
-              private http:HttpClient, private formBuilder : UntypedFormBuilder,
+              private http:HttpClient, private formBuilder : FormBuilder,
               private loginService:LoginService) {
 
   }
