@@ -9,7 +9,7 @@
   line-height: math.div($size * 5, 9);
   background-color: $iconBackground;
 
-  .mat-icon, .mat-icon-button i {
+  .mat-icon, .mat-mdc-icon-button i {
     line-height: math.div($size, 2) - $iconOffset;
     color:$iconColor;
   }
@@ -55,6 +55,6 @@
   margin-left:20px;
 }
 
-.mat-dialog-content {
+.mat-mdc-dialog-content {
   margin-top:20px;
 }

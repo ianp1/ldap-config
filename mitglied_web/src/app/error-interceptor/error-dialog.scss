@@ -10,7 +10,7 @@
   background-color: white;
 
 
-  .mat-icon, .mat-icon-button i {
+  .mat-icon, .mat-mdc-icon-button i {
     line-height: math.div($size, 2);
     color:mat.get-color-from-palette($customWarn, 500);
   }
@@ -48,6 +48,6 @@
   margin-left:20px;
 }
 
-.mat-dialog-content {
+.mat-mdc-dialog-content {
   margin-top:20px;
 }

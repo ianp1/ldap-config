@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { LoginService } from '../login/login.service';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';

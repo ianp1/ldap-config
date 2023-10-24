@@ -4,7 +4,7 @@ import { AppComponent } from '../app.component';
 import { LoginService } from '../login/login.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { SuccessDialog } from '../success-dialog/success-dialog';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'meine-daten',

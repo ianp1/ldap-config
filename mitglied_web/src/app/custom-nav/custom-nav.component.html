@@ -77,7 +77,7 @@
         </div>
       </div>
     </mat-toolbar>
-    <mat-card class="page_container">
+    <mat-card appearance="outlined" class="page_container">
       <div *ngIf="entry!='start'">
         <login
           (validLogin)="valid=$event;updateMenuEntries()"

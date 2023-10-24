@@ -8,7 +8,7 @@
   padding-right: 40px;
 }
 
-.login-mask .mat-spinner, .login-mask form {
+.login-mask .mat-mdc-progress-spinner, .login-mask form {
   margin-left: 15px;
   display: inline;
 }
@@ -25,7 +25,7 @@
 
 @mixin inputColor($color) {
   color:$color;
-
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
   ::ng-deep .mat-form-field-underline {
     background-color:$color;
   }
@@ -33,27 +33,27 @@
   ::ng-deep input {
     caret-color:$color;
   }
-
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
   &.mat-focused ::ng-deep .mat-form-field-ripple {
     background-color:$color;
   }
-
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
   ::ng-deep .mat-form-field-label {
     color:$color;
   }
 }
 
-.mat-form-field {
+.mat-mdc-form-field {
   margin-left:15px;
 }
 
-.mat-form-field {
+.mat-mdc-form-field {
   &.invalid {
     @include inputColor(red);
   }
 }
 
-.mat-form-field {
+.mat-mdc-form-field {
   &.valid {
     @include inputColor(green);
   }

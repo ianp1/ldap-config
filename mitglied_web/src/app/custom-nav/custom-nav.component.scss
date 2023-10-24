@@ -34,7 +34,7 @@
   z-index: 1000;
 }
 
-.mat-tab-header ::ng-deep {
+.mat-mdc-tab-header ::ng-deep {
   display: none !important;
 }
 
@@ -106,7 +106,7 @@
   margin-bottom: 70px;
 }
 
-.mat-nav-list .mat-list-item {
+.mat-nav-list .mat-mdc-list-item {
   padding-left: 40px;
 }
 
@@ -114,6 +114,6 @@
   padding-left: 20px;
 }
 
-.mat-list-item {
+.mat-mdc-list-item {
   width: auto !important;
 }
