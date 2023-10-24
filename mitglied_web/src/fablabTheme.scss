@@ -18,7 +18,18 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
+/*
 
+
+$candy-app-primary: mat.define-palette($customPrimary);
+$candy-app-accent:  mat.define-palette($customAccent);
+
+// The warn palette is optional (defaults to red).
+$candy-app-warn:    mat.define-palette($customWarn);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$candy-app-theme: mat.define-light-theme($candy-app-primary, $candy-app-accent, $candy-app-warn);
+*/
 $customPrimary : (
     50: #6590aa,
     100: #57849e,
@@ -48,7 +59,7 @@ $customPrimary : (
       A100: rgba(black, 0.87),
       A200: white,
       A400: white,
-      A700: white,
+      A700: white
     )
 );
 
@@ -118,16 +129,22 @@ $customWarn: (
     )
 );
 
-$candy-app-primary: mat.define-palette($customPrimary);
-$candy-app-accent:  mat.define-palette($customAccent, A200, A100, A400);
 
-// The warn palette is optional (defaults to red).
-$candy-app-warn:    mat.define-palette($customWarn);
+$my-app-primary: mat.define-palette($customPrimary);
+$my-app-accent:  mat.define-palette($customAccent);
+$my-app-warn:    mat.define-palette($customWarn);
 
-// Create the theme object (a Sass map containing all of the palettes).
-$candy-app-theme: mat.define-light-theme($candy-app-primary, $candy-app-accent, $candy-app-warn);
+$my-app-theme: mat.define-light-theme((
+  color: (
+    primary: $my-app-primary, 
+    accent: $my-app-accent, 
+    warn: $my-app-warn
+  )
+));
+
+
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
-@include mat.all-component-themes($candy-app-theme);
+@include mat.all-component-themes($my-app-theme);

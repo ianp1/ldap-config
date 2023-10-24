@@ -18,14 +18,21 @@
 }
 
 .link-home {
-  font-size: 18px;
   margin-top: 0px;
   padding-left: 4px !important;
 
   .material-icons {
     margin-right: 15px;
+    margin-left: 10px;
+
+    font-size: 18px;
   }
 }
+
+#link-home-text {
+  font-size: 18px;
+}
+
 
 .close-menu {
   position: absolute;
@@ -106,8 +113,12 @@
   margin-bottom: 70px;
 }
 
-.mat-nav-list .mat-mdc-list-item {
+.mat-mdc-nav-list .mat-mdc-list-item {
   padding-left: 40px;
+}
+
+.mat-mdc-nav-list .mdc-list-item__content {
+  padding-left: 16px !important;
 }
 
 .sidenav h3 {
