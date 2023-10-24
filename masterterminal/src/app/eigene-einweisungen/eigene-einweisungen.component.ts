@@ -90,7 +90,7 @@ export class EigeneEinweisungenComponent implements OnInit {
             var date = new Date(this.appComponent.reformatLDAPDate(einweisung.datum));
 
             date.setFullYear(date.getFullYear() + 1);
-            var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
+            let diff = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
 
             console.log("einweisung: ", einweisung);
             console.log("activated: ", this.isActivated(einweisung))

@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
-import { Subject } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
-import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
 import { LoginService } from '../login/login.service';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'neues-mitglied',
@@ -23,7 +22,7 @@ export class MitgliedEintragenComponent implements OnInit {
               private loginService:LoginService) { }
 
   loginForm: UntypedFormGroup;
-  userSelected: any;
+  userSelected: User;
   valid: boolean = false;
 
   initForm() {
@@ -71,11 +70,11 @@ export class MitgliedEintragenComponent implements OnInit {
       geburtsdatum: this.appComponent.reformatLDAPDate(val['geburtstag']),
     });
 
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
@@ -83,12 +82,12 @@ export class MitgliedEintragenComponent implements OnInit {
       headers: headers,
       params: params
     }).subscribe(data => {
-      var beitragsDate = '';
+      let beitragsDate = '';
       if (data['beitragsanpassungBis'] && data['beitragsanpassungBis']!='') {
         beitragsDate = this.appComponent.reformatLDAPDate(data['beitragsanpassungBis']);
       }
 
-      var mitgliedDate = '';
+      let mitgliedDate = '';
       if (data['beginnMitgliedschaft'] && data['beginnMitgliedschaft'] != '') {
         mitgliedDate = this.appComponent.reformatLDAPDate(data['beginnMitgliedschaft']);
       }
@@ -120,14 +119,14 @@ export class MitgliedEintragenComponent implements OnInit {
   }
 
   mitgliedEintragen() {
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
-    var dn = this.appComponent.sanitize(this.userSelected.dn);
+    const dn = this.appComponent.sanitize(this.userSelected.dn);
 
-    var values = {};
+    const values = {};
     Object.keys(this.loginForm.controls).forEach(key=> {
-      var value = this.appComponent.sanitize(this.loginForm.value[key]);
+      let value = this.appComponent.sanitize(this.loginForm.value[key]);
       if (key == "geburtsdatum" || key == "beitragsanpassungBis" || key == "beginnMitgliedschaft") {
         if (value != "") {
           value = this.appComponent.formatLDAPDate(value);
@@ -144,7 +143,7 @@ export class MitgliedEintragenComponent implements OnInit {
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Mitglied/'+dn, values).subscribe(data=>{
       if (data) {
         const dialogRef = this.dialog.open(SuccessDialog);
-        dialogRef.afterClosed().subscribe(data => {
+        dialogRef.afterClosed().subscribe(() => {
           this.initForm();
         });
       }
@@ -152,7 +151,7 @@ export class MitgliedEintragenComponent implements OnInit {
       //400: Fehlende Daten
       //Sonst: Anderer Fehler
       if (error.status === 400) {
-        let dialogRef = this.dialog.open(SuccessDialog, {
+        this.dialog.open(SuccessDialog, {
           data : {
             icon:"error",
             icon_class: "iconError",

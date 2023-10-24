@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 
 import { AppComponent } from '../app.component';
 
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
 import { LoginService } from './login.service';
 
@@ -32,10 +32,8 @@ export class LoginComponent implements OnInit {
   }
 
   initForm() {
-    var username = "";
-    var password = "";
-    var useCurrentDate = true;
-    var date = new Date();
+    let username = "";
+    let password = "";
 
     if (typeof this.formGroup !== 'undefined') {
       username = this.formGroup.value["username"];
@@ -52,19 +50,19 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.userQueryChanged
         .pipe(debounceTime(500))
-        .subscribe(model => {
+        .subscribe(() => {
           this.validating = true;
-          var user = this.appComponent.sanitize(this.formGroup.value["username"]);
-          var passw = this.appComponent.sanitize(this.formGroup.value["password"]);
-          var headers = new HttpHeaders();
-          var params = new HttpParams();
+          const user = this.appComponent.sanitize(this.formGroup.value["username"]);
+          const passw = this.appComponent.sanitize(this.formGroup.value["password"]);
+          const headers = new HttpHeaders();
+          let params = new HttpParams();
           params = params.append('author_user', user);
           params = params.append('author_password', passw);
 
           this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Authentifizierung', {
             headers: headers,
             params: params
-          }).subscribe(data =>{
+          }).subscribe(() =>{
               this.loginService.password = passw;
               this.loginService.username = user;
               this.validating = false;
@@ -73,6 +71,7 @@ export class LoginComponent implements OnInit {
               this.pending = false;
             },
             error => {
+              console.log("error logging in: ", error);
               this.validating = false;
               this.validLogin.emit(false);
               this.pending = false;

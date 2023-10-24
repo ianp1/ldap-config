@@ -11,7 +11,10 @@ import { AppComponent } from '../app.component';
 })
 export class SummaryPageComponent implements OnInit {
 
-  changes:{"einweisungen":any, "sicherheitsbelehrungen":any};
+
+  changes:Changes;
+
+
   columnsEinweisungen = ['geraet', 'eingewiesener', 'einweisungsdatum', 'edit'];
 
   columnsSicherheitsbelehrungen = ['eingewiesener', 'einweisungsdatum'];
@@ -29,35 +32,31 @@ export class SummaryPageComponent implements OnInit {
   }
 
   updateSummary() {
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisungen/Recent', {
+    this.http.get<Changes>(this.appComponent.url_base+'api/v1.0/index.php/Einweisungen/Recent', {
       headers:headers,
       params:params
     }).subscribe(data => {
-      console.log(data);
+      console.log("changes: ", data);
 
-      //this.changes = <Array<any>>data;
-      this.changes = {
-        "einweisungen":<Array<any>>data["einweisungen"],
-        "sicherheitsbelehrungen":<Array<any>>data["sicherheitsbelehrung"]
-      };
+      this.changes = data;
       console.log(this.changes);
     });
   }
 
   widerrufe(dn) {
     console.log("widerrufe ", dn);
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const  passw = this.appComponent.sanitize(this.loginService.password);
 
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
@@ -65,8 +64,22 @@ export class SummaryPageComponent implements OnInit {
     this.http.delete(this.appComponent.url_base+'api/v1.0/index.php/Einweisungen/'+dn, {
       headers: headers,
       params: params
-    }).subscribe(data => {
+    }).subscribe(() => {
       this.updateSummary();
     });
   }
+}
+
+class Changes {
+  einweisungen: EinweisungResponse[] = [];
+  sicherheitsbelehrungen: EinweisungResponse[] = [];
+
+}
+
+class EinweisungResponse {
+  cn: string;
+  geburtstag: string;
+  sicherheitsbelehrung: string;
+  geraetname: string;
+  sn: string;
 }

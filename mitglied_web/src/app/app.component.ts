@@ -64,8 +64,13 @@ export class AppComponent {
     this.setInactivity();
   }
 
-  formatLDAPDate(date:any):string {
-    return formatDate(date, 'yyyyMMdd', 'de-DE')+'000000Z'
+  formatLDAPDate(date:unknown):string {
+    
+    if (typeof date === 'string' || typeof date === 'number' || date instanceof Date) {
+      return formatDate(date, 'yyyyMMdd', 'de-DE')+'000000Z';
+    } 
+
+    return date + "";
   }
 
   reformatLDAPDate(date:string):string {
@@ -73,7 +78,7 @@ export class AppComponent {
   }
 
   compareLDAPDates(date1:string, date2:string):boolean {
-    for (var i = 0; i < 8; i++) {
+    for (let i = 0; i < 8; i++) {
       if (parseInt(date1[i]) > parseInt(date2[i])) {
         return true;
       }

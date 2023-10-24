@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { AppComponent } from '../app.component';
 
 import * as fileSaver from 'file-saver';
@@ -35,16 +35,16 @@ export class AbrechnungExportierenComponent implements OnInit {
   }
 
   download() {
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
-    var params = {
+    const params = {
       'author_user' : user,
       'author_password' : passw
     };
 
-    let prices = JSON.stringify(this.pricesForm.value);
-    let date = this.appComponent.formatLDAPDate(this.appComponent.sanitize(this.pricesForm.value['abrechnungsdatum']));
+    const prices = JSON.stringify(this.pricesForm.value);
+    const date = this.appComponent.formatLDAPDate(this.appComponent.sanitize(this.pricesForm.value['abrechnungsdatum']));
     this.http.post<Blob>(this.appComponent.url_base+'api/v1.0/index.php/Abrechnung/'+date+'/' + 
         this.appComponent.encodeURL(prices), params, {
           responseType: 'blob' as 'json'

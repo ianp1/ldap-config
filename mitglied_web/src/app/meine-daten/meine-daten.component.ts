@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { AppComponent } from '../app.component';
 import { LoginService } from '../login/login.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { SuccessDialog } from '../success-dialog/success-dialog';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'meine-daten',
@@ -53,11 +53,11 @@ export class MeineDatenComponent implements OnInit {
   }
 
   datenPrefil() {
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
@@ -85,12 +85,12 @@ export class MeineDatenComponent implements OnInit {
   }
 
   datenSpeichern() {
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
-    var values = {};
+    const values = {};
     Object.keys(this.dataForm.controls).forEach(key=> {
-      var value = this.appComponent.sanitize(this.dataForm.value[key]);
+      let value = this.appComponent.sanitize(this.dataForm.value[key]);
       if (key == "geburtsdatum") {
         if (value != "") {
           value = this.appComponent.formatLDAPDate(value);
@@ -107,7 +107,7 @@ export class MeineDatenComponent implements OnInit {
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Person/'+user, values).subscribe(data=>{
       if (data) {
         const dialogRef = this.dialog.open(SuccessDialog);
-        dialogRef.afterClosed().subscribe(data => {
+        dialogRef.afterClosed().subscribe(() => {
           this.initForm();
           this.datenPrefil();
         });
@@ -116,7 +116,7 @@ export class MeineDatenComponent implements OnInit {
       //400: Fehlende Daten
       //Sonst: Anderer Fehler
       if (error.status === 400) {
-        let dialogRef = this.dialog.open(SuccessDialog, {
+        this.dialog.open(SuccessDialog, {
           data : {
             icon:"error",
             icon_class: "iconError",

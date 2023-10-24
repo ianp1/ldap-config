@@ -10,6 +10,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { SuccessDialog } from '../success-dialog/success-dialog';
 
 import { LoginService } from '../login/login.service';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'rfid-vergeben',
@@ -19,12 +20,12 @@ import { LoginService } from '../login/login.service';
 export class RfidEintragenComponent implements OnInit {
   loginForm: UntypedFormGroup;
 
-  userSelected : any;
+  userSelected : User;
 
   showRfidWarning : boolean = false;
 
   searching:boolean = false;
-  users:any = [];
+  users:User[] = [];
 
   @ViewChild('usersearch', {static: false})
   userSearch;
@@ -36,6 +37,7 @@ export class RfidEintragenComponent implements OnInit {
   initForm() {
     this.loginForm = this.formBuilder.group({
       eingewiesener: [''],
+      // eslint-disable-next-line no-useless-escape
       rfid: ['', [Validators.required, this.regexValidator(/^(([0-9a-fA-F]{1,2}[\_\ ]){3}[0-9a-fA-F]{1,2}|[0-9a-fA-F]{4,8}|(([0-9a-fA-F]{1,2}[\_\ ]){6}[0-9a-fA-F]{1,2}))$/im)]]
     });
   }
@@ -45,26 +47,28 @@ export class RfidEintragenComponent implements OnInit {
   }
 
   enterRfid() {
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
-    var updateUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
-    var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
+    
+    const updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
+    
     console.log(this.loginForm.value['rfid']);
     console.log(this.appComponent.sanitize(this.loginForm.value['rfid']));
     console.log(updateRfid);
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
+    const  headers = new HttpHeaders();
+    let params = new HttpParams();
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid, {
+    this.http.get<User[]>(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid, {
       headers: headers,
       params: params
     }).subscribe(data => {
+      console.log("requested rfid users: ", data);
 
-      var ar = data as Array<any>;
-      let pickDialog = this.dialog.open(DialogRfidExisting, {
-        data : {users:ar}
+      //var ar = data as Array<any>;
+      const pickDialog = this.dialog.open<DialogRfidExisting, DialogRfidExistingData>(DialogRfidExisting, {
+        data : {users:data}
       })
       pickDialog.afterClosed().subscribe(result => {
         if (result) {
@@ -84,7 +88,7 @@ export class RfidEintragenComponent implements OnInit {
     });
   }
 
-  prefillRFID(user:any) {
+  prefillRFID(user:User) {
     this.userSelected = user;
     if (typeof user.rfid !== 'undefined' && user.rfid != '' && user.rfid !== null) {
       this.showRfidWarning = true;
@@ -100,14 +104,14 @@ export class RfidEintragenComponent implements OnInit {
     }
   }
 
-  connectRFID(user:string, passw:string, updateRfid:string, updateUser:Object):void {
-    var params = {
+  connectRFID(user:string, passw:string, updateRfid:string, updateUser:User):void {
+    const params = {
       'author_user' : user,
       'author_password' : passw
     };
-    var updateDN = this.appComponent.encodeURL(this.appComponent.sanitize(updateUser["dn"]));
+    const updateDN = this.appComponent.encodeURL(this.appComponent.sanitize(updateUser["dn"]));
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid+'/'+updateDN, params)
-      .subscribe(data => {
+      .subscribe(() => {
         const dialogRef = this.dialog.open(SuccessDialog, {
           data : {
             customText : "Der neue Besitzer wurde eingetragen. Bitte trage jetzt<br/>"+
@@ -117,11 +121,11 @@ export class RfidEintragenComponent implements OnInit {
             "in der neuen Karte ein und werfe die <b>Kosten (2€)</b> in die vorgesehene Kasse",
           }
         });
-        dialogRef.afterClosed().subscribe(data => {
+        dialogRef.afterClosed().subscribe(() => {
           this.initForm();
           this.userSearch.select();
         });
-      }, error => {
+      }, () => {
 
       });
   }
@@ -131,7 +135,7 @@ export class RfidEintragenComponent implements OnInit {
   }
 
   regexValidator(reg: RegExp): ValidatorFn {
-    return (control: AbstractControl): {[key: string]: any} | null => {
+    return (control: AbstractControl): {[key: string]: unknown} | null => {
       const forbidden = reg.test(control.value);
       console.log("regex validator: ", forbidden);
       return forbidden ? null : {'forbiddenName': {value: control.value}};
@@ -141,7 +145,7 @@ export class RfidEintragenComponent implements OnInit {
 
 
 export interface DialogRfidExistingData {
-  users:any[];
+  users:User[];
 }
 
 export interface DialogRfidExistingColumn {
@@ -159,15 +163,15 @@ export interface DialogRfidExistingColumn {
 })
 export class DialogRfidExisting {
   displayedColumns: string[] = ['Name', 'UID', 'DN'];
-  dataArray: any[];
+  dataArray: User[];
   interfacestring: DialogRfidExistingColumn[];
   constructor (public dialogRef: MatDialogRef<DialogRfidExisting>,
         @Inject(MAT_DIALOG_DATA) public data: DialogRfidExistingData) {
-    this.dataArray = data.users as any[];
+    this.dataArray = data.users;
     this.interfacestring = this.dataArray.map(obj => {
       return {
-        vorname:obj.cn,
-        nachname:obj.sn,
+        vorname:obj.vorname,
+        nachname:obj.nachname,
         uid:obj.uid,
         dn:obj.dn,
         geburtstag:obj.geburtstag

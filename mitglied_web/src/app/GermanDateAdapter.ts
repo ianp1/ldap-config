@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class GermanDateAdapter extends NativeDateAdapter{
-  parse (value : any) : Date | null {
+  parse (value : unknown) : Date | null {
     console.log("parse: ", value);
     if ((typeof value === 'string') && (value.indexOf('.') > -1)) {
       const str = value.split('.');
@@ -13,11 +13,13 @@ export class GermanDateAdapter extends NativeDateAdapter{
       }
       return new Date(Number(str[2]), Number(str[1]) - 1, Number(str[0]), 12);
     }
-    console.log("value after : ", value);
-    const timestamp = typeof value === 'number' ? value : Date.parse(value);
+    if (typeof value === 'string') {
+      console.log("value after : ", value);
+      const timestamp = typeof value === 'number' ? value : Date.parse(value);
+      console.log("timestamp ", timestamp);
+      return isNaN(timestamp) ? null : new Date(timestamp);
+    }
 
-
-    console.log("timestamp ", timestamp);
-    return isNaN(timestamp) ? null : new Date(timestamp);
+    return null;
   }
 }

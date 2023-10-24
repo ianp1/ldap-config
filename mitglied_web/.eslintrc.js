@@ -6,4 +6,11 @@ module.exports = {
       'eslint:recommended',
       'plugin:@typescript-eslint/recommended'
     ],
+    ignorePatterns: [
+      "node_modules/",
+      "dist/",
+      "karma.conf.js",
+      "e2e/",
+      ".eslintrc.js"
+    ]
   };

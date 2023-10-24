@@ -3,12 +3,15 @@ import { AppComponent } from '../app.component';
 
 import { Subject } from 'rxjs';
 
-import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { debounceTime, map } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
 import { LoginService } from '../login/login.service';
+import { User } from '../models/user.model';
+import { Einweisung } from '../models/einweisung.model';
+import { EinweisungResponse } from './EinweisungResponse';
 
 @Component({
   selector: 'einweisungen-einsehen',
@@ -21,12 +24,12 @@ export class EigeneEinweisungenComponent implements OnInit {
   searching: boolean;
   validLogin: boolean = false;
 
-  users:any = [];
+  users:User[] = [];
 
-  einweisungen:any = null;
+  einweisungen:Einweisung[] = null;
 
   columnsToDisplay = ['geraet', 'datum'];
-  selectedUser:any;
+  selectedUser:User;
   ownUser: false;
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
@@ -43,33 +46,34 @@ export class EigeneEinweisungenComponent implements OnInit {
        showUser: ['']
     });
 
-    this.loginForm.get('ownUser').valueChanges.subscribe(value => {
+    this.loginForm.get('ownUser').valueChanges.subscribe(() => {
       this.einweisungen = null;
     });
 
     this.userQueryChanged
         .pipe(debounceTime(500))
         .subscribe(
-          model => {
-            var user = this.appComponent.sanitize(this.loginService.username);
-            var passw = this.appComponent.sanitize(this.loginService.password);
-            var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
+          () => {
+            const user = this.appComponent.sanitize(this.loginService.username);
+            const passw = this.appComponent.sanitize(this.loginService.password);
+            const searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
 
             if (searchTerm != "") {
               this.searching = true;
 
-              var headers = new HttpHeaders();
-              var params = new HttpParams();
+              const headers = new HttpHeaders();
+              let params = new HttpParams();
               params = params.append('author_user', user);
               params = params.append('author_password', passw);
 
-              this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
+              this.http.get<User[]>(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
                 headers: headers,
                 params: params
               }).subscribe(data => {
                 this.users=data;
                 this.searching = false;
               }, error => {
+                console.log("error searching users: ", error);
                 this.searching = false;
               });
             }
@@ -77,7 +81,7 @@ export class EigeneEinweisungenComponent implements OnInit {
         );
   }
 
-  userSelected(user:any) {
+  userSelected(user:User) {
     this.selectedUser = user;
     this.einweisungen = null;
   }
@@ -88,37 +92,49 @@ export class EigeneEinweisungenComponent implements OnInit {
   }
 
   showEinweisungen() {
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
-    var searchTerm = "";
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
+    let searchTerm = "";
     if (this.loginForm.value['ownUser']) {
       searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginService.username));
     } else {
       searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
     }
 
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/'+searchTerm, {
+    this.http.get<EinweisungResponse[]>(this.appComponent.url_base+'api/v1.0/index.php/Einweisung/'+searchTerm, {
       headers: headers,
       params: params
     }).subscribe(data => {
-      var requestData = <Array<any>> data;
+      console.log("einweisung response is: ", data);
 
-      var einweisung:any;
-      for (einweisung of requestData) {
-        console.log(einweisung);
-        console.log(einweisung.mentor);
-        if (einweisung.mentor) {
-          einweisung.class = 'valid';
+      const einweisungen:Einweisung[] = [];
+      
+      for (const einweisungResponse of data) {
+        const einweisung = new Einweisung();
+
+        if (einweisungResponse.sicherheitsbelehrung) {
+          einweisung.sicherheitsbelehrung = true;
         } else {
-          var date = new Date(this.appComponent.reformatLDAPDate(einweisung.datum));
+          //do this to prevent null values
+          einweisung.sicherheitsbelehrung = false;
+        }
+
+        einweisung.geraet = einweisungResponse.geraet;
+        einweisung.datum = einweisungResponse.datum;
+        if (einweisungResponse.mentor) {
+          einweisung.class = 'valid';
+          einweisung.mentor = true;
+        } else {
+          einweisung.mentor = false;
+          const date = new Date(this.appComponent.reformatLDAPDate(einweisungResponse.datum));
 
           date.setFullYear(date.getFullYear() + 1);
-          var diff:Number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
+          const diff:number = ((date.getTime() - new Date().getTime()) / 1000.0 / 60.0 / 60.0 / 24.0 / 31.0);
 
 
           if (diff > 3) {
@@ -129,8 +145,11 @@ export class EigeneEinweisungenComponent implements OnInit {
             einweisung.class = 'invalid';
           }
         }
+
+        einweisungen.push(einweisung);
       }
-      this.einweisungen = data;
+      console.log("einweisungen are: ", einweisungen);
+      this.einweisungen = einweisungen;
     });
   }
 }

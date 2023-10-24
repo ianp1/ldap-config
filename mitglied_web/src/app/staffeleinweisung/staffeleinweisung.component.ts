@@ -5,6 +5,8 @@ import { LoginService } from '../login/login.service';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { SuccessDialog } from '../success-dialog/success-dialog';
 import { MatDialog } from '@angular/material/dialog';
+import { Geraet } from '../models/einweisung.model';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'staffeleinweisung',
@@ -16,8 +18,8 @@ export class StaffeleinweisungComponent implements OnInit {
   constructor(private appComponent:AppComponent, private loginService:LoginService,
             private http:HttpClient, private formBuilder: UntypedFormBuilder, private dialog: MatDialog) { }
 
-  maschinen:any;
-  userSelected: any;
+  maschinen:Geraet[];
+  userSelected: User;
   loginForm: UntypedFormGroup;
 
 
@@ -34,16 +36,16 @@ export class StaffeleinweisungComponent implements OnInit {
   }
 
   updateMachines() {
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
     params = params.append('filter', "tiered");
 
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Maschinen', {
+    this.http.get<Geraet[]>(this.appComponent.url_base+'api/v1.0/index.php/Maschinen', {
       headers:headers,
       params:params
     }).subscribe(data => {
@@ -52,8 +54,8 @@ export class StaffeleinweisungComponent implements OnInit {
   }
 
   initForm() {
-    var username = "";
-    var password = "";
+    let username = "";
+    let password = "";
 
     if (typeof this.loginForm !== 'undefined') {
       username = this.loginForm.value["username"];
@@ -73,14 +75,14 @@ export class StaffeleinweisungComponent implements OnInit {
   selectUser(userEvent) {
     this.userSelected = userEvent;
     if (this.userSelected) {
-      var headers = new HttpHeaders();
-      var params = new HttpParams();
-      var user = this.appComponent.sanitize(this.loginService.username);
-      var passw = this.appComponent.sanitize(this.loginService.password);
+      const headers = new HttpHeaders();
+      let params = new HttpParams();
+      const user = this.appComponent.sanitize(this.loginService.username);
+      const passw = this.appComponent.sanitize(this.loginService.password);
 
-      var geraet = this.appComponent.encodeURL(this.appComponent.sanitize(
+      const geraet = this.appComponent.encodeURL(this.appComponent.sanitize(
               this.loginForm.value["maschine"]));
-      var searchedUser = userEvent.dn;
+      const searchedUser = userEvent.dn;
 
       params = params.append('author_user', user);
       params = params.append('author_password', passw);
@@ -100,22 +102,22 @@ export class StaffeleinweisungComponent implements OnInit {
 
   updateEntry() {
     if (this.userSelected) {
-      var params = new HttpParams();
-      var user = this.appComponent.sanitize(this.loginService.username);
-      var passw = this.appComponent.sanitize(this.loginService.password);
+      let params = new HttpParams();
+      const user = this.appComponent.sanitize(this.loginService.username);
+      const passw = this.appComponent.sanitize(this.loginService.password);
 
-      var geraet = this.appComponent.encodeURL(this.appComponent.sanitize(
+      const geraet = this.appComponent.encodeURL(this.appComponent.sanitize(
               this.loginForm.value["maschine"]));
-      var searchedUser = this.userSelected.dn;
+      const searchedUser = this.userSelected.dn;
 
       params = params.append('author_user', user);
       params = params.append('author_password', passw);
       params = params.append('aktiviert', this.loginForm.value["aktiviert"]);
       params = params.append('kommentar', this.loginForm.value["kommentar"]);
 
-      this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Staffeleinweisung/'+geraet+'/'+searchedUser, params).subscribe(data => {
-        var dialogRef = this.dialog.open(SuccessDialog);
-          dialogRef.afterClosed().subscribe(data => {
+      this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Staffeleinweisung/'+geraet+'/'+searchedUser, params).subscribe(() => {
+        const dialogRef = this.dialog.open(SuccessDialog);
+          dialogRef.afterClosed().subscribe(() => {
             this.initForm();
           });
       });

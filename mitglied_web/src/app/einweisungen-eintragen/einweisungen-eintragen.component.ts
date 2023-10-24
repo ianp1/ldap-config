@@ -11,6 +11,8 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
 
 import { LoginService } from '../login/login.service';
 import { UserSearchComponent } from '../user-search/user-search.component';
+import { Geraet } from '../models/einweisung.model';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'neue-einweisung',
@@ -21,10 +23,10 @@ import { UserSearchComponent } from '../user-search/user-search.component';
 export class EinweisungenEintragenComponent implements OnInit {
   searching: boolean = false;
 
-  maschinen:any = [];
-  users:any = [];
+  maschinen:Geraet[] = [];
+  users:User[] = [];
 
-  userSelected: any;
+  userSelected: User;
 
   loginForm: UntypedFormGroup;
 
@@ -41,11 +43,11 @@ export class EinweisungenEintragenComponent implements OnInit {
   get loginControls() { return this.loginForm.controls; }
 
   initForm() {
-    var username = "";
-    var password = "";
-    var maschine = "";
-    var date = new Date();
-    var useCurrentDate = true;
+    let username = "";
+    let password = "";
+    let maschine = "";
+    let date = new Date();
+    let useCurrentDate = true;
 
     if (typeof this.loginForm !== 'undefined') {
       username = this.loginForm.value["username"];
@@ -77,19 +79,20 @@ export class EinweisungenEintragenComponent implements OnInit {
 
   updateMachines() {
 
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
-    this.http.get(this.appComponent.url_base+'api/v1.0/index.php/Maschinen', {
+    this.http.get<Geraet[]>(this.appComponent.url_base+'api/v1.0/index.php/Maschinen', {
       headers:headers,
       params:params
     }).subscribe(data => {
       this.maschinen = data;
+      console.log("fetched machines: ", data);
 
     });
   }
@@ -102,20 +105,20 @@ export class EinweisungenEintragenComponent implements OnInit {
   }
 
   enterEinweisung() {
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
-    var requestUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
-    var machine = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['maschine']));
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
+    const requestUser = this.appComponent.encodeURL(this.appComponent.sanitize(this.userSelected.dn));
+    const machine = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['maschine']));
 
-    var date = this.appComponent.formatLDAPDate(new Date());
+    let date = this.appComponent.formatLDAPDate(new Date());
     if (!this.loginForm.value['useCurrentDate']) {
-      var dateValue = this.appComponent.sanitize(this.loginForm.value['date']);
+      const dateValue = this.appComponent.sanitize(this.loginForm.value['date']);
       if (dateValue == '') {
         return ;
       }
       date = this.appComponent.formatLDAPDate(dateValue);
     }
-    var params = {
+    const params = {
       'author_user' : user,
       'author_password' : passw
     };
@@ -125,10 +128,10 @@ export class EinweisungenEintragenComponent implements OnInit {
     ).subscribe(data => {
       if (data) {
 
-        var dialogRef;
+        let dialogRef;
         if (typeof(data['status'] === 'undefined') && data['status'] !== "not updating") {
           dialogRef = this.dialog.open(SuccessDialog);
-          dialogRef.afterClosed().subscribe(data => {
+          dialogRef.afterClosed().subscribe(() => {
             this.usersearch.select();
             this.initForm();
           });
@@ -147,9 +150,9 @@ export class EinweisungenEintragenComponent implements OnInit {
               params["force"]=true;
               this.http.post(this.appComponent.url_base+"api/v1.0/index.php/Einweisung/"+requestUser+"/"+machine+"/"+date,
                 params
-              ).subscribe(postData => {
+              ).subscribe(() => {
                 dialogRef = this.dialog.open(SuccessDialog);
-                dialogRef.afterClosed().subscribe(data => {
+                dialogRef.afterClosed().subscribe(() => {
                   this.usersearch.select();
                   this.initForm();
                 });
@@ -160,7 +163,7 @@ export class EinweisungenEintragenComponent implements OnInit {
 
       }
     }, error => {
-
+      console.log("error creating Einweisung: ", error);
     });
   }
 }

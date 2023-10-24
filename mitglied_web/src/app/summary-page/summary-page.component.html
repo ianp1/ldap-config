@@ -53,7 +53,7 @@
         Eingewiesener
       </th>
       <td mat-cell *matCellDef="let einweisung">
-        {{ einweisung.geraetname }} {{ einweisung.sn }} ({{ einweisung.geburtstag | ldapDate | date:"dd.MM.yyyy" }})
+        {{ einweisung.cn }} {{ einweisung.sn }} ({{ einweisung.geburtstag | ldapDate | date:"dd.MM.yyyy" }})
       </td>
     </ng-container>
 

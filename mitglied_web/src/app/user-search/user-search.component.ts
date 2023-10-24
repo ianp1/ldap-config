@@ -4,12 +4,12 @@ import { AppComponent } from '../app.component';
 
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
-import { UntypedFormGroup, FormControl } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 
 import { LoginService } from '../login/login.service';
-import { MatInput } from '@angular/material/input';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'user-search',
@@ -27,11 +27,11 @@ export class UserSearchComponent implements OnInit {
   filter: object;
 
   @Output()
-  userSelected = new EventEmitter<any>();
+  userSelected = new EventEmitter<User>();
 
   searching : boolean;
 
-  users : any;
+  users : User[] = [];
 
   validUser : boolean;
 
@@ -44,11 +44,11 @@ export class UserSearchComponent implements OnInit {
               private loginService:LoginService) { }
 
   ngOnInit() {
-    this.userQueryChanged.subscribe(model=>{
+    this.userQueryChanged.subscribe(()=>{
       this.validUser=false;
     });
     this.userQueryChanged.subscribe(
-      model => {
+      () => {
         console.log("reset results");
         this.userSelected.emit(null);
       }
@@ -56,43 +56,47 @@ export class UserSearchComponent implements OnInit {
     this.userQueryChanged
         .pipe(debounceTime(500))
         .subscribe(
-          model => {
-            var user = this.appComponent.sanitize(this.loginService.username);
-            var passw = this.appComponent.sanitize(this.loginService.password);
-            var searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.formGroup.value[this.eingewiesenerControl]));
+          () => {
+            const user = this.appComponent.sanitize(this.loginService.username);
+            const passw = this.appComponent.sanitize(this.loginService.password);
+            const searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.formGroup.value[this.eingewiesenerControl]));
 
             if (searchTerm != "") {
               this.emptySearchResult = false;
               this.searching = true;
 
-              var headers = new HttpHeaders();
-              var params = new HttpParams();
+              const headers = new HttpHeaders();
+              let params = new HttpParams();
               params = params.append('author_user', user);
               params = params.append('author_password', passw);
               if (this.filter) {
                 params = params.append('filter', JSON.stringify(this.filter));
               }
 
-              this.http.get(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
+              this.http.get<User[]>(this.appComponent.url_base+'api/v1.0/index.php/User/'+searchTerm, {
                 headers: headers,
                 params: params
               }).subscribe(data => {
-                console.log("changing rfid codes: ", data);
-                for (var j = 0; j < (<Array<any>>data).length; j++) {
-                  var cUser = data[j];
+                console.log("found users: ", data);
+                //for (let j = 0; j < (<Array<any>>data).length; j++) {
+                  //var cUser = data[j];
                   /*if (cUser["rfid"] != null) {
                     console.log("user is ", cUser);
                     for (var i = 2; i < cUser["rfid"].length; i+= 3) {
                       cUser["rfid"] = cUser["rfid"].substr(0, i)+"_"+cUser["rfid"].substr(i);
                     }
                   }*/
-                }
+                //}
+                data.forEach((user) => {
+                  console.log("user obj: ", user);
+                });
                 this.users = data;
                 if (this.users.length === 0) {
                   this.emptySearchResult = true;
                 }
                 this.searching = false;
               }, error => {
+                console.log("error searching for users: ", error);
                 this.searching = false;
               });
             }
@@ -102,7 +106,7 @@ export class UserSearchComponent implements OnInit {
   }
 
   getUserByID(id:string) {
-    for (let user of this.users) {
+    for (const user of this.users) {
       if (user.uid === id) {
         this.validUser = true;
         return user;

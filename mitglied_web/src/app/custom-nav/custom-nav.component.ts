@@ -82,10 +82,10 @@ export class CustomNavComponent {
       return;
     }
 
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
@@ -93,9 +93,9 @@ export class CustomNavComponent {
       headers: headers,
       params: params
     }).subscribe(data =>{
-      console.log("menu entries request successfull");
-      var headers = new HttpHeaders();
-      var params = new HttpParams();
+      console.log("menu entries request successfull: ", data);
+      const headers = new HttpHeaders();
+      let params = new HttpParams();
       params = params.append('author_user', user);
       params = params.append('author_password', passw);
 
@@ -103,6 +103,7 @@ export class CustomNavComponent {
         headers: headers,
         params: params
       }).subscribe(data => {
+        console.log("menu entries request successfull: ", data);
         this.showMemberMenu = true;
       });
 
@@ -110,10 +111,11 @@ export class CustomNavComponent {
         headers: headers,
         params: params
       }).subscribe(data => {
+        console.log("show tiered menu request: ", data);
         this.showTieredMenu = true;
       });
     }, error => {
-      console.log("menu entries request permission denied");
+      console.log("menu entries request permission denied", error);
       this.showMemberMenu = false;
     });
   }

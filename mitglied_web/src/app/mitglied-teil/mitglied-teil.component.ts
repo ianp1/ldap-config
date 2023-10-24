@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { LoginService } from '../login/login.service';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'mitglied-teil',
@@ -16,8 +17,8 @@ export class MitgliedTeilComponent implements OnInit {
 
 
   detailForm: UntypedFormGroup;
-  inhaber: any;
-  neuesMitglied: any;
+  inhaber: User;
+  neuesMitglied: User;
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
     private formBuilder:UntypedFormBuilder, public dialog:MatDialog,
@@ -61,11 +62,11 @@ export class MitgliedTeilComponent implements OnInit {
       geburtsdatum: this.appComponent.reformatLDAPDate(val['geburtstag']),
     });
 
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
-    var headers = new HttpHeaders();
-    var params = new HttpParams();
+    const headers = new HttpHeaders();
+    let params = new HttpParams();
     params = params.append('author_user', user);
     params = params.append('author_password', passw);
 
@@ -73,9 +74,8 @@ export class MitgliedTeilComponent implements OnInit {
       headers: headers,
       params: params
     }).subscribe(data => {
-      var beitragsDate = '';
 
-      var mitgliedDate = '';
+      let mitgliedDate = '';
       if (data['beginnMitgliedschaft'] && data['beginnMitgliedschaft'] != '') {
         mitgliedDate = this.appComponent.reformatLDAPDate(data['beginnMitgliedschaft']);
       }
@@ -101,15 +101,15 @@ export class MitgliedTeilComponent implements OnInit {
   }
 
   teilhaberEintragen() {
-    var user = this.appComponent.sanitize(this.loginService.username);
-    var passw = this.appComponent.sanitize(this.loginService.password);
+    const user = this.appComponent.sanitize(this.loginService.username);
+    const passw = this.appComponent.sanitize(this.loginService.password);
 
-    var neuMitgliedDn = this.appComponent.sanitize(this.neuesMitglied.dn);
-    var inhaberDn = this.appComponent.sanitize(this.inhaber.dn);
+    const neuMitgliedDn = this.appComponent.sanitize(this.neuesMitglied.dn);
+    const inhaberDn = this.appComponent.sanitize(this.inhaber.dn);
 
-    var values = {};
+    const  values = {};
     Object.keys(this.detailForm.controls).forEach(key=> {
-      var value = this.appComponent.sanitize(this.detailForm.value[key]);
+      let value = this.appComponent.sanitize(this.detailForm.value[key]);
       if (key == "geburtsdatum" || key == "beginnMitgliedschaft") {
         if (value != "") {
           value = this.appComponent.formatLDAPDate(value);
@@ -126,7 +126,7 @@ export class MitgliedTeilComponent implements OnInit {
     this.http.post(this.appComponent.url_base+'api/v1.0/index.php/Mitgliedteil/'+inhaberDn+'/'+neuMitgliedDn, values).subscribe(data=>{
       if (data) {
         const dialogRef = this.dialog.open(SuccessDialog);
-        dialogRef.afterClosed().subscribe(data => {
+        dialogRef.afterClosed().subscribe(() => {
           this.initForm();
         });
       }
@@ -134,7 +134,7 @@ export class MitgliedTeilComponent implements OnInit {
       //400: Fehlende Daten
       //Sonst: Anderer Fehler
       if (error.status === 400) {
-        let dialogRef = this.dialog.open(SuccessDialog, {
+        this.dialog.open(SuccessDialog, {
           data : {
             icon:"error",
             icon_class: "iconError",

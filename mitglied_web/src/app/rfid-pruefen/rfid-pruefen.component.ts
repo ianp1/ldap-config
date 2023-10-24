@@ -4,11 +4,11 @@ import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { UntypedFormGroup, UntypedFormControl } from '@angular/forms';
-import { debounceTime, map } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 import { LoginService } from '../login/login.service';
-import { MatInput } from '@angular/material/input';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'rfid-besitzer-finden',
@@ -26,7 +26,7 @@ export class RfidPruefenComponent implements OnInit {
 
   searching:boolean = false;
 
-  found_users:any;
+  found_users:User[];
   noUsersFound:boolean = false;
   @ViewChild('rfidinput', {static: false})
   rfidInput;
@@ -37,19 +37,19 @@ export class RfidPruefenComponent implements OnInit {
   ngOnInit() {
     this.rfidQueryChanged
         .pipe(debounceTime(500))
-        .subscribe(model => {
-          var user = this.appComponent.sanitize(this.loginService.username);
-          var passw = this.appComponent.sanitize(this.loginService.password);
-          var updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
+        .subscribe(() => {
+          const user = this.appComponent.sanitize(this.loginService.username);
+          const passw = this.appComponent.sanitize(this.loginService.password);
+          const updateRfid = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['rfid']));
 
-          var headers = new HttpHeaders();
-          var params = new HttpParams();
+          const headers = new HttpHeaders();
+          let params = new HttpParams();
           params = params.append('author_user', user);
           params = params.append('author_password', passw);
 
           this.searching = true;
 
-          this.http.get(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid, {
+          this.http.get<User[]>(this.appComponent.url_base+'api/v1.0/index.php/RFID/'+updateRfid, {
             headers: headers,
             params: params
           }).subscribe(data => {
@@ -59,7 +59,7 @@ export class RfidPruefenComponent implements OnInit {
 
             this.rfidInput.nativeElement.select();
             //this.rfidInput.;
-          }, error => {
+          }, () => {
             this.found_users = null;
             this.noUsersFound = true;
             this.searching = false;

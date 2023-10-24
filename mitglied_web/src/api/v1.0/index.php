@@ -465,7 +465,7 @@
 			));
 		}
 
-		return $response -> withJson(array("einweisungen"=>$ar, "sicherheitsbelehrung"=>$belehrungen), 201);
+		return $response -> withJson(array("einweisungen"=>$ar, "sicherheitsbelehrungen"=>$belehrungen), 201);
 	});
 
 	/**
@@ -527,8 +527,8 @@
 		for ($i = 0; $i < $userResult["count"]; $i ++) {
 			array_push($ar, array(
 				"dn" => $userResult[$i]["dn"],
-				"cn" => $userResult[$i]["cn"][0],
-				"sn" => $userResult[$i]["sn"][0],
+				"vorname" => $userResult[$i]["cn"][0],
+				"nachname" => $userResult[$i]["sn"][0],
 				"geburtstag" => $userResult[$i]["geburtstag"][0],
 				"uid" => $userResult[$i]["uid"][0]
 			));
@@ -1244,7 +1244,7 @@
 		$ar = array();
 
 		for ($i = 0; $i < $result['count']; $i++) {
-			array_push($ar, array("name"=>$result[$i]["geraetname"][0], "dn"=>$result[$i]["dn"], "cn"=>$result[$i]["cn"][0]));
+			array_push($ar, array("geraetname"=>$result[$i]["geraetname"][0], "dn"=>$result[$i]["dn"], "cn"=>$result[$i]["cn"][0]));
 		}
 
 		return $response -> withJson($ar, 201);
