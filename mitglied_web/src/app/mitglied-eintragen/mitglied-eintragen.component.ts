@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -19,10 +19,10 @@ import { LoginService } from '../login/login.service';
 export class MitgliedEintragenComponent implements OnInit {
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
-              private formBuilder:FormBuilder, public dialog:MatDialog,
+              private formBuilder:UntypedFormBuilder, public dialog:MatDialog,
               private loginService:LoginService) { }
 
-  loginForm: FormGroup;
+  loginForm: UntypedFormGroup;
   userSelected: any;
   valid: boolean = false;
 

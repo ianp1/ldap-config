@@ -6,7 +6,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
-import { FormGroup, FormControl } from '@angular/forms';
+import { UntypedFormGroup, FormControl } from '@angular/forms';
 
 import { LoginService } from '../login/login.service';
 import { MatInput } from '@angular/material/input';
@@ -20,7 +20,7 @@ export class UserSearchComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
 
   @Input()
-  formGroup : FormGroup;
+  formGroup : UntypedFormGroup;
   @Input()
   eingewiesenerControl : string;
   @Input()

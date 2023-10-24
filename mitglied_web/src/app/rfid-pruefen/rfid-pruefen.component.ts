@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { FormGroup, FormControl } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormControl } from '@angular/forms';
 import { debounceTime, map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
@@ -18,10 +18,10 @@ import { MatInput } from '@angular/material/input';
 export class RfidPruefenComponent implements OnInit {
   rfidQueryChanged: Subject<string> = new Subject<string>();
 
-  loginForm: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl(''),
-    rfid: new FormControl('')
+  loginForm: UntypedFormGroup = new UntypedFormGroup({
+    username: new UntypedFormControl(''),
+    password: new UntypedFormControl(''),
+    rfid: new UntypedFormControl('')
   });
 
   searching:boolean = false;

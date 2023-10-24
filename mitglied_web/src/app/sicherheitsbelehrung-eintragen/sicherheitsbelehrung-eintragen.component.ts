@@ -5,7 +5,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
@@ -19,13 +19,13 @@ import { LoginService } from '../login/login.service';
   styleUrls: ['./sicherheitsbelehrung-eintragen.component.scss']
 })
 export class SicherheitsbelehrungEintragenComponent implements OnInit {
-  sicherheitForm: FormGroup;
+  sicherheitForm: UntypedFormGroup;
 
 
   get sicherheitControls() { return this.sicherheitForm.controls; }
 
   constructor(public dialog: MatDialog, private appComponent:AppComponent,
-              private http:HttpClient, private formBuilder : FormBuilder,
+              private http:HttpClient, private formBuilder : UntypedFormBuilder,
               private loginService:LoginService) {
 
   }

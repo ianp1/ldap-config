@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -15,12 +15,12 @@ import { SuccessDialog } from '../success-dialog/success-dialog';
 export class MitgliedTeilComponent implements OnInit {
 
 
-  detailForm: FormGroup;
+  detailForm: UntypedFormGroup;
   inhaber: any;
   neuesMitglied: any;
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
-    private formBuilder:FormBuilder, public dialog:MatDialog,
+    private formBuilder:UntypedFormBuilder, public dialog:MatDialog,
     private loginService:LoginService) { }
 
   ngOnInit() {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
 import { AppComponent } from '../app.component';
 import { LoginService } from '../login/login.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -13,9 +13,9 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 })
 export class MeineDatenComponent implements OnInit {
 
-  dataForm: FormGroup;
+  dataForm: UntypedFormGroup;
   constructor(
-    private formBuilder:FormBuilder, 
+    private formBuilder:UntypedFormBuilder, 
     private appComponent:AppComponent, 
     private loginService:LoginService,
     private http:HttpClient,

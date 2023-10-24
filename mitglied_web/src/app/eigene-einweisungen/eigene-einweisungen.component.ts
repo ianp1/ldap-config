@@ -3,7 +3,7 @@ import { AppComponent } from '../app.component';
 
 import { Subject } from 'rxjs';
 
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { UntypedFormGroup, FormControl, UntypedFormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { debounceTime, map } from 'rxjs/operators';
@@ -17,7 +17,7 @@ import { LoginService } from '../login/login.service';
 })
 export class EigeneEinweisungenComponent implements OnInit {
   userQueryChanged: Subject<string> = new Subject<string>();
-  loginForm: FormGroup;
+  loginForm: UntypedFormGroup;
   searching: boolean;
   validLogin: boolean = false;
 
@@ -30,7 +30,7 @@ export class EigeneEinweisungenComponent implements OnInit {
   ownUser: false;
 
   constructor(private appComponent:AppComponent, private http:HttpClient,
-              private formBuilder:FormBuilder, private loginService:LoginService) {
+              private formBuilder:UntypedFormBuilder, private loginService:LoginService) {
 
   }
 
