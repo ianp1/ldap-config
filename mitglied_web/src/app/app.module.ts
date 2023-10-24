@@ -161,7 +161,7 @@ registerLocaleData(localeDe, 'de');
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
-		RouterModule.forRoot(appRoutes, { relativeLinkResolution: 'legacy' })
+		RouterModule.forRoot(appRoutes, {})
 	],
 	providers: [
     {
