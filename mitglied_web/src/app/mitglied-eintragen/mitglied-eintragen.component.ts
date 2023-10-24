@@ -3,7 +3,7 @@ import { AppComponent } from '../app.component';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 
 import { SuccessDialog } from '../success-dialog/success-dialog';
 

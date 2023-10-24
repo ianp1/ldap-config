@@ -8,7 +8,7 @@ import {
 import { Observable } from 'rxjs';
 
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
