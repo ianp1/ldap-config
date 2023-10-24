@@ -2,10 +2,8 @@ import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 
 import { AppComponent } from '../app.component';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Subject } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
 
-import { UntypedFormGroup, FormControl, UntypedFormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
