@@ -80,8 +80,9 @@ export class LoginComponent implements OnInit {
   }
 
   changed() {
-    this.loginValid= false;
+    this.loginValid = false;
     this.validLogin.emit(false);
+    this.validating = true;
     this.userQueryChanged.next('');
     this.pending = true;
 

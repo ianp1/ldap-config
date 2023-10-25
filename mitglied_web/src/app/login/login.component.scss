@@ -49,16 +49,25 @@
 
 .mat-mdc-form-field {
   &.invalid {
+    .mat-form-field-label, .mat-mdc-input-element {
+      @include inputColor(red);
+    }
     @include inputColor(red);
   }
-}
-
-.mat-mdc-form-field {
   &.valid {
+    .mat-form-field-label, .mat-mdc-input-element {
+      @include inputColor(green);
+    }
     @include inputColor(green);
   }
 }
 
 a:visited {
   color:blue;
+}
+
+.spinner_container, .spinner_container .mat-mdc-progress-spinner {
+  width: 60px;
+  height: 60px;
+  display: inline-block
 }
