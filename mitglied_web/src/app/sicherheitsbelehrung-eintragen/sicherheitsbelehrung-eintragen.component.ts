@@ -88,11 +88,15 @@ export class SicherheitsbelehrungEintragenComponent implements OnInit {
             data : {users:ar, appComponent:this.appComponent}
           })
           pickDialog.afterClosed().subscribe(result => {
+            console.log("result: ", result);
+            console.log(typeof result);
             if (result instanceof DialogUserExistingResponse) {
+              console.log("result is DialogUserExistingResponse");
               if (result.createUser) {
                 this.createUser();
               } else {
-                this.updateSicherheitsbelehrung(result["UserDN"]);
+                console.log("update Sicherheitsbelehrung", result.UserDN);
+                this.updateSicherheitsbelehrung(result.UserDN);
               }
             }
           });
@@ -252,17 +256,17 @@ export class DialogUserExisting {
   }
 
   updateUser(DN:string) {
-    this.dialogRef.close({
-      createUser: false,
-      UserDN:DN
-    });
+    const response = new DialogUserExistingResponse();
+    response.UserDN = DN;
+    response.createUser = false;
+    this.dialogRef.close(response);
   }
 
   createUser() {
-    this.dialogRef.close({
-      createUser: true,
-      UserDN: ""
-    });
+    const response = new DialogUserExistingResponse();
+    response.createUser = true;
+    response.UserDN = "";
+    this.dialogRef.close(response);
   }
 
   abort() {
