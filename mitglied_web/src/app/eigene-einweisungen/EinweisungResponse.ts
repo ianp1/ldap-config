@@ -4,6 +4,7 @@ export class EinweisungResponse {
     sicherheitsbelehrung: boolean | null;
     datum: string;
     geraet: Geraet | null;
-    class: string;
+    class: string | null;
     mentor: boolean | null;
+    aktiviert: string | null;
 }

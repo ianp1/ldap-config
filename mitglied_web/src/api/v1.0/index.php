@@ -654,7 +654,7 @@
 		$dn = "ou=einweisung,".$ldap_base_dn;
 		$searchTerm = "(&(objectClass=einweisung)(eingewiesener=$RequestUser))";
 
-		$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum"));
+		$einweisungen = ldap_search($ldapconn, $dn, $searchTerm, array("einweisungsdatum", "aktiviert"));
 		$einweisungenResult = ldap_get_entries($ldapconn, $einweisungen);
 
 		for ($i = 0; $i < $einweisungenResult["count"]; $i++) {
@@ -667,16 +667,20 @@
 				$parent = $parent.$split[$j];
 			}
 
+			//var_dump($einweisungenResult);
 			$geraet = ldap_get_entries($ldapconn, ldap_read($ldapconn, $parent, "(objectClass=geraet)", array("geraetname","cn")));
-
+			//var_dump($geraet);
+			
 			array_push($ar, array(
 				"datum"=>$einweisungenResult[$i]["einweisungsdatum"][0],
+				"aktiviert" => $einweisungenResult[$i]["aktiviert"][0],
 				"geraet"=>array(
 					"geraetname"=>$geraet[0]["geraetname"][0],
 					"cn"=>$geraet[0]["cn"][0]
 				)
 			));
 		}
+		//die();
 
 		$searchTerm = "(&(objectClass=geraet)(member=$RequestUser))";
 		$mentorenschaft = ldap_search($ldapconn, $dn, $searchTerm, array("geraetname", "cn"));

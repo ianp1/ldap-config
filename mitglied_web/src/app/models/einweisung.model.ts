@@ -4,6 +4,7 @@ export class Einweisung {
     sicherheitsbelehrung: boolean;
     class: string;
     mentor: boolean;
+    aktiviert: boolean;
 }
 
 

@@ -52,7 +52,7 @@
             *matCellDef="let einweisung"
             class="einweisung"
             [ngClass]="einweisung.class">
-            {{einweisung.mentor ? 'Gerätementor' : einweisung.datum|ldapDate|date:"dd.MM.yyyy"}}
+            {{einweisung.mentor ? 'Gerätementor' : (einweisung.aktiviert ? "":"Unvollständig (") + (einweisung.datum|ldapDate|date:"dd.MM.yyyy") + (einweisung.aktiviert ? "":")")}}
           </td>
         </ng-container>
 

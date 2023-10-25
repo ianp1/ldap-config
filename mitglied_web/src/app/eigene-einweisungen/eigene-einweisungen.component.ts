@@ -126,6 +126,11 @@ export class EigeneEinweisungenComponent implements OnInit {
 
         einweisung.geraet = einweisungResponse.geraet;
         einweisung.datum = einweisungResponse.datum;
+        if (einweisungResponse.aktiviert !== null && einweisungResponse.aktiviert !== undefined) {
+          einweisung.aktiviert = einweisungResponse.aktiviert === 'TRUE';
+        } else {
+          einweisung.aktiviert = true;
+        }
         if (einweisungResponse.mentor) {
           einweisung.class = 'valid';
           einweisung.mentor = true;
@@ -142,6 +147,10 @@ export class EigeneEinweisungenComponent implements OnInit {
           } else if (diff >= 0) {
             einweisung.class = 'warning';
           } else {
+            einweisung.class = 'invalid';
+          }
+
+          if (einweisung.aktiviert === false) {
             einweisung.class = 'invalid';
           }
         }
