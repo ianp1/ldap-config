@@ -109,6 +109,7 @@ export class UserSearchComponent implements OnInit {
                 console.log("found users: ", data);
                 this.userSearchService.lastSearch = searchTerm;
                 this.userSearchService.lastResult = data;
+                this.userSearchService.lastSelection = undefined;
                 //for (let j = 0; j < (<Array<any>>data).length; j++) {
                   //var cUser = data[j];
                   /*if (cUser["rfid"] != null) {
