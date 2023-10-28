@@ -34,14 +34,28 @@
   }
 }
 
+
+/*
 .mat-mdc-form-field {
-  &.invalidUser {
-    @include inputColor(#df5a49);
+  &.invalid {
+    .mat-form-field-label, .mat-mdc-input-element {
+      @include inputColor(red);
+    }
+    @include inputColor(red);
   }
-}
+*/
 
 .mat-mdc-form-field {
+  &.invalidUser {
+    .mat-form-field-label, .mat-mdc-input-element {
+      @include inputColor(#df5a49);
+    }
+    @include inputColor(#df5a49);
+  }
   &.validUser {
+    .mat-form-field-label, .mat-mdc-input-element {
+      @include inputColor(green);
+    }
     @include inputColor(green);
   }
 }
