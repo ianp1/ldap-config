@@ -10,7 +10,7 @@
         #searchfield
     >
     <mat-autocomplete #auto="matAutocomplete"
-      (optionSelected)="userSelected.emit(getUserByID($event.option.value))"
+      (optionSelected)="emitSelectedUser($event.option.value)"
       autoActiveFirstOption
     >
       <mat-option *ngFor="let user of users" [value]="user.uid">{{user.vorname}} {{user.nachname}} (Benutzer-ID: {{user.uid}}, {{appComponent.reformatLDAPDate(user.geburtstag) | date : "dd.MM.yyyy"}})</mat-option>

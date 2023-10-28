@@ -63,6 +63,7 @@ import { RfidEintragenComponent, DialogRfidExisting } from './rfid-eintragen/rfi
 import { RfidPruefenComponent } from './rfid-pruefen/rfid-pruefen.component';
 import { LoginComponent } from './login/login.component';
 import { LoginService } from './login/login.service';
+import { UserSearchService } from './user-search/user-search.service';
 
 import { UserSearchComponent } from './user-search/user-search.component';
 
@@ -171,7 +172,8 @@ registerLocaleData(localeDe, 'de');
     },
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
     { provide: DateAdapter, useClass: GermanDateAdapter, deps: [MAT_DATE_LOCALE, Platform] },
-    LoginService
+    LoginService,
+    UserSearchService
   ],
 	exports: [
 		CustomNavComponent,

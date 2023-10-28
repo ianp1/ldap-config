@@ -10,6 +10,7 @@ import { FormGroup } from '@angular/forms';
 
 import { LoginService } from '../login/login.service';
 import { User } from '../models/user.model';
+import { UserSearchService } from './user-search.service';
 
 @Component({
   selector: 'user-search',
@@ -41,9 +42,11 @@ export class UserSearchComponent implements OnInit {
   searchField;
 
   constructor(public appComponent:AppComponent, public http:HttpClient,
-              private loginService:LoginService) { }
+              private loginService:LoginService, 
+              private userSearchService: UserSearchService) { }
 
   ngOnInit() {
+    console.log("---------on init user search!!");
     this.userQueryChanged.subscribe(()=>{
       this.validUser=false;
     });
@@ -53,6 +56,28 @@ export class UserSearchComponent implements OnInit {
         this.userSelected.emit(null);
       }
     );
+    const oldUsers = this.userSearchService.lastResult;
+    if (oldUsers.length > 0) {
+      this.users = oldUsers;
+    }
+    const oldSearch = this.userSearchService.lastSearch;
+    const oldSelection = this.userSearchService.lastSelection;
+    if (oldSelection !== undefined && oldSelection !== null) {
+      this.emitSelectedUser(oldSelection.uid);
+      const userSearchValue = [];
+      userSearchValue[this.eingewiesenerControl] = oldSelection.uid;
+      this.formGroup.patchValue(userSearchValue);
+      this.validUser = true;
+    } else {
+      if (oldSearch !== "") {
+        const oldSearchValue = [];
+        oldSearchValue[this.eingewiesenerControl] = oldSearch;
+        this.formGroup.patchValue(oldSearchValue);
+        //this.formGroup.value[this.eingewiesenerControl] = oldSearch;
+      }
+    }
+
+
     this.userQueryChanged
         .pipe(debounceTime(500))
         .subscribe(
@@ -64,6 +89,7 @@ export class UserSearchComponent implements OnInit {
             if (searchTerm != "") {
               this.emptySearchResult = false;
               this.searching = true;
+
 
               const headers = new HttpHeaders();
               let params = new HttpParams();
@@ -78,6 +104,8 @@ export class UserSearchComponent implements OnInit {
                 params: params
               }).subscribe(data => {
                 console.log("found users: ", data);
+                this.userSearchService.lastSearch = searchTerm;
+                this.userSearchService.lastResult = data;
                 //for (let j = 0; j < (<Array<any>>data).length; j++) {
                   //var cUser = data[j];
                   /*if (cUser["rfid"] != null) {
@@ -87,9 +115,6 @@ export class UserSearchComponent implements OnInit {
                     }
                   }*/
                 //}
-                data.forEach((user) => {
-                  console.log("user obj: ", user);
-                });
                 this.users = data;
                 if (this.users.length === 0) {
                   this.emptySearchResult = true;
@@ -121,6 +146,14 @@ export class UserSearchComponent implements OnInit {
 
   public select() {
     this.searchField.nativeElement.focus();
+  }
+
+  public emitSelectedUser(userId: string) {
+    console.log("emit user: ", userId);
+    const user = this.getUserByID(userId);
+    console.log("user is", user);
+    this.userSelected.emit(user);
+    this.userSearchService.lastSelection = user;
   }
 
 }

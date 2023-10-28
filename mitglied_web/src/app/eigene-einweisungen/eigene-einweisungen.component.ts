@@ -82,6 +82,7 @@ export class EigeneEinweisungenComponent implements OnInit {
   }
 
   userSelected(user:User) {
+    console.log("fetched emitted user: ", user);
     this.selectedUser = user;
     this.einweisungen = null;
   }
@@ -98,7 +99,7 @@ export class EigeneEinweisungenComponent implements OnInit {
     if (this.loginForm.value['ownUser']) {
       searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginService.username));
     } else {
-      searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.loginForm.value['showUser']));
+      searchTerm = this.appComponent.encodeURL(this.appComponent.sanitize(this.selectedUser.uid));
     }
 
     const headers = new HttpHeaders();

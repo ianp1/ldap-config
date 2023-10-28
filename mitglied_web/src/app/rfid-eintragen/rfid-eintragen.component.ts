@@ -76,6 +76,7 @@ export class RfidEintragenComponent implements OnInit {
         }
       });
 
+
       //Schon Nutzer gefunden
     }, error => {
       //404: Kein Nutzer mit diesem RFID
