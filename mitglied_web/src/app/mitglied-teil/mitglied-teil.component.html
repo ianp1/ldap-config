@@ -14,13 +14,14 @@
     </div>
     <div *ngIf="inhaber!=null">
       <h3>
-        Mitgliedsinformationen
+        Mitgliedsinformationen:
       </h3>
       <user-search
         [eingewiesenerControl]="'neuesMitglied'"
         [formGroup]="detailForm"
         (userSelected)="prefillMitglied($event)"
         [filter]="{'mitgliedschaft':'', 'notObjectClass': 'fablabMitglied'}"
+        [restoreSearch]="false"
       >
       </user-search>
       <div class="personendaten">

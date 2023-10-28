@@ -26,6 +26,8 @@ export class UserSearchComponent implements OnInit {
   eingewiesenerControl : string;
   @Input()
   filter: object;
+  @Input()
+  restoreSearch?: boolean = true;
 
   @Output()
   userSelected = new EventEmitter<User>();
@@ -56,27 +58,28 @@ export class UserSearchComponent implements OnInit {
         this.userSelected.emit(null);
       }
     );
-    const oldUsers = this.userSearchService.lastResult;
-    if (oldUsers.length > 0) {
-      this.users = oldUsers;
-    }
-    const oldSearch = this.userSearchService.lastSearch;
-    const oldSelection = this.userSearchService.lastSelection;
-    if (oldSelection !== undefined && oldSelection !== null) {
-      this.emitSelectedUser(oldSelection.uid);
-      const userSearchValue = [];
-      userSearchValue[this.eingewiesenerControl] = oldSelection.uid;
-      this.formGroup.patchValue(userSearchValue);
-      this.validUser = true;
-    } else {
-      if (oldSearch !== "") {
-        const oldSearchValue = [];
-        oldSearchValue[this.eingewiesenerControl] = oldSearch;
-        this.formGroup.patchValue(oldSearchValue);
-        //this.formGroup.value[this.eingewiesenerControl] = oldSearch;
+    if (this.restoreSearch) {
+      const oldUsers = this.userSearchService.lastResult;
+      if (oldUsers.length > 0) {
+        this.users = oldUsers;
+      }
+      const oldSearch = this.userSearchService.lastSearch;
+      const oldSelection = this.userSearchService.lastSelection;
+      if (oldSelection !== undefined && oldSelection !== null) {
+        this.emitSelectedUser(oldSelection.uid);
+        const userSearchValue = [];
+        userSearchValue[this.eingewiesenerControl] = oldSelection.uid;
+        this.formGroup.patchValue(userSearchValue);
+        this.validUser = true;
+      } else {
+        if (oldSearch !== "") {
+          const oldSearchValue = [];
+          oldSearchValue[this.eingewiesenerControl] = oldSearch;
+          this.formGroup.patchValue(oldSearchValue);
+          //this.formGroup.value[this.eingewiesenerControl] = oldSearch;
+        }
       }
     }
-
 
     this.userQueryChanged
         .pipe(debounceTime(500))
