@@ -19,7 +19,11 @@ fi
 for f in ./seed/*
 do
     IFS=
-    TASK_RESPONSE=`ldapadd -h localhost -p 389 -D $LDAP_USER -w "$LDAP_PASSWORD" -f $f -c -v 2>&1`
+    echo "'$LDAP_USER'"
+    echo "'$LDAP_PASSWORD'"
+    echo "'$f'"
+    set -o pipefail
+    TASK_RESPONSE=$(ldapadd -h localhost -p 389 -D $LDAP_USER -w "$LDAP_PASSWORD" -f $f -c -v 2>&1 | tr '\0' '\n')
     if [ $? -ne 0 ]
     then
         echo -e "error performing seed action \e[31m$f\e[0m"
