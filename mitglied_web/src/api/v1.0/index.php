@@ -15,8 +15,8 @@
 
 
 		if (getenv("DEV")) {
-			echo "hier";
-			die();
+			//echo "hier";
+			//die();
 			$ldaphost = "localhost";
 		} else {
 			$ldaphost = "ldap-provider.fablab-luebeck.de";

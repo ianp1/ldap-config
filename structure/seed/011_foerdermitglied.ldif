@@ -1,0 +1,16 @@
+dn: uid=FoerderMitglied,ou=user,dc=ldap-provider,dc=fablab-luebeck
+objectClass: fablabPerson
+objectClass: inetOrgPerson
+objectClass: fablabMitglied
+uid: FoerderMitglied
+cn: Foerder
+sn: Mitglied
+geburtstag: 20200229230530Z
+sicherheitsbelehrung: 20200229230530Z
+userPassword: FoerderMitglied
+strasse: Foerderstrasse
+ort: Foerderort
+plz: 12345
+anrede: Herr
+mitgliedsart: foerdermitgliedschaft
+beginn: 20200229230530Z
