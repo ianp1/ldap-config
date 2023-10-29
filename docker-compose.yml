@@ -16,6 +16,11 @@ services:
 
     ldap-server:
         build: ./structure
+        ports: 
+            - "389:389"
+        environment:
+            - LDAP_DOMAIN=ldap-provider.fablab-luebeck
+            - LDAP_BASE_DN=dc=ldap-provider,dc=fablab-luebeck
 
 volumes:
     application:
