@@ -2,5 +2,8 @@
     "debug.node.autoAttach": "on",
     "files.watcherExclude": {
         "**/target": true
-    }
+    },
+    "java.project.sourcePaths": [
+        "mitglied_web/src/app/user-search"
+    ]
 }
