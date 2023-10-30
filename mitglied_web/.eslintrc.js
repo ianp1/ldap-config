@@ -12,5 +12,8 @@ module.exports = {
       "karma.conf.js",
       "e2e/",
       ".eslintrc.js"
-    ]
+    ],
+    rules: {
+      "@typescript-eslint/no-inferrable-types": "off"
+    }
   };
