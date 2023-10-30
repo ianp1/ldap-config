@@ -7,7 +7,6 @@ export class UserSearchService {
     private _lastSearch:string = '';
     private _lastSelection:(User|undefined) = undefined;
 
-    constructor() { }
 
     public get lastResult() {
         return this._lastResult;

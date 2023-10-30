@@ -9,8 +9,6 @@ export class LoginService {
 
   public valuesChanged = new BehaviorSubject(false);
 
-  constructor() { }
-
   public get username() {
     return this._username;
   }

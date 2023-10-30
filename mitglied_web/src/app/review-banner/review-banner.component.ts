@@ -9,8 +9,8 @@ export class ReviewBannerComponent implements OnInit {
 
   showBanner : boolean = true;
 
-  constructor() { }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   ngOnInit() {
   }
 

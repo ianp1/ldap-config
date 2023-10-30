@@ -126,8 +126,8 @@ export class RfidEintragenComponent implements OnInit {
           this.initForm();
           this.userSearch.select();
         });
-      }, () => {
-
+      }, err => {
+        console.log("error while updating rfid: ", err);
       });
   }
 
