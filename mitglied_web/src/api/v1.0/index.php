@@ -1392,7 +1392,7 @@
 				}
 			}
 	
-			return $response -> withJson($geraete, 200);
+			return $response -> withJson(array("devices"=>$geraete), 200);
 		});
 	}) -> add(function ($request, $response, $next) {
 		include_once("auth.php");
