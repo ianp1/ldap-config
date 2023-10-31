@@ -5,6 +5,9 @@
 	use \Psr\Http\Message\ServerRequestInterface as Request;
 	use \Psr\Http\Message\ResponseInterface as Response;
 
+	use \PhpMqtt\Client\MqttClient;
+	use \PhpMqtt\Client\ConnectionSettings;
+
 	$app = new \Slim\App;
 
 	
@@ -1394,6 +1397,83 @@
 	
 			return $response -> withJson(array("devices"=>$geraete), 200);
 		});
+
+		$app -> post("/Devices/{deviceId}/activate/{appId}/{rfid}", function (Request $request, Response $response, array $args) {
+			$deviceId = $args["deviceId"];
+			$appId = $args["appId"];
+			$rfid = cleanRFIDTag($args['rfid']);
+	
+			$ldapconn = $request -> getAttribute("ldapconn");
+			$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+			$mqtt = $request -> getAttribute("mqtt");
+			//check if $deviceId ends with ldap_base_dn
+
+			$searchString = "ou=einweisung,".$ldap_base_dn;
+			if (!(substr_compare($deviceId, $searchString, -strlen($searchString)) === 0)) {
+				return $response -> withJson(array("message: " => "Invalid machine location, must be located under ou=einweisung".$ldap_base_dn), 400);
+			}
+	
+			$userSearch = ldap_search(
+				$ldapconn, 
+				"ou=user,".$ldap_base_dn,
+				"(rfid=$rfid)",
+				array("dn", "sicherheitsbelehrung"));
+			$userResult = ldap_get_entries($ldapconn, $userSearch);
+
+
+			$geraetSuche = ldap_search(
+				$ldapconn, 
+				$deviceId, 
+				"(&(objectClass=geraet))", 
+				array("dn", "gestaffelteEinweisung", "mqttChannel"));
+			$geraetResult = ldap_get_entries($ldapconn, $geraetSuche);
+
+			$einweisungSuche = ldap_search(
+				$ldapconn,
+				$deviceId,
+				"(&(objectClass=einweisung)(eingewiesener=".$userResult[0]["dn"]."))",
+				array("dn", "aktiv", "einweisungsdatum"));
+			$einweisungResult = ldap_get_entries($ldapconn, $einweisungSuche);
+
+			$mentorSuche = ldap_search(
+				$ldapconn,
+				$deviceId,
+				"(&(objectClass=geraet)(member=".$userResult[0]["dn"]."))",
+				array("dn"));
+			$mentorResult = ldap_get_entries($ldapconn, $mentorSuche);
+			
+			if ($mentorResult["count"] === 0) {
+				if ($einweisungResult["count"] === 0 ) {
+					return $response -> withJson(array("message" => "User is not introduced into this machine"), 401);
+				} else {
+					$daysSinceEinweisung = (time() - ldapToUnixTimestamp($einweisungResult[0]["einweisungsdatum"][0])) / 86400;
+					if ($daysSinceEinweisung > 365) {
+						return $response -> withJson(array("message" => "User machine introduction is not valid anymore"), 401);
+					}
+				}
+			}
+
+
+			if (isset($geraetResult[0]["gestaffelteEinweisung"]) && $geraetResult[0]["gestaffelteEinweisung"] === "TRUE") {
+				if (!isset($einweisungResult[0]["aktiv"]) || $einweisungResult[0]["aktiv"][0] === "FALSE" ) {
+					return $response -> withJson(array("message" => "User introduction is not activated, maybe it is not completed yet?"), 401);
+				}	
+			}
+
+			$sicherheitsbelehrungDateUnix = ldapToUnixTimestamp($userResult[0]["sicherheitsbelehrung"][0]);
+			$daysSinceSicherheitsbelehrung = (time() - $sicherheitsbelehrungDateUnix) / 86400;
+			if ($daysSinceSicherheitsbelehrung > 365) {
+				return $response -> withJson(array("message" => "User safety instruction is not valid anymore"), 401);
+			}
+
+			$mqttChannel = $machineResult[0]["mqttchannel"][0];
+			$mqttChannel = "test/m1";
+			$mqtt -> publish($mqttChannel, "1", 0, false);
+
+			return $response -> withStatus(200);
+		});
+
+
 	}) -> add(function ($request, $response, $next) {
 		include_once("auth.php");
 
@@ -1427,9 +1507,26 @@
 
 		$request = $request -> withAttribute("ldapconn", $ldapconn);
 		$request = $request -> withAttribute("ldap_base_dn", $ldap_base_dn);
+		
+		$connectionSettings = (new ConnectionSettings)
+			-> setUsername($APP_MQTT_USERNAME)
+			-> setPassword($APP_MQTT_PASSWORD)
+			-> setKeepaliveInterval(60)
+			-> setUseTls(true);
 
+		$mqtt = new MqttClient(
+			"mqtt.fablab-luebeck.de", 
+			1883, 
+			"mitglied_web_app",
+			MqttClient::MQTT_3_1_1
+		);
+
+		$mqtt -> connect($connectionSettings, false);
+
+		$request = $request -> withAttribute("mqtt", $mqtt);
 		$response = $next($request, $response);
 
+		$mqtt -> disconnect();
 		ldap_close($ldapconn);
 
 		return $response;
