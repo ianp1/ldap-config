@@ -1368,7 +1368,11 @@
 				
 
 				if ($mentor || $einweisungResult["count"] > 0) {
-					if ($mentor || !isset($einweisungResult[0]["aktiviert"]) || $einweisungResult[0]["aktiviert"][0] === "TRUE") {
+					if ($geraetResult[$i]["dn"] == "cn=Drehbank,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck") {
+						//var_dump($geraetResult[$i]);
+						//var_dump($einweisungResult);
+					}
+					if ($mentor || !isset($geraetResult[$i]["gestaffelteeinweisung"]) || $geraetResult[$i]["gestaffelteeinweisung"][0] === "FALSE" || $einweisungResult[0]["aktiviert"][0] === "TRUE") {
 						
 						$geraet = array(
 							"displayName" => $geraetResult[$i]["geraetname"][0],
