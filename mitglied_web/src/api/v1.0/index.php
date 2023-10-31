@@ -1348,7 +1348,7 @@
 			}
 
 			$mentorSuche = ldap_search($ldapconn, "ou=einweisung,".$ldap_base_dn,
-				"(&(objectClass=geraet)(member=".$SicherheitsbelehrungResult['dn']."))",
+				"(&(objectClass=geraet)(member=".$SicherheitsbelehrungResult[0]['dn']."))",
 				array("dn"));
 			$mentorResult = ldap_get_entries($ldapconn, $mentorSuche);
 			$mentorGeraete = array();
@@ -1365,6 +1365,7 @@
 	
 				//is geraet dn in mentorGeraete?
 				$mentor = array_search($geraetResult[$i]["dn"], $mentorGeraete) !== false;
+				
 
 				if ($mentor || $einweisungResult["count"] > 0) {
 					if ($mentor || !isset($einweisungResult[0]["aktiviert"]) || $einweisungResult[0]["aktiviert"][0] === "TRUE") {
