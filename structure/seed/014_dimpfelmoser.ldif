@@ -1,0 +1,7 @@
+dn: cn=dimpfelmoser,cn=prusa,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
+objectClass: geraetInstanz
+objectClass: top
+cn: dimpfelmoser
+cost: Test
+imageURL: https://www.fablab-luebeck.de/user/pages/3DDrucker/_Prusai3/prusa.jpg
+description: Prusa i3

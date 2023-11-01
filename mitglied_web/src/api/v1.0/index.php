@@ -1398,19 +1398,19 @@
 			return $response -> withJson(array("devices"=>$geraete), 200);
 		});
 
-		$app -> post("/Devices/{deviceId}/activate/{appId}/{rfid}", function (Request $request, Response $response, array $args) {
-			$deviceId = $args["deviceId"];
+		$app -> post("/Devices/{deviceInstanceId}/activate/{appId}/{rfid}", function (Request $request, Response $response, array $args) {
+			$deviceInstanceId = $args["deviceInstanceId"];
 			$appId = $args["appId"];
 			$rfid = cleanRFIDTag($args['rfid']);
 	
 			$ldapconn = $request -> getAttribute("ldapconn");
 			$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 			$mqtt = $request -> getAttribute("mqtt");
-			//check if $deviceId ends with ldap_base_dn
+			//check if $deviceInstanceId ends with ldap_base_dn
 
 			$searchString = "ou=einweisung,".$ldap_base_dn;
-			if (!(substr_compare($deviceId, $searchString, -strlen($searchString)) === 0)) {
-				return $response -> withJson(array("message: " => "Invalid machine location, must be located under ou=einweisung".$ldap_base_dn), 400);
+			if (!(substr_compare($deviceInstanceId, $searchString, -strlen($searchString)) === 0)) {
+				return $response -> withJson(array("message: " => "Invalid machine location, must be located under ou=einweisung,".$ldap_base_dn), 400);
 			}
 	
 			$userSearch = ldap_search(
@@ -1420,6 +1420,19 @@
 				array("dn", "sicherheitsbelehrung"));
 			$userResult = ldap_get_entries($ldapconn, $userSearch);
 
+			$geraetInstanceSuche = ldap_search(
+				$ldapconn,
+				$deviceInstanceId,
+				"(&(objectClass=geraetInstanz))",
+				array("dn", "mqttChannel")
+			);
+			$geraetInstanceResult = ldap_get_entries($ldapconn, $geraetInstanceSuche);
+			if ($geraetInstanceResult["count"] === 0) {
+				return $response -> withJson(array("message" => "The given geraetInstanz could not be found. Did you accidently provide a geraet instead?"), 404);
+			}
+			$deviceId = substr($deviceInstanceId, strpos($deviceInstanceId, ",") + 1, strlen($deviceInstanceId));
+
+
 
 			$geraetSuche = ldap_search(
 				$ldapconn, 
@@ -1427,6 +1440,9 @@
 				"(&(objectClass=geraet))", 
 				array("dn", "gestaffelteEinweisung", "mqttChannel"));
 			$geraetResult = ldap_get_entries($ldapconn, $geraetSuche);
+			if ($geraetResult["count"] === 0) {
+				return $response -> withJson(array("message" => "No geraet corresponding to this geraetInstanz found. Is it placed correctly within ldap hierarchy?"), 404);
+			}
 
 			$einweisungSuche = ldap_search(
 				$ldapconn,
@@ -1466,8 +1482,7 @@
 				return $response -> withJson(array("message" => "User safety instruction is not valid anymore"), 401);
 			}
 
-			$mqttChannel = $machineResult[0]["mqttchannel"][0];
-			$mqttChannel = "test/m1";
+			$mqttChannel = $geraetInstanceResult[0]["mqttchannel"][0];
 			$mqtt -> publish($mqttChannel, "1", 0, false);
 
 			return $response -> withStatus(200);
@@ -1479,7 +1494,7 @@
 
 
 		if (getenv("DEV")) {
-			$ldaphost = "ldap-provider.fablab-luebeck.de";
+			$ldaphost = "localhost";
 		} else {
 			$ldaphost = "ldap-provider.fablab-luebeck.de";
 		}
@@ -1494,12 +1509,12 @@
 		}
 
 		ldap_set_option($ldapconn,LDAP_OPT_PROTOCOL_VERSION,3);
-		ldap_start_tls($ldapconn);
 		if (!getenv("DEV")) {
+			ldap_start_tls($ldapconn);
 		}
 
 		if (!ldap_bind($ldapconn, $APP_LDAP_USERNAME, $APP_LDAP_PASSWORD)) {
-			return $response -> withStatus(401);
+			return $response -> withJson(array("message" => "Error connecting to LDAP"), 500);
 		}
 
 		$ldap_base_dn = "dc=ldap-provider,dc=fablab-luebeck";

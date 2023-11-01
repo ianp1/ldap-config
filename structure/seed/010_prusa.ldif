@@ -1,6 +1,6 @@
 dn: cn=prusa,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck
-objectClass: geraet
 objectClass: groupOfNames
+objectClass: geraet
 geraetname: prusa
 cn: prusa
 member: uid=mentor,ou=user,dc=ldap-provider,dc=fablab-luebeck
