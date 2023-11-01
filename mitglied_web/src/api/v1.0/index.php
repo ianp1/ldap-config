@@ -1380,11 +1380,12 @@
 
 						for ($i = 0; $i < $geraetInstanceResult["count"]; $i++) {
 							$geraet = array(
-								"displayName" => $geraetResult[$i]["geraetname"][0],
+								"displayName" => $geraetInstanceResult[$i]["cn"][0],
+								"deviceType" => $geraetResult[$i]["geraetname"][0],
 								"status" => "aktiv",
 								"cost" => $geraetInstanceResult[$i]["cost"][0],
 								"imageUrl" => $geraetInstanceResult[$i]["imageurl"][0],
-								"deviceId" => $geraetResult[$i]["dn"],
+								"deviceId" => $geraetInstanceResult[$i]["dn"],
 								"mentor" => $mentor
 							);
 							if (!$mentor) {
