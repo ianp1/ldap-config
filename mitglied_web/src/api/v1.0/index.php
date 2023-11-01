@@ -1371,31 +1371,37 @@
 				
 
 				if ($mentor || $einweisungResult["count"] > 0) {
-					if ($geraetResult[$i]["dn"] == "cn=Drehbank,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck") {
-						//var_dump($geraetResult[$i]);
-						//var_dump($einweisungResult);
-					}
 					if ($mentor || !isset($geraetResult[$i]["gestaffelteeinweisung"]) || $geraetResult[$i]["gestaffelteeinweisung"][0] === "FALSE" || $einweisungResult[0]["aktiviert"][0] === "TRUE") {
 						
-						$geraet = array(
-							"displayName" => $geraetResult[$i]["geraetname"][0],
-							"status" => "aktiv",
-							"cost" => "",
-							"imageUrl" => "",
-							"safetyInstructionDate" => $SicherheitsbelehrungResult[0]["sicherheitsbelehrung"][0],
-							"deviceId" => $geraetResult[$i]["dn"],
-							"mentor" => $mentor
-						);
-						if (!$mentor) {
-							$geraet['trainingDate'] = $einweisungResult[0]["einweisungsdatum"][0];
-						}
+						$geraetInstanceSuche = ldap_search($ldapconn, $geraetResult[$i]["dn"], 
+							"(&(objectClass=geraetInstanz))", 
+							array("dn", "cost", "imageurl", "cn"));
+						$geraetInstanceResult = ldap_get_entries($ldapconn, $geraetInstanceSuche);
 
-						array_push($geraete, $geraet);
+						for ($i = 0; $i < $geraetInstanceResult["count"]; $i++) {
+							$geraet = array(
+								"displayName" => $geraetResult[$i]["geraetname"][0],
+								"status" => "aktiv",
+								"cost" => $geraetInstanceResult[$i]["cost"][0],
+								"imageUrl" => $geraetInstanceResult[$i]["imageurl"][0],
+								"deviceId" => $geraetResult[$i]["dn"],
+								"mentor" => $mentor
+							);
+							if (!$mentor) {
+								$geraet['trainingDate'] = $einweisungResult[0]["einweisungsdatum"][0];
+							}
+	
+							array_push($geraete, $geraet);
+						}
 					}
 				}
 			}
 	
-			return $response -> withJson(array("devices"=>$geraete), 200);
+			$result = array(
+				"devices" => $geraete,
+				"safetyInstructionDate" => $SicherheitsbelehrungResult[0]["sicherheitsbelehrung"][0],
+			);
+			return $response -> withJson($result, 200);
 		});
 
 		$app -> post("/Devices/{deviceInstanceId}/activate/{appId}/{rfid}", function (Request $request, Response $response, array $args) {
