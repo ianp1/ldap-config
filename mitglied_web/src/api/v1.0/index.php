@@ -1378,7 +1378,7 @@
 							array("dn", "cost", "imageurl", "cn"));
 						$geraetInstanceResult = ldap_get_entries($ldapconn, $geraetInstanceSuche);
 
-						for ($i = 0; $i < $geraetInstanceResult["count"]; $i++) {
+						for ($j = 0; $j < $geraetInstanceResult["count"]; $j++) {
 							$geraet = array(
 								"displayName" => $geraetInstanceResult[$i]["cn"][0],
 								"deviceType" => $geraetResult[$i]["geraetname"][0],
