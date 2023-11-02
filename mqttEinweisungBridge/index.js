@@ -32,51 +32,55 @@ client.on('message', function(topic, message) {
         let machine = "cn="+details.machine+",ou=einweisung,dc=ldap-provider,dc=fablab-luebeck";
         let sourceMac = details.terminalMac;
         let rfid = details.rfid;
+
+        if (hasValue(machine) && hasValue(sourceMac) && hasValue(rfid)) {
         
-        axios.get('https://einweisungen.fablab-luebeck.de/api/v1.0/Einweisung/'+rfid+'/'+machine+'?author_bot=terminal&author_password=LwRa2RPYY')
-        .then(response => {
-            console.log("response is: ", response.data);
+            axios.get('https://einweisungen.fablab-luebeck.de/api/v1.0/Einweisung/'+rfid+'/'+machine+'?author_bot=terminal&author_password=LwRa2RPYY')
+            .then(response => {
+                console.log("response is: ", response.data);
 
-            let newTopicArray = topic.split("/");
-            let newTopic = newTopicArray[0] + "/" + newTopicArray[1];
+                let newTopicArray = topic.split("/");
+                let newTopic = newTopicArray[0] + "/" + newTopicArray[1];
 
-	    if (topic.startsWith('machines/v2')) {
-	    	newTopic = newTopic + "/" + newTopicArray[2];
-	    }
-            if (response.data === false) {
-                console.log("response is false");
-                client.publish(newTopic, JSON.stringify(false));
-            } else {
-                
-                //TODO: Parse values
-                let einweisung = response.data.einweisung;
-                let sicherheitsbelehrung = response.data.sicherheitsbelehrung;
-                let aktiviert = response.data.aktiviert;
-                let payload = {
+                if (topic.startsWith('machines/v2')) {
+                    newTopic = newTopic + "/" + newTopicArray[2];
+                }
+
+                if (response.data === false) {
+                    console.log("response is false");
+                    client.publish(newTopic, JSON.stringify(false));
+                } else {
+                    
+                    //TODO: Parse values
+                    let einweisung = response.data.einweisung;
+                    let sicherheitsbelehrung = response.data.sicherheitsbelehrung;
+                    let aktiviert = response.data.aktiviert;
+                    let payload = {
+                        terminalMac: sourceMac,
+                        einweisung: einweisung,
+                        aktiviert: aktiviert,
+                        sicherheitsbelehrung: sicherheitsbelehrung
+                    };
+                    if (!topic.startsWith('machines/v2')) {
+                        if (aktiviert && einweisung !== false && einweisung > 0 && sicherheitsbelehrung !== false && sicherheitsbelehrung > 0) {
+                            console.log("activate relay");
+                            client.publish(newTopic+"/active", "1");
+                        } else {
+                            console.log("dont activate relay:");
+                            console.log(aktiviert, einweisung, sicherheitsbelehrung);
+                        }
+                    }
+                    client.publish(newTopic, JSON.stringify(payload));
+                }
+            }).catch(error => {
+                client.publish(topic, JSON.stringify({
                     terminalMac: sourceMac,
-                    einweisung: einweisung,
-                    aktiviert: aktiviert,
-                    sicherheitsbelehrung: sicherheitsbelehrung
-                };
-		if (!topic.startsWith('machines/v2')) {
-			if (aktiviert && einweisung !== false && einweisung > 0 && sicherheitsbelehrung !== false && sicherheitsbelehrung > 0) {
-			    console.log("activate relay");
-			    client.publish(newTopic+"/active", "1");
-			} else {
-			    console.log("dont activate relay:");
-			    console.log(aktiviert, einweisung, sicherheitsbelehrung);
-			}
-		}
-                client.publish(newTopic, JSON.stringify(payload));
-            }
-        }).catch(error => {
-            client.publish(topic, JSON.stringify({
-                terminalMac: sourceMac,
-                einweisung: false,
-                sicherheitsbelehrung: false
-            }))
-            console.log("error requesting data: ", error);
-        });
+                    einweisung: false,
+                    sicherheitsbelehrung: false
+                }))
+                console.log("error requesting data: ", error);
+            });
+        }
     } catch(e) {
         console.log(e);
     }
@@ -85,3 +89,7 @@ client.on('message', function(topic, message) {
 client.on('error', function(err) {
     console.log("Error: ", err);
 });
+
+function hasValue(value) {
+    return value !== undefined && value !== null && value !== "";
+}
