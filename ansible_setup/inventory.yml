@@ -39,6 +39,7 @@ fablab_linux_servers:
       ansible_user: service
     ldap-web-rep:
       ansible_host: 192.168.24.107
+      ansible_user: service
   vars:
 ##########
 # describes all linux servers within the fablab network (external, not intranet)
