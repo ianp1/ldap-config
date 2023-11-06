@@ -36,6 +36,7 @@ fablab_linux_servers:
       ansible_host: 192.168.16.4
     ldap-provider-rep:
       ansible_host: 192.168.24.106
+      ansible_user: service
     ldap-web-rep:
       ansible_host: 192.168.24.107
   vars:
