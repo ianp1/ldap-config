@@ -1329,6 +1329,60 @@
 
 	//----------- MakercardApp endpoint
 	$app -> group('/MakercardApp', function() use ($app) {
+
+		$app -> get("/Devices/{appId}/{deviceInstanceId}/status", function (Request $request, Response $response, array $args) {
+			$deviceInstanceId = $args["deviceInstanceId"];
+			$ldapconn = $request -> getAttribute("ldapconn");
+			$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
+			$mqtt = $request -> getAttribute("mqtt");
+
+			$geraetInstanceSuche = ldap_read(
+				$ldapconn,
+				$deviceInstanceId,
+				"(&(objectClass=geraetInstanz))",
+				array("dn", "mqttChannel")
+			);
+			$geraetInstanceResult = ldap_get_entries($ldapconn, $geraetInstanceSuche);
+			if ($geraetInstanceResult["count"] === 0) {
+				return $response -> withJson(array("message" => "The given geraetInstanz could not be found. Did you accidently provide a geraet instead?"), 404);
+			}
+
+			$mqttChannelsJson = $geraetInstanceResult[0]["mqttchannel"][0];
+			$mqttChannels = json_decode($mqttChannelsJson, true);
+
+			if ($mqttChannels === null || !isset($mqttChannels["status"]) || !isset($mqttChannels["command"])) {
+				return $response -> withJson(array("message" => "Invalid mqtt channel settings for this geraetInstanz"), 500);
+			} 
+
+			$statusChannel = $mqttChannels["status"];
+			$commandChannel = $mqttChannels["command"];
+
+			$mqtt->registerLoopEventHandler(function ($mqtt, float $elapsedTime) {
+				if ($elapsedTime >= 5) {
+					$mqtt->interrupt();
+				}
+			});
+			$result = array();
+			//subscribe to status channel
+			$mqtt -> subscribe($statusChannel, function ($topic, $message) use ($mqtt, $commandChannel, &$result) {
+				//publish to command channel
+				$result["status"] = "online";
+				$messageContent = json_decode($message, true);
+				$result["enabled"] = $messageContent["output"];
+				$mqtt -> interrupt();
+			}, 0);
+			$mqtt -> publish($commandChannel, "status_update", 0, false);
+
+			$mqtt -> loop(true);
+			// {"id":"123", "src":"user_1", "method":"Switch.Set", "params":{"id":1,"on":true}}
+			
+			if (! isset($result["status"]) ) {
+				return $response -> withJson(array("status" => "offline", "enabled" => false), 200);
+			}
+			return $response -> withJson($result, 200);
+
+		});
+
 		$app -> get('/Devices/{appId}/{rfid}', function(Request $request, Response $response, array $args) {
 			$appId = $args["appId"];
 			$rfid = cleanRFIDTag($args['rfid']);
@@ -1427,7 +1481,7 @@
 				array("dn", "sicherheitsbelehrung"));
 			$userResult = ldap_get_entries($ldapconn, $userSearch);
 
-			$geraetInstanceSuche = ldap_search(
+			$geraetInstanceSuche = ldap_read(
 				$ldapconn,
 				$deviceInstanceId,
 				"(&(objectClass=geraetInstanz))",
@@ -1437,6 +1491,7 @@
 			if ($geraetInstanceResult["count"] === 0) {
 				return $response -> withJson(array("message" => "The given geraetInstanz could not be found. Did you accidently provide a geraet instead?"), 404);
 			}
+
 			$deviceId = substr($deviceInstanceId, strpos($deviceInstanceId, ",") + 1, strlen($deviceInstanceId));
 
 
@@ -1489,11 +1544,30 @@
 				return $response -> withJson(array("message" => "User safety instruction is not valid anymore"), 401);
 			}
 
-			$mqttChannel = $geraetInstanceResult[0]["mqttchannel"][0];
-			$mqtt -> publish($mqttChannel, "1", 0, false);
+			$mqttChannelsJson = $geraetInstanceResult[0]["mqttchannel"][0];
+			$mqttChannels = json_decode($mqttChannelsJson, true);
+
+			if ($mqttChannels === null || !isset($mqttChannels["enable"]) || !isset($mqttChannels["switchId"])) {
+				return $response -> withJson(array("message" => "Invalid mqtt channel settings for this geraetInstanz"), 500);
+			} 
+
+			$mqttChannel = $mqttChannels["enable"];
+			// {"id":"123", "src":"user_1", "method":"Switch.Set", "params":{"id":1,"on":true}}
+			$message = array(
+				"id" => "123",
+				"src" => "mitglied_web_api",
+				"method" => "Switch.Set",
+				"params" => array(
+					"id" => $mqttChannels["switchId"],
+					"on" => true
+				)
+			);
+			$mqtt -> publish($mqttChannel, json_encode($message), 0, false);
 
 			return $response -> withStatus(200);
 		});
+
+		
 
 
 	}) -> add(function ($request, $response, $next) {
