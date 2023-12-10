@@ -1355,6 +1355,10 @@
 			} 
 
 			$statusChannel = $mqttChannels["status"];
+			$statusName = "output";
+			if (isset($mqttChannels["statusName"])) {
+				$statusName = $mqttChannels["statusName"];
+			}
 			$commandChannel = $mqttChannels["command"];
 
 			$mqtt->registerLoopEventHandler(function ($mqtt, float $elapsedTime) {
@@ -1364,11 +1368,12 @@
 			});
 			$result = array();
 			//subscribe to status channel
-			$mqtt -> subscribe($statusChannel, function ($topic, $message) use ($mqtt, $commandChannel, &$result) {
+			$mqtt -> subscribe($statusChannel, function ($topic, $message) use ($mqtt, $commandChannel, $statusName, &$result) {
 				//publish to command channel
 				$result["status"] = "online";
 				$messageContent = json_decode($message, true);
-				$result["enabled"] = $messageContent["output"];
+				$result["enabled"] = $messageContent[$statusName];
+				
 				$mqtt -> interrupt();
 			}, 0);
 			$mqtt -> publish($commandChannel, "status_update", 0, false);
@@ -1390,12 +1395,12 @@
 			$ldapconn = $request -> getAttribute("ldapconn");
 			$ldap_base_dn = $request -> getAttribute("ldap_base_dn");
 	
-			$geraetSuche = ldap_search($ldapconn, "ou=einweisung,".$ldap_base_dn, 
+			$geraetSuche = ldap_list($ldapconn, "ou=einweisung,".$ldap_base_dn, 
 				"(&(objectClass=geraet))", 
 				array("dn", "geraetname", "gestaffelteEinweisung"));
 			$geraetResult = ldap_get_entries($ldapconn, $geraetSuche);
 	
-			$sicherheitsbelehrungSuche = ldap_search($ldapconn, "ou=user,".$ldap_base_dn, 
+			$sicherheitsbelehrungSuche = ldap_list($ldapconn, "ou=user,".$ldap_base_dn, 
 				"(&(objectClass=fablabPerson)(rfid=$rfid))", 
 				array("dn", "sicherheitsbelehrung"));
 			$SicherheitsbelehrungResult = ldap_get_entries($ldapconn, $sicherheitsbelehrungSuche);
@@ -1404,7 +1409,7 @@
 				return $response -> withStatus(404);
 			}
 
-			$mentorSuche = ldap_search($ldapconn, "ou=einweisung,".$ldap_base_dn,
+			$mentorSuche = ldap_list($ldapconn, "ou=einweisung,".$ldap_base_dn,
 				"(&(objectClass=geraet)(member=".$SicherheitsbelehrungResult[0]['dn']."))",
 				array("dn"));
 			$mentorResult = ldap_get_entries($ldapconn, $mentorSuche);
@@ -1415,7 +1420,7 @@
 	
 			$geraete = array();
 			for ($i = 0; $i < $geraetResult["count"]; $i++) {
-				$einweisungSuche = ldap_search($ldapconn, $geraetResult[$i]["dn"], 
+				$einweisungSuche = ldap_list($ldapconn, $geraetResult[$i]["dn"], 
 					"(&(objectClass=einweisung)(eingewiesener=".$SicherheitsbelehrungResult[0]["dn"]."))", 
 					array("dn", "einweisungsdatum", "aktiviert", "kommentar"));
 				$einweisungResult = ldap_get_entries($ldapconn, $einweisungSuche);
@@ -1427,16 +1432,17 @@
 				if ($mentor || $einweisungResult["count"] > 0) {
 					if ($mentor || !isset($geraetResult[$i]["gestaffelteeinweisung"]) || $geraetResult[$i]["gestaffelteeinweisung"][0] === "FALSE" || $einweisungResult[0]["aktiviert"][0] === "TRUE") {
 						
-						$geraetInstanceSuche = ldap_search($ldapconn, $geraetResult[$i]["dn"], 
+						$geraetInstanceSuche = ldap_list($ldapconn, $geraetResult[$i]["dn"], 
 							"(&(objectClass=geraetInstanz))", 
-							array("dn", "cost", "imageurl", "cn"));
+							array("dn", "cost", "imageurl", "cn", "mqttChannel"));
 						$geraetInstanceResult = ldap_get_entries($ldapconn, $geraetInstanceSuche);
+						
 
 						for ($j = 0; $j < $geraetInstanceResult["count"]; $j++) {
 							$geraet = array(
 								"displayName" => $geraetInstanceResult[$j]["cn"][0],
 								"deviceType" => $geraetResult[$i]["geraetname"][0],
-								"status" => "aktiv",
+								"status" => isset($geraetInstanceResult[$j]["mqttchannel"]) ? "mqttManaged" : "unknown",
 								"cost" => $geraetInstanceResult[$j]["cost"][0],
 								"imageUrl" => $geraetInstanceResult[$j]["imageurl"][0],
 								"deviceId" => $geraetInstanceResult[$j]["dn"],
@@ -1625,6 +1631,7 @@
 		$mqtt -> disconnect();
 		ldap_close($ldapconn);
 
+		
 		return $response;
 	});
 	
