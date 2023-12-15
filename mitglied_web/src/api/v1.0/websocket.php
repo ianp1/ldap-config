@@ -64,9 +64,7 @@
 
         setupMqttSubscriptions();
         $server -> after(500, function () use ($server, $fd, $clientName, $mqtt, &$topics) {
-            var_dump($topics);
             foreach ($topics as $topic) {
-                var_dump($topic["command"]);
                 $mqtt -> publish ($topic["command"], 'status_update');
             }
         });
@@ -91,9 +89,7 @@
         echo "received message from {$frame->fd}: {$frame->data}\n";
         try {
             $message = json_decode($frame->data, true);
-            var_dump($message);
-            var_dump($topics);
-            var_dump($topics[$message["deviceId"]]);
+            
             if (isset($message["deviceId"]) && isset($topics[$message["deviceId"]])) {
                 $topics[$message["deviceId"]]["lastUpdate"] = 0;
                 $mqtt -> publish ($topics[$message["deviceId"]]["command"], "status_update");
@@ -138,10 +134,6 @@
 
                 echo "subscribing to {$mqttChannels["status"]}\n";
                 $mqtt -> subscribe($mqttChannels["status"], function (string $topic, string $message) use (&$topics, $server, $fds, $geraetInstanz, $mqttChannels) {
-                    var_dump($topic, $message);
-                    
-
-                    var_dump($topics[$geraetInstanz["dn"]]["lastUpdate"]);
                     if ($topics[$geraetInstanz["dn"]]["lastUpdate"] > time() - 5) {
                         return;
                     }
