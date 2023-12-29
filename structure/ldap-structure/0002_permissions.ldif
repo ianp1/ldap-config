@@ -13,7 +13,7 @@ olcAccess: to dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" filter=(o
 olcAccess: to dn.base="ou=config,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="cn=nextUID,ou=config,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=user,dc=ldap-provider,dc=fablab-luebeck" write by * break
 #bots
-olcAccess: to dn.base="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.subtree="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.subtree="ou=bot,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="ou=group,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=nextcloud,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
