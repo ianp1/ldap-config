@@ -15,3 +15,4 @@ olcAttributeTypes: {10}( 2.25.128424792425578037463837247958458780603.13 NAME 'c
 olcObjectClasses: {0}( 2.25.128424792425578037463837247958458780603.25 NAME 'einweisung' DESC 'Einweisung' SUP top STRUCTURAL MUST ( distinctname $ einweisungsdatum $ eingewiesener) MAY (geraetementor $ aktiviert $ kommentar))
 olcObjectClasses: {1}( 2.25.128424792425578037463837247958458780603.26 NAME 'geraet' DESC 'Geraet' SUP top AUXILIARY MUST ( geraetname ) MAY ( gestaffelteEinweisung $ discordGroup) )
 olcObjectClasses: {2}( 2.25.128424792425578037463837247958458780603.27 NAME 'geraetInstanz' DESC 'Instanz eines Geraets' SUP top STRUCTURAL MUST ( cn ) MAY ( cost $ imageURL $ mqttChannel $ description) )
+olcObjectClasses: {3}( 2.25.128424792425578037463837247958458780603.28 NAME 'discordPresentGroup' DESC 'Discord Gruppe' SUP top AUXILIARY MUST ( discordGroup ) MAY () )
