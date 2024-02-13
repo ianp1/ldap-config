@@ -18,7 +18,7 @@ olcAccess: to dn.subtree="ou=bot,dc=ldap-provider,dc=fablab-luebeck" by dn.child
 olcAccess: to dn.base="ou=group,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=nextcloud,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=discordbot,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" by group.exact="cn=mitgliedverwaltung,ou=group,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.base="ou=posixGroups,ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
-olcAccess: to dn.children="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.exact="cn=nextcloud,ou=bot,dc=ldap-provider,dc=fablab-luebeck" by dn.exact="cn=discordbot,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
+olcAccess: to dn.children="ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.exact="cn=nextcloud,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by dn.exact="cn=discordbot,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=posixGroups,ou=group,dc=ldap-provider,dc=fablab-luebeck" by dn.children="ou=ldap-auth-client,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.subtree="ou=bot,dc=ldap-provider,dc=fablab-luebeck" attrs=children,entry,ou,cn,sn,uid,objectClass,memberOf by dn.exact="cn=nextcloud,ou=bot,dc=ldap-provider,dc=fablab-luebeck" read by * break
 olcAccess: to dn.children="ou=bot,dc=ldap-provider,dc=fablab-luebeck" attrs=userPassword by anonymous auth by * break
