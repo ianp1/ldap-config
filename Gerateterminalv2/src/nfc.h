@@ -1,5 +1,6 @@
 #include <Wire.h>
-#include "pm532/Adafruit_PN532.h"
+#include <Adafruit_PN532.h>
+#include "makercardHTTP.h"
 #define PN532_SS 25
 #define PN532_RST 27
 extern void bootLogTFT(String s);
@@ -57,7 +58,8 @@ boolean readTag(){
       Serial.println("Last card read: " + lastCardRead);
       if (lastCardRead != content) {
         lastCardRead = content;
-        checkCard(content);
+        Machine::loadMachines("Terminal", content);
+        //checkCard(content);
       }
       lastCardReadTimestamp = millis();
   }

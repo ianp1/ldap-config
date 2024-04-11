@@ -103,9 +103,6 @@ void initOTA() {
       else // U_SPIFFS
         type = "filesystem";
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      tft->fillScreen(ST77XX_BLACK);
-      tft->setCursor(0, 0);
-      tft->setTextColor(ST77XX_WHITE);
       bootLogTFT("Start updating " + type);
     })
     .onEnd([]() {

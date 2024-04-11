@@ -1,14 +1,7 @@
 #include <SPI.h>
-#include <TFT_eSPI.h>  // Hardware-specific library
-#include <TJpg_Decoder.h>
+#include <TFT_eSPI.h>
 
-extern String geraet;
-extern bool isMQTTConnected();
 extern int checkWifi();
-#define LED_PIN 4
-#define DIMM_INTERVAL 30000  // 5 Minuten
-#define LED_PWM_HIGH 240
-#define LED_PWM_LOW 10
 
 TFT_eSPI tft = TFT_eSPI();
 bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
@@ -28,74 +21,54 @@ long timestampLastChange = 0;
 
 // Funktionen
 void initTFT() {
-    analogWrite(LED_PIN, LED_PWM_HIGH);
     // Initialise the TFT
     tft.begin();
     tft.setTextColor(0xFFFF, 0x0000);
     tft.fillScreen(TFT_BLACK);
     tft.setSwapBytes(true);
-    // The jpeg image can be scaled by a factor of 1, 2, 4, or 8
-    TJpgDec.setJpgScale(1);
-    // The decoder must be given the exact name of the rendering function above
-    TJpgDec.setCallback(tft_output);
-    tft.
     
-    tft->invertDisplay(false);
-    tft->setRotation(1);
-    tft->fillScreen(ST77XX_BLACK);
-    tft->setCursor(0, 0);
-    tft->setTextColor(ST77XX_WHITE);
+    tft.invertDisplay(false);
+    tft.setRotation(1);
+    tft.fillScreen(TFT_BLACK);
+    tft.setCursor(0, 0);
+    tft.setTextColor(TFT_WHITE);
 }
 
 void bootLogTFT(String s) {
     Serial.println(s);
-    tft->println(s);
-}
-
-void initTouch() {
-    if (!ts.begin()) {
-        bootLogTFT("STMPE not found!");
-        sleep(5000);
-        ESP.restart();
-    }
-    ts.setRotation(1);
-}
-
-bool onDecode(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
-    tft->drawRGBBitmap(x, y, bitmap, w, h);
-    return 1;
+    tft.println(s);
 }
 
 // TODO: Name und alle Einweisungen des Terminals
 void showCardInfo() {
     if (lastDisplayStatus != displayStatus) {
         lastDisplayStatus = displayStatus;
-        tft->fillRect(0, 25, 319, 239, ST77XX_BLACK);
-        tft->setCursor(0, 46);
-        tft->setTextSize(3);
-        tft->setTextColor(ST77XX_WHITE);
-        tft->print("Einweisung: ");
+        tft.fillRect(0, 25, 319, 239, TFT_BLACK);
+        tft.setCursor(0, 46);
+        tft.setTextSize(3);
+        tft.setTextColor(TFT_WHITE);
+        tft.print("Einweisung: ");
         if (einweisung == -1) {
-            tft->setTextColor(ST77XX_RED);
+            tft.setTextColor(TFT_RED);
         } else {
-            tft->setTextColor(ST77XX_GREEN);
+            tft.setTextColor(TFT_GREEN);
         }
-        tft->println(einweisung);
-        tft->setTextColor(ST77XX_WHITE);
-        tft->print("Sicherheitsbelehrung: ");
+        tft.println(einweisung);
+        tft.setTextColor(TFT_WHITE);
+        tft.print("Sicherheitsbelehrung: ");
         if (sicherheitsbelehrung == -1) {
-            tft->setTextColor(ST77XX_RED);
+            tft.setTextColor(TFT_RED);
         } else {
-            tft->setTextColor(ST77XX_GREEN);
+            tft.setTextColor(TFT_GREEN);
         }
-        tft->println(sicherheitsbelehrung);
+        tft.println(sicherheitsbelehrung);
     }
-    if (is_touched) {
+    /*if (tft.getTouch()) {
         displayStatus = 1;
         is_touched = false;
-    }
+    }*/
 }
-
+/*
 void handleTouh() {
     if (ts.touched()) {
         is_touched = true;
@@ -114,68 +87,68 @@ void handleTouh() {
     } else {
         is_touched = false;
     }
-}
+}*/
 
 void displayStatusBar() {
     // Fill Top
-    uint16_t color = ST77XX_WHITE;
-    tft->fillRect(0, 0, 319, 25, color);
+    uint16_t color = TFT_WHITE;
+    tft.fillRect(0, 0, 319, 25, color);
     // Draw Name
-    tft->setCursor(3, 3);
-    color = ST77XX_BLACK;
-    tft->setTextSize(2);
-    tft->setTextColor(color);
-    tft->print(geraet);
+    tft.setCursor(3, 3);
+    color = TFT_BLACK;
+    tft.setTextSize(2);
+    tft.setTextColor(color);
+    tft.print("Hallo");
     // Draw MQTT
-    tft->setCursor(145, 3);
-    if (isMQTTConnected()) {
-        color = ST77XX_GREEN;
+    tft.setCursor(145, 3);
+    if (true) {
+        color = TFT_GREEN;
     } else {
-        color = ST77XX_RED;
+        color = TFT_RED;
     }
-    tft->setTextColor(color);
-    tft->print("MQTT");
+    tft.setTextColor(color);
+    tft.print("MQTT");
 
     // Draw Time
-    color = ST77XX_BLACK;
+    color = TFT_BLACK;
     time_t now = time(nullptr);
     struct tm timeinfo;
     gmtime_r(&now, &timeinfo);
-    tft->setCursor(195, 3);
-    tft->setTextColor(color);
-    tft->print(timeinfo.tm_hour);
-    tft->print(":");
+    tft.setCursor(195, 3);
+    tft.setTextColor(color);
+    tft.print(timeinfo.tm_hour);
+    tft.print(":");
     if (timeinfo.tm_min < 10) {
-        tft->print(0);
+        tft.print(0);
     }
-    tft->print(timeinfo.tm_min);
+    tft.print(timeinfo.tm_min);
     // Draw Wifi
     int srenth = checkWifi();
     if (srenth) {
         if (srenth > -60) {
-            color = ST77XX_GREEN;
+            color = TFT_GREEN;
         } else {
-            color = ST77XX_YELLOW;
+            color = TFT_YELLOW;
         }
     } else {
-        color = ST77XX_RED;
+        color = TFT_RED;
     }
-    tft->setCursor(260, 3);
-    tft->setTextColor(color);
-    tft->print(srenth);
-    tft->print("db");
+    tft.setCursor(260, 3);
+    tft.setTextColor(color);
+    tft.print(srenth);
+    tft.print("db");
     /*
     int ofsetX = 306;
     int ofsetY = 0;
-    tft->drawLine(ofsetX + 0,ofsetY + 7,ofsetX + 4,ofsetY + 3, color);
-    tft->drawLine(ofsetX + 4,ofsetY + 3,ofsetX + 7,ofsetY + 3, color);
-    tft->drawLine(ofsetX + 7,ofsetY + 3,ofsetX + 11,ofsetY + 7, color);
+    tft.drawLine(ofsetX + 0,ofsetY + 7,ofsetX + 4,ofsetY + 3, color);
+    tft.drawLine(ofsetX + 4,ofsetY + 3,ofsetX + 7,ofsetY + 3, color);
+    tft.drawLine(ofsetX + 7,ofsetY + 3,ofsetX + 11,ofsetY + 7, color);
 
-    tft->drawLine(ofsetX + 2,ofsetY + 8,ofsetX + 4,ofsetY + 6, color);
-    tft->drawLine(ofsetX + 4,ofsetY + 6,ofsetX + 7,ofsetY + 6, color);
-    tft->drawLine(ofsetX + 7,ofsetY + 6,ofsetX + 9,ofsetY + 8, color);
+    tft.drawLine(ofsetX + 2,ofsetY + 8,ofsetX + 4,ofsetY + 6, color);
+    tft.drawLine(ofsetX + 4,ofsetY + 6,ofsetX + 7,ofsetY + 6, color);
+    tft.drawLine(ofsetX + 7,ofsetY + 6,ofsetX + 9,ofsetY + 8, color);
 
-    tft->drawRect(ofsetX + 5,ofsetY + 9,2,2, color);*/
+    tft.drawRect(ofsetX + 5,ofsetY + 9,2,2, color);*/
 }
 
 void showUnit(int i) {
@@ -189,34 +162,34 @@ void showUnit(int i) {
         const char *costC = docc["maschines"][i]["cost"];
         lastDisplayStatus = displayStatus;
         int xText = 110;
-        tft->fillRect(0, 25, 319, 239, ST77XX_BLACK);
-        TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
-        tft->setCursor(xText, 30);
-        tft->setTextSize(3);
-        tft->setTextColor(ST77XX_WHITE);
-        tft->println(nameC);  // Schreibe namen names[ausgewahltesGerat]
-        tft->setTextSize(2);
-        tft->setCursor(xText, tft->getCursorY());
-        tft->print("Kosten:");  // GeräteKosten
-        tft->println(costC);    // -> Varriable costs[ausgewahltesGerat]
-        tft->setCursor(0, 140);
-        tft->println("Halte deine Karte vor das");
-        tft->println("Terminal um das Geraet");
-        tft->println("freizuschalten.");
+        tft.fillRect(0, 25, 319, 239, TFT_BLACK);
+        //TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
+        tft.setCursor(xText, 30);
+        tft.setTextSize(3);
+        tft.setTextColor(TFT_WHITE);
+        tft.println(nameC);  // Schreibe namen names[ausgewahltesGerat]
+        tft.setTextSize(2);
+        tft.setCursor(xText, tft.getCursorY());
+        tft.print("Kosten:");  // GeräteKosten
+        tft.println(costC);    // -> Varriable costs[ausgewahltesGerat]
+        tft.setCursor(0, 140);
+        tft.println("Halte deine Karte vor das");
+        tft.println("Terminal um das Geraet");
+        tft.println("freizuschalten.");
     }
     /*
-    tft->print("Einweisung: ");
-    tft->println(einweisung);
-    tft->print("Sicherheitsbelehrung: ");
-    tft->println(sicherheitsbelehrung);
+    tft.print("Einweisung: ");
+    tft.println(einweisung);
+    tft.print("Sicherheitsbelehrung: ");
+    tft.println(sicherheitsbelehrung);
     */
     // Wenn in benutzung von wem und seit wann
     // Wenn nicht, dann "Halte deine Karte vor das Terminal um das Gerät zu aktiviren"
     // Zurück displayStatus = 1; ausgewahltesGerat = -1;
-    if (is_touched) {
+    /*if (is_touched) {
         displayStatus = 1;
         is_touched = false;
-    }
+    }*/
 }
 
 void showOK(int i) {
@@ -228,28 +201,28 @@ void showOK(int i) {
         const char *costC = docc["maschines"][i]["cost"];
         lastDisplayStatus = displayStatus;
         int xText = 110;
-        tft->fillRect(0, 25, 319, 239, ST77XX_BLACK);
-        TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
-        tft->setCursor(xText, 30);
-        tft->setTextSize(3);
-        tft->setTextColor(ST77XX_WHITE);
-        tft->println(nameC);  // Schreibe namen names[ausgewahltesGerat]
-        tft->setTextSize(2);
-        tft->setCursor(xText, tft->getCursorY());
-        tft->print("Kosten:");  // GeräteKosten
-        tft->println(costC);    // -> Varriable costs[ausgewahltesGerat]
-        tft->setCursor(0, 140);
-        tft->setTextSize(4);
-        tft->setTextColor(ST77XX_BLACK, ST77XX_GREEN);
-        tft->print(" Freigegeben ");  // TODO: Testen ob es passt
+        tft.fillRect(0, 25, 319, 239, TFT_BLACK);
+        //TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
+        tft.setCursor(xText, 30);
+        tft.setTextSize(3);
+        tft.setTextColor(TFT_WHITE);
+        tft.println(nameC);  // Schreibe namen names[ausgewahltesGerat]
+        tft.setTextSize(2);
+        tft.setCursor(xText, tft.getCursorY());
+        tft.print("Kosten:");  // GeräteKosten
+        tft.println(costC);    // -> Varriable costs[ausgewahltesGerat]
+        tft.setCursor(0, 140);
+        tft.setTextSize(4);
+        tft.setTextColor(TFT_BLACK, TFT_GREEN);
+        tft.print(" Freigegeben ");  // TODO: Testen ob es passt
     }
-    if (is_touched) {
+    /*if (is_touched) {
         displayStatus = 1;
         is_touched = false;
-    }
+    }*/
 }
 
-void dimmDisplay() {
+/*void dimmDisplay() {
     if (is_touched) {
         if (millis() - timestampLastChange >= DIMM_INTERVAL) {  // TODO: Funktioniert noch nicht, touch geht durch
             is_touched = false;
@@ -264,9 +237,9 @@ void dimmDisplay() {
     } else {
         analogWrite(LED_PIN, LED_PWM_HIGH);
     }
-}
+}*/
 
-void handleTouchInput() {
+/*void handleTouchInput() {
     if (is_touched) {
         is_touched = false;
         if (y > 30) {
@@ -292,10 +265,10 @@ void handleTouchInput() {
             }
         }
     }
-}
+}*/
 
 void showMenu() {
-    tft->fillRect(0, 25, 319, 239, ST77XX_WHITE);
+    tft.fillRect(0, 25, 319, 239, TFT_WHITE);
     JsonArray array = docc["maschines"].as<JsonArray>();
     int countter = 0;
     int xKords[] = {0, 0, 100, 100, 200, 200};
@@ -303,21 +276,21 @@ void showMenu() {
     for (JsonVariant v : array) {
         char imgC[25] = "/";
         strcat(imgC, v["img"]);
-        TJpgDec.drawFsJpg(xKords[countter], yKords[countter], imgC, LittleFS);
-        tft->setTextSize(1);
-        tft->setCursor(xKords[countter], yKords[countter]);
-        tft->setTextColor(ST77XX_WHITE, ST77XX_BLACK);
-        tft->println(v["name"].as<String>());
+        //TJpgDec.drawFsJpg(xKords[countter], yKords[countter], imgC, LittleFS);
+        tft.setTextSize(1);
+        tft.setCursor(xKords[countter], yKords[countter]);
+        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        tft.println(v["name"].as<String>());
         countter++;
     }
 }
 
 void handleDisplayMenue() {
-    dimmDisplay();
+    //dimmDisplay();
     if (displayStatus == 1) {
         ausgewahltesGerat = -1;
         bool skipDraw = lastDisplayStatus == displayStatus;
-        handleTouchInput();
+        //handleTouchInput();
         if (!skipDraw) {
             lastDisplayStatus = displayStatus;
             showMenu();

@@ -1,0 +1,225 @@
+#ifndef MEINE_DEF_H
+#define MEINE_DEF_H
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
+
+class Machine {
+   public:
+    // counter machineCount und max machines
+    static const int maxMachines = 50;
+    static int machineCount;
+    static Machine machines[maxMachines];
+    static const int maxWhitelistSize = 8;
+    static int whitelistCount;
+    static String whitelist[maxWhitelistSize];
+    static unsigned long safetyInstructionDate;
+    String name;
+    String deviceId;
+    String img;
+    String cost;
+    String description;
+    String deviceType;
+    bool isActive;
+    bool isMentor;
+    // DateTime equivalent in Arduino is usually handled with `unsigned long` or `time_t`
+    unsigned long einweisung;
+    String error;
+
+    // Standardkonstruktor
+    Machine()
+        : name(""), img(""), cost(""), deviceId(""), description(""), isMentor(false), isActive(false), einweisung(0), deviceType(""), error("") {}
+
+    // Konstruktor mit Parametern
+    Machine(String name, String img, String cost, String deviceId, String description, bool isMentor, bool isActive, unsigned long einweisung, String deviceType)
+        : name(name), img(img), cost(cost), deviceId(deviceId), description(description), isMentor(isMentor), isActive(isActive), einweisung(einweisung), deviceType(deviceType) {}
+
+    static Machine* getMachines() {
+        return machines;
+    }
+
+    static unsigned long parseDate(const String& dateString) {
+        Serial.println("Date: " + dateString);
+
+        if (dateString.length() != 15) {
+            Serial.println("Invalid date format: " + dateString);
+            return 0;
+        }
+
+        tm elements = {};
+
+        elements.tm_year = dateString.substring(0, 4).toInt() - 1900;
+        elements.tm_mon = dateString.substring(4, 6).toInt() - 1;
+        elements.tm_mday = dateString.substring(6, 8).toInt();
+        elements.tm_hour = dateString.substring(8, 10).toInt();
+        elements.tm_min = dateString.substring(10, 12).toInt();
+        elements.tm_sec = dateString.substring(12, 14).toInt();
+
+        // Debug-Ausgaben
+        Serial.print("Year: ");
+        Serial.println(elements.tm_year + 1900);
+        Serial.print("Month: ");
+        Serial.println(elements.tm_mon + 1);
+        Serial.print("Day: ");
+        Serial.println(elements.tm_mday);
+        Serial.print("Hour: ");
+        Serial.println(elements.tm_hour);
+        Serial.print("Minute: ");
+        Serial.println(elements.tm_min);
+        Serial.print("Second: ");
+        Serial.println(elements.tm_sec);
+
+        time_t time = mktime(&elements);
+
+        if (time == -1) {
+            Serial.println("Invalid date conversion");
+            return 0;
+        }
+        Serial.print("Fertig: ");
+        Serial.println((unsigned long)time);
+        return ((unsigned long)time) + 0;
+    }
+
+    static void parseJSON(String json) {
+        JsonDocument doc;  // Adjust the size based on the complexity of your JSON
+
+        deserializeJson(doc, json);
+        // print doc
+        //serializeJsonPretty(doc, Serial);
+        //safetyInstructionDate = parseDate(doc["safetyInstructionDate"] | "");
+
+        JsonArray devices = doc["devices"];
+
+        machineCount = 0;  // Reset the count each time you parse
+        for (JsonObject device : devices) {
+            if (machineCount >= maxMachines) {
+                Serial.println("Maximum machine count reached, skipping additional devices");
+                break;
+            }
+
+            String name = device["displayName"] | "No Name";
+            Serial.println(name);
+            String img = device["imageUrl"] | "";
+            Serial.println(img);
+            String cost = device["cost"] | "";
+            String deviceId = device["deviceId"] | "";
+            String description = device["description"] | "";
+            String deviceType = device["deviceType"] | "";
+            bool isMentor = device["mentor"] | false;
+            bool isActive = (device["status"] | "unknown") != "unknown";
+
+            // Parse trainingDate
+            Serial.println(isActive);
+            unsigned long einweisung = parseDate(device["trainingDate"] | "");
+
+            // Create a new Machine object and add it to the array
+            machines[machineCount++] = Machine(name, img, cost, deviceId, description, isMentor, isActive, einweisung, deviceType);
+            Serial.println(name + " erfolgreich hinzugefügt");
+        }
+        //UBaseType_t stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+        //Serial.print("Stack High Water Mark: ");
+        //Serial.println(stackHighWaterMark);
+        //parseDate(doc["safetyInstructionDate"] | "");
+        //stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+        //Serial.print("Stack High Water Mark: ");
+        //Serial.println(stackHighWaterMark);
+        //Serial.println(parseDate(doc["safetyInstructionDate"] | ""));
+        //safetyInstructionDate = parseDate(doc["safetyInstructionDate"] | "");
+        //Serial.println("Deine Sicherheitsbelehrung ist noch gültig bis: " + safetyInstructionDate);
+    }
+
+    static void loadMachines(String appId, String rfid) {
+        WiFiClientSecure client;
+        client.setInsecure();  // Use this only if you don't have the certificate
+
+        HTTPClient https;
+
+        String url = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/MakercardApp/Devices/" + appId + "/" + rfid;
+        https.begin(client, url);
+
+        int httpCode = https.GET();
+
+        if (httpCode > 0) {
+            String payload = https.getString();
+            Serial.println(payload);
+            // Parse the payload as JSON and process it
+            payload =
+                "{"
+                "    \"devices\": ["
+                "        {"
+                "            \"displayName\": \"0.4mm Edelstahldüse\","
+                "            \"deviceType\": \"Prusa i3 MK3\","
+                "            \"status\": \"mqttManaged\","
+                "            \"cost\": null,"
+                "            \"imageUrl\": \"https://www.fablab-luebeck.de/user/pages/lasercutter/_lasercutter/lasercutter.jpg\","
+                "            \"deviceId\": \"cn=0.4mm Edelstahldüse,cn=PrusaMK3,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck\","
+                "            \"mentor\": true,"
+                "            \"trainingDate\": \"20230928000000Z\""
+                "        },"
+                "       {"
+                "            \"displayName\": \"0.4mm Edelstahldüse\","
+                "            \"deviceType\": \"Prusa i3 MK3\","
+                "            \"status\": \"mqttManaged\","
+                "            \"cost\": null,"
+                "            \"imageUrl\": \"https://www.fablab-luebeck.de/user/pages/lasercutter/_lasercutter/lasercutter.jpg\","
+                "            \"deviceId\": \"cn=0.4mm Edelstahldüse,cn=PrusaMK3,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck\","
+                "            \"mentor\": true,"
+                "            \"trainingDate\": \"20230928000000Z\""
+                "        }"
+                "    ],"
+                "    \"safetyInstructionDate\": \"20231201000000Z\""
+                "}";
+
+            parseJSON(payload);
+        } else {
+            Serial.print("Error on HTTPS request: ");
+            Serial.println(https.errorToString(httpCode).c_str());
+        }
+
+        https.end();
+    }
+
+    void requestActivateMachine(const String& appId, const String& rfid) {
+        WiFiClientSecure client;
+
+        HTTPClient https;
+        String url = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/MakercardApp/Devices/" + deviceId + "/activate/" + appId + "/" + rfid;
+        Serial.println(url);
+
+        https.begin(client, url);
+        int httpCode = https.POST("");
+
+        if (httpCode > 0) {
+            String response = https.getString();
+            Serial.println(response);
+
+            if (httpCode == 200 && response.indexOf("<!DOCTYPE html>") == -1) {
+                isActive = true;
+            } else {
+                if (response.indexOf("<!DOCTYPE html>") != -1) {
+                    error = "Du befindest dich im falschem Netzwerk. Bitte verbinde dich mit dem FabLab-WLAN.";
+                } else {
+                    error = response;
+                }
+                isActive = false;
+                Serial.println("Anfrage fehlgeschlagen mit Status " + String(httpCode));
+                Serial.println(response);
+            }
+        } else {
+            Serial.println("Error on HTTPS request: " + httpCode);
+            // Serial.println("Error on HTTPS request: " + https.errorToString(httpCode).c_str());
+            isActive = false;
+        }
+
+        https.end();
+    }
+};
+
+int Machine::machineCount = 0;
+Machine Machine::machines[Machine::maxMachines];
+unsigned long Machine::safetyInstructionDate = 0;
+String Machine::whitelist[maxWhitelistSize];
+int Machine::whitelistCount = 0;
+
+#endif // MEINE_DEF_H

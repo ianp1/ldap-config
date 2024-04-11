@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 #include <time.h>
 #include <esp_sleep.h>
+#include <makercardHTTP.h>
 #define CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 int ausgewahltesGerat = -1;// Index der Config geräte
 int einweisung = 0;// Wie lnge eine Einweisung noch vorhanden ist
@@ -14,16 +15,14 @@ long lastCardReadTimestamp = 0;// Wann das letzte mal eine Karte gelesen wurde
 long mqttDisconnectedTimestamp = 0;// Wann der MQTT teil die verbindung verloren hat
 const int dailyRestartHour = 4;
 const int restartDelayInMinutes = 10;
-DynamicJsonDocument docc(2048);
+JsonDocument docc;
 // Filesystem
 #include "FS.h"
 #include <LittleFS.h>
 //TFT
-#include "display.h"
+#include "displayeSPI.h"
 // WLAN/OTA/time
 #include "wlan.h"
-// MQTT
-#include "mqttteil.h"
 // Cardreader
 #include "nfc.h"
 // Funktionen
@@ -82,24 +81,40 @@ void initFilsystem() {
 void getConfig() {
   // Read the file
   File file = LittleFS.open("/config.json", "r");
-  DeserializationError error = deserializeJson(docc, file);
+  if (!file) {
+    Serial.println("Failed to open config file");
+    return;
+  }
+DeserializationError error = deserializeJson(docc, file); // `file` ist schon geöffnet mit LittleFS.open("/config.json", "r");
   if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    sleep(5000);
+    bootLogTFT("deserializeJson() failed: ");
+    bootLogTFT(error.f_str());
+    delay(5000);
     ESP.restart();
   }
-  //für alle maschienen setze activstatus auf 0
-  for (int i = 0; i < docc["maschines"].size(); i++) {
-    docc["maschines"][i]["activestart"] = 0;
+
+  JsonArray arr = docc["Whitelist"];
+  Machine::whitelistCount = arr.size() < Machine::maxWhitelistSize ? arr.size() : Machine::maxWhitelistSize;
+  for (int i = 0; i < Machine::whitelistCount; i++) {
+    Machine::whitelist[i] = arr[i].as<String>();
   }
+
+  // Beispiel, um die geladenen Werte zu überprüfen
+  bootLogTFT("Geladene Whitelist:");
+  for (int i = 0; i < Machine::whitelistCount; i++) {
+    bootLogTFT(Machine::whitelist[i]);
+  }
+  //für alle maschienen setze activstatus auf 0
+  //for (int i = 0; i < docc["maschines"].size(); i++) {
+  //  docc["maschines"][i]["activestart"] = 0;
+  //}
   //docc["maschines"][countter]["activestart"] != 0
   // Varriablen in Json lassen?
-  geraet = docc["name"].as<String>();
-  mqttChannel = docc["mqtt"]["mqttChannel"].as<String>();
-  mqttChannelCard = mqttChannel + "/card";
-  mqttUser = docc["mqtt"]["mqttUser"].as<String>();
-  mqttPassword = docc["mqtt"]["mqttPassword"].as<String>();
+  //geraet = docc["name"].as<String>();
+  //mqttChannel = docc["mqtt"]["mqttChannel"].as<String>();
+  //mqttChannelCard = mqttChannel + "/card";
+  //mqttUser = docc["mqtt"]["mqttUser"].as<String>();
+  //mqttPassword = docc["mqtt"]["mqttPassword"].as<String>();
 
   file.close();
   bootLogTFT("finished reading filesystem information");
@@ -129,37 +144,14 @@ void setup() {
   initOTA();
   //set Time
   initTime();
-  //    JSON Alle angeschlossenen Geräte
-  // connect to mqtt
-  initMQTT();
   // Start Touch
-  initTouch();
-  handleTouh();
+  //initTouch();
+  //handleTouh();
   // init cardreader
   initCard();
   // init Images
-  TJpgDec.setCallback(onDecode);
+  //TJpgDec.setCallback(onDecode);
   displayStatus = 1;// Menue
-}
-
-//TODO: Config Geräte namen mit auswahl an ausgewahltesGerat
-//TODO: Wenn status der Maschine angeschaltet, dann ausschalten -> Eventuell erst abfrage einbauen
-void checkCard(String content) {
-  String payload = "{\"terminalMac\": \"" + WiFi.macAddress() + "\",\"machine\": \"" + docc["maschines"][ausgewahltesGerat]["einweisungsname"].as<String>() + "\",\"rfid\": \"" + content + "\"}";
-  String topic = String(docc["maschines"][ausgewahltesGerat]["mqttChannel"].as<String>() + "/card");
-  Serial.print("Veröffentliche Nachricht: ");
-  Serial.println(payload);
-  Serial.print("auf Thema: ");
-  Serial.println(topic);
-  bool success = mqttClient.publish(topic, payload.c_str());
-  if (success) {
-    cardSendTimestamp = millis();
-  } else {
-    //lastError()
-    Serial.println(mqttClient.lastError());
-    // Fehlerbehandlung, z.B. Anzeige einer Fehlermeldung auf dem Display oder Protokollierung des Fehlers
-    Serial.println("Fehler beim Veröffentlichen der MQTT-Nachricht: " + payload);
-  }
 }
 
 
@@ -167,7 +159,7 @@ void restartDailyAtFour() {
   time_t now = time(nullptr);
   struct tm timeinfo;
   localtime_r(&now, &timeinfo);
-
+  // Restart at 4am
   if (timeinfo.tm_hour == dailyRestartHour && (now - timestampLastChange) >= (restartDelayInMinutes * 60)) {
     bootLogTFT("Restarting ESP32 at 4am...");
     esp_restart();
@@ -177,10 +169,8 @@ void restartDailyAtFour() {
 void loop() {
   //Chck Wlan connection and reconnect
   checkWifi();
-  //MQTT Get Device state and Update time and User
-  checkMQTT();
   //Touch on Device, switch to Image and Menue(Frischalten/Freigeben, Sperren, Kosten Info, Zurück)-> bestätigung durch Karte
-  handleTouh();
+  //handleTouh();
   //Check card -> New Card -> Display Name Einweisungen kompatible und Sicherheitsbelehrung.(zurück Button)
   boolean isCard =  readTag();
   if (lastCardReadTimestamp + 2000 < millis() && !isCard) {//Keine Karte seit 10 Sekunden

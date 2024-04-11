@@ -13,3 +13,4 @@ Switch-GetStatus: https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndService
 	- http://192.168.13.160/rpc/Switch.GetStatus?id=0
 System: http://192.168.13.160/rpc/Sys.GetStatus
 
+{"id":"123", "src":"user_1", "method":"Switch.Set", "params":{"id":2,"on":true}}
