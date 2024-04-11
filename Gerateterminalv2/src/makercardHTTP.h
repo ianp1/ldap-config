@@ -99,6 +99,16 @@ class Machine {
             }
 
             String name = device["displayName"] | "No Name";
+            bool isInWhitelist = false;
+            for (int j = 0; j < whitelistCount; j++) {
+                if (whitelist[j] == name) {
+                    isInWhitelist = true;
+                    break; // Beendet die innere Schleife, wenn der Name gefunden wurde
+                }
+            }
+            if (!isInWhitelist) {
+                continue;
+            }
             Serial.println(name);
             String img = device["imageUrl"] | "";
             Serial.println(img);

@@ -1,5 +1,7 @@
 #include <SPI.h>
 #include <TFT_eSPI.h>
+#include <JPEGDecoder.h>       // JPEGDecoder-Bibliothek für das Dekodieren des JPEG
+
 
 extern int checkWifi();
 
@@ -10,6 +12,8 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
     return 1;
 }
 
+uint16_t x = 0, y = 0; // To store the touch coordinates
+bool pressed = false;
 int displayStatus = 0;
 int lastDisplayStatus = -1;
 long timestampLastChange = 0;
@@ -32,6 +36,27 @@ void initTFT() {
     tft.fillScreen(TFT_BLACK);
     tft.setCursor(0, 0);
     tft.setTextColor(TFT_WHITE);
+}
+
+// Funktion zum Anzeigen eines JPEG-Bildes von einer URL
+void displayJPEGFromURL(String url) {
+    // TODO Prüfen ob Bild schon im Speicher ist, wenn nicht, dann runterladen, wenn doch, dann rendern
+  HTTPClient http;
+  http.begin(url); // Beginne die HTTP-Anfrage
+
+  int httpCode = http.GET(); // Starte die GET-Anfrage
+
+  // Prüfe den HTTP-Statuscode
+  if (httpCode == HTTP_CODE_OK) {
+    // Hole den Stream
+    WiFiClient *stream = http.getStreamPtr();
+    // TODO Render Image
+    //https://github.com/Bodmer/TFT_eSPI/blob/master/examples/Generic/ESP32_SDcard_jpeg/ESP32_SDcard_jpeg.ino
+  } else {
+    Serial.println("Bild konnte nicht geladen werden. HTTP-Anfrage fehlgeschlagen.");
+  }
+
+  http.end(); // Beende die HTTP-Sitzung
 }
 
 void bootLogTFT(String s) {
@@ -63,31 +88,25 @@ void showCardInfo() {
         }
         tft.println(sicherheitsbelehrung);
     }
-    /*if (tft.getTouch()) {
+    if (pressed) {
         displayStatus = 1;
-        is_touched = false;
-    }*/
+        pressed = false;
+    }
 }
-/*
+
 void handleTouh() {
-    if (ts.touched()) {
-        is_touched = true;
-        TS_Point p = ts.getPoint();
-        x = map(p.x, 3850, 180, 0, 320);
-        y = map(p.y, 3850, 180, 0, 240);
-        z = p.z;
+
+  // Pressed will be set true is there is a valid touch on the screen
+  pressed = tft.getTouch(&x, &y);
+    if (pressed) {
         Serial.print("->(");
         Serial.print(x);
         Serial.print(", ");
         Serial.print(y);
-        Serial.print(", ");
-        Serial.print(z);
         Serial.println(")");
         timestampLastChange = millis();
-    } else {
-        is_touched = false;
     }
-}*/
+}
 
 void displayStatusBar() {
     // Fill Top
@@ -186,10 +205,10 @@ void showUnit(int i) {
     // Wenn in benutzung von wem und seit wann
     // Wenn nicht, dann "Halte deine Karte vor das Terminal um das Gerät zu aktiviren"
     // Zurück displayStatus = 1; ausgewahltesGerat = -1;
-    /*if (is_touched) {
+    if (pressed) {
         displayStatus = 1;
-        is_touched = false;
-    }*/
+        pressed = false;
+    }
 }
 
 void showOK(int i) {
@@ -216,32 +235,32 @@ void showOK(int i) {
         tft.setTextColor(TFT_BLACK, TFT_GREEN);
         tft.print(" Freigegeben ");  // TODO: Testen ob es passt
     }
-    /*if (is_touched) {
+    if (pressed) {
         displayStatus = 1;
-        is_touched = false;
-    }*/
+        pressed = false;
+    }
 }
 
-/*void dimmDisplay() {
-    if (is_touched) {
-        if (millis() - timestampLastChange >= DIMM_INTERVAL) {  // TODO: Funktioniert noch nicht, touch geht durch
-            is_touched = false;
+void dimmDisplay() {
+    if (pressed) {
+        if (millis() - timestampLastChange >= 50000) {  // TODO: Funktioniert noch nicht, touch geht durch
+            pressed = false;
         }
         timestampLastChange = millis();
     }
     if (lastDisplayStatus != displayStatus) {
         timestampLastChange = millis();
     }
-    if (millis() - timestampLastChange >= DIMM_INTERVAL) {
-        analogWrite(LED_PIN, LED_PWM_LOW);
+    if (millis() - timestampLastChange >= 50000) {
+        analogWrite(TFT_BL, 240);
     } else {
-        analogWrite(LED_PIN, LED_PWM_HIGH);
+        analogWrite(TFT_BL, 200);
     }
-}*/
+}
 
-/*void handleTouchInput() {
-    if (is_touched) {
-        is_touched = false;
+void handleTouchInput() {
+    if (pressed) {
+        pressed = false;
         if (y > 30) {
             displayStatus = 3;
             if (x < 100) {
@@ -265,7 +284,7 @@ void showOK(int i) {
             }
         }
     }
-}*/
+}
 
 void showMenu() {
     tft.fillRect(0, 25, 319, 239, TFT_WHITE);
@@ -286,11 +305,11 @@ void showMenu() {
 }
 
 void handleDisplayMenue() {
-    //dimmDisplay();
+    dimmDisplay();
     if (displayStatus == 1) {
         ausgewahltesGerat = -1;
         bool skipDraw = lastDisplayStatus == displayStatus;
-        //handleTouchInput();
+        handleTouchInput();
         if (!skipDraw) {
             lastDisplayStatus = displayStatus;
             showMenu();
