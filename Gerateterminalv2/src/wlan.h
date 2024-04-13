@@ -61,102 +61,107 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 long wifiDisconnectedTimestamp = 0;
 #include <WiFiClientSecure.h>
 WiFiClientSecure wifiClient;
-//OTA
+// OTA
+#include <ArduinoOTA.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
-#include <ArduinoOTA.h>
 // Time
 #include <time.h>
 
 void initWlan() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  //WiFi.setSleep(false);
-  bootLogTFT("Verbinde WLAN");
-  int abortCounter = 0;
-  while (WiFi.status() != WL_CONNECTED) {
-    abortCounter++;
-    delay(500);
-    Serial.print(".");
-    if (abortCounter >=20) {
-      bootLogTFT("WLAN verbindet nicht, starte neu.");
-      delay(5000);
-      ESP.restart();
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    // WiFi.setSleep(false);
+    bootLogTFT("Verbinde WLAN");
+    int abortCounter = 0;
+    while (WiFi.status() != WL_CONNECTED) {
+        abortCounter++;
+        delay(500);
+        Serial.print(".");
+        if (abortCounter >= 20) {
+            bootLogTFT("WLAN verbindet nicht, starte neu.");
+            delay(5000);
+            ESP.restart();
+        }
     }
-  }
-  Serial.println("");
-  bootLogTFT("WiFi connected");
-  bootLogTFT("IP address: ");
-  wifiClient.setCACert(ca_cert);
+    Serial.println("");
+    bootLogTFT("WiFi connected");
+    bootLogTFT("IP address: ");
+    wifiClient.setCACert(ca_cert);
 }
 
 void initOTA() {
-  ArduinoOTA.setPassword("11Ie8alLvfe50It");
-  ArduinoOTA
-    .onStart([]() {
-      String type;
-      if (ArduinoOTA.getCommand() == U_FLASH)
-        type = "sketch";
-      else // U_SPIFFS
-        type = "filesystem";
-      // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      bootLogTFT("Start updating " + type);
-    })
-    .onEnd([]() {
-      bootLogTFT("\nEnd");
-    })
-    .onProgress([](unsigned int progress, unsigned int total) {
-      bootLogTFT("Progress: " + String(progress / (total / 100)));
-    })
-    .onError([](ota_error_t error) {
-      Serial.printf("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) bootLogTFT("Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) bootLogTFT("Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) bootLogTFT("Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) bootLogTFT("Receive Failed");
-      else if (error == OTA_END_ERROR) bootLogTFT("End Failed");
-    });
-  ArduinoOTA.begin();
+    ArduinoOTA.setPassword("11Ie8alLvfe50It");
+    ArduinoOTA
+        .onStart([]() {
+            String type;
+            if (ArduinoOTA.getCommand() == U_FLASH)
+                type = "sketch";
+            else  // U_SPIFFS
+                type = "filesystem";
+            // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+            bootLogTFT("Start updating " + type);
+        })
+        .onEnd([]() {
+            bootLogTFT("\nEnd");
+        })
+        .onProgress([](unsigned int progress, unsigned int total) {
+            bootLogTFT("Progress: " + String(progress / (total / 100)));
+        })
+        .onError([](ota_error_t error) {
+            Serial.printf("Error[%u]: ", error);
+            if (error == OTA_AUTH_ERROR)
+                bootLogTFT("Auth Failed");
+            else if (error == OTA_BEGIN_ERROR)
+                bootLogTFT("Begin Failed");
+            else if (error == OTA_CONNECT_ERROR)
+                bootLogTFT("Connect Failed");
+            else if (error == OTA_RECEIVE_ERROR)
+                bootLogTFT("Receive Failed");
+            else if (error == OTA_END_ERROR)
+                bootLogTFT("End Failed");
+        });
+    ArduinoOTA.begin();
 }
 
 /**
  * Sets ntp up, needed for ssl verification
  */
 time_t initTime() {
-  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
-  setenv("TZ", "CET-1CEST,M3.5.0/2,M10.5.0/3", 1);
-  tzset();
-  bootLogTFT("Waiting for NTP time sync: ");
-  int cT = 0;
-  time_t now = time(nullptr);
-  while (now < 8 * 3600 * 2) {
-    delay(100);
-    now = time(nullptr);
-    cT++;
-    if (cT%10 == 0) {
-      bootLogTFT("Sync in Progress");
+    configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+    //setenv("TZ", "CET-1CEST,M3.5.0/2,M10.5.0/3", 1);
+    tzset();
+    bootLogTFT("Waiting for NTP time sync: ");
+    int cT = 0;
+    time_t now = time(nullptr);
+    while (now < 8 * 3600 * 2) {
+        delay(100);
+        now = time(nullptr);
+        cT++;
+        if (cT % 10 == 0) {
+            bootLogTFT("Sync in Progress");
+        }
+        if (cT >= 150) {  // nach 15 Sekunden
+            bootLogTFT("Zeitserver braucht zu lange");
+            delay(5000);
+            ESP.restart();
+        }
     }
-    if (cT >= 150){// nach 15 Sekunden
-      bootLogTFT("Zeitserver braucht zu lange");
-      delay(5000);
-      ESP.restart();
-    }
-  }
-  struct tm timeinfo;
-  gmtime_r(&now, &timeinfo);
-  bootLogTFT("Current time: " + String(asctime(&timeinfo)));
-  return now;
+    struct tm timeinfo;
+    gmtime_r(&now, &timeinfo);
+    bootLogTFT("Current time: " + String(asctime(&timeinfo)));
+    return now;
 }
 
 int checkWifi() {
-  if (WiFi.status() != WL_CONNECTED) {
-    if (wifiDisconnectedTimestamp == 0) {
-      wifiDisconnectedTimestamp = millis();
+    if (WiFi.status() != WL_CONNECTED) {
+        if (wifiDisconnectedTimestamp == 0) {
+            wifiDisconnectedTimestamp = millis();
+        }
+        // startup = true;//TODO: Eventuell hilfreich
+        return 0;
+    } else {
+        wifiDisconnectedTimestamp = 0;
+        return WiFi.RSSI();
     }
-    //startup = true;//TODO: Eventuell hilfreich
-    return 0;
-  }else {
-    wifiDisconnectedTimestamp = 0;
-    return WiFi.RSSI();
-  }
 }

@@ -2,9 +2,9 @@
 #define MEINE_DEF_H
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
+#include <TimeLib.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include <TimeLib.h>
 extern int lastDisplayStatus;
 extern int ausgewahltesGerat;
 extern int displayStatus;
@@ -48,10 +48,10 @@ class Machine {
     }
 
     static String formatDate(time_t timestamp) {
-        char buf[11]; // Speicher für das Datum im Format DD.MM.YYYY plus Null-Terminator
+        char buf[11];  // Speicher für das Datum im Format DD.MM.YYYY plus Null-Terminator
         tmElements_t tm;
 
-        breakTime(timestamp, tm); // Konvertiere den Unix-Zeitstempel in eine Zeitstruktur
+        breakTime(timestamp, tm);  // Konvertiere den Unix-Zeitstempel in eine Zeitstruktur
 
         snprintf(buf, sizeof(buf), "%02d.%02d.%04d", tm.Day, tm.Month, tmYearToCalendar(tm.Year));
         return String(buf);
@@ -104,7 +104,7 @@ class Machine {
 
         deserializeJson(doc, json);
         // print doc
-        //serializeJsonPretty(doc, Serial);
+        // serializeJsonPretty(doc, Serial);
         Serial.println(doc["safetyInstructionDate"] | "");
         safetyInstructionDate = parseDate(doc["safetyInstructionDate"] | "");
 
@@ -122,7 +122,7 @@ class Machine {
             for (int j = 0; j < whitelistCount; j++) {
                 if (whitelist[j] == name) {
                     isInWhitelist = true;
-                    break; // Beendet die innere Schleife, wenn der Name gefunden wurde
+                    break;  // Beendet die innere Schleife, wenn der Name gefunden wurde
                 }
             }
             if (!isInWhitelist) {
@@ -149,18 +149,18 @@ class Machine {
         if (whitelistCount == 1 && machineCount == 1) {
             machines->requestActivateMachine(rfid);
         }
-        
-        //UBaseType_t stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
-        //Serial.print("Stack High Water Mark: ");
-        //Serial.println(stackHighWaterMark);
-        //parseDate(doc["safetyInstructionDate"] | "");
-        //stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
-        //Serial.print("Stack High Water Mark: ");
-        //Serial.println(stackHighWaterMark);
-        //Serial.println(parseDate(doc["safetyInstructionDate"] | ""));
-        //safetyInstructionDate = parseDate(doc["safetyInstructionDate"] | "");
-        //Serial.println("Deine Sicherheitsbelehrung ist noch gültig bis: " + safetyInstructionDate);
-        //sicherheitsbelehrung = safetyInstructionDate
+
+        // UBaseType_t stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+        // Serial.print("Stack High Water Mark: ");
+        // Serial.println(stackHighWaterMark);
+        // parseDate(doc["safetyInstructionDate"] | "");
+        // stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+        // Serial.print("Stack High Water Mark: ");
+        // Serial.println(stackHighWaterMark);
+        // Serial.println(parseDate(doc["safetyInstructionDate"] | ""));
+        // safetyInstructionDate = parseDate(doc["safetyInstructionDate"] | "");
+        // Serial.println("Deine Sicherheitsbelehrung ist noch gültig bis: " + safetyInstructionDate);
+        // sicherheitsbelehrung = safetyInstructionDate
     }
 
     static void loadMachines(String rfid) {
@@ -197,6 +197,36 @@ class Machine {
                 "            \"deviceType\": \"Prusa i3 MK3\","
                 "            \"status\": \"mqttManaged\","
                 "            \"cost\": \"1.1\","
+                "            \"imageUrl\": \"https://www.fablab-luebeck.de/user/pages/lasercutter/_lasercutter/lasercutter.jpg\","
+                "            \"deviceId\": \"cn=0.4mm Edelstahldüse,cn=PrusaMK3,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck\","
+                "            \"mentor\": true,"
+                "            \"trainingDate\": \"20230928000000Z\""
+                "        },"
+                "       {"
+                "            \"displayName\": \"Namexy2\","
+                "            \"deviceType\": \"Prusa i3 MK3\","
+                "            \"status\": \"mqttManaged\","
+                "            \"cost\": \"2.1\","
+                "            \"imageUrl\": \"https://www.fablab-luebeck.de/user/pages/lasercutter/_lasercutter/lasercutter.jpg\","
+                "            \"deviceId\": \"cn=0.4mm Edelstahldüse,cn=PrusaMK3,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck\","
+                "            \"mentor\": true,"
+                "            \"trainingDate\": \"20230928000000Z\""
+                "        },"
+                "       {"
+                "            \"displayName\": \"Namexy2\","
+                "            \"deviceType\": \"Prusa i3 MK3\","
+                "            \"status\": \"mqttManaged\","
+                "            \"cost\": \"3.1\","
+                "            \"imageUrl\": \"https://www.fablab-luebeck.de/user/pages/lasercutter/_lasercutter/lasercutter.jpg\","
+                "            \"deviceId\": \"cn=0.4mm Edelstahldüse,cn=PrusaMK3,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck\","
+                "            \"mentor\": true,"
+                "            \"trainingDate\": \"20230928000000Z\""
+                "        },"
+                "       {"
+                "            \"displayName\": \"Namexy2\","
+                "            \"deviceType\": \"Prusa i3 MK3\","
+                "            \"status\": \"mqttManaged\","
+                "            \"cost\": \"4.1\","
                 "            \"imageUrl\": \"https://www.fablab-luebeck.de/user/pages/lasercutter/_lasercutter/lasercutter.jpg\","
                 "            \"deviceId\": \"cn=0.4mm Edelstahldüse,cn=PrusaMK3,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck\","
                 "            \"mentor\": true,"
@@ -260,7 +290,7 @@ class Machine {
         }
         https.end();
         Serial.println("Gerät freischalten Fertig");
-        lastDisplayStatus -1;
+        lastDisplayStatus - 1;
         timestampLastChange = millis();
     }
 };
@@ -271,4 +301,4 @@ unsigned long Machine::safetyInstructionDate = 0;
 String Machine::whitelist[maxWhitelistSize];
 int Machine::whitelistCount = 0;
 
-#endif // MEINE_DEF_H
+#endif  // MEINE_DEF_H

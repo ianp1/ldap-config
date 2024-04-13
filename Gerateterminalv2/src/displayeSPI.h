@@ -1,7 +1,6 @@
+#include <JPEGDecoder.h>  // JPEGDecoder-Bibliothek für das Dekodieren des JPEG
 #include <SPI.h>
 #include <TFT_eSPI.h>
-#include <JPEGDecoder.h>       // JPEGDecoder-Bibliothek für das Dekodieren des JPEG
-
 
 extern int checkWifi();
 
@@ -12,7 +11,7 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
     return 1;
 }
 
-uint16_t x = 0, y = 0; // To store the touch coordinates
+uint16_t x = 0, y = 0;  // To store the touch coordinates
 bool pressed = false;
 int displayStatus = 0;
 int lastDisplayStatus = -1;
@@ -28,12 +27,12 @@ long timestampLastChange = 0;
 void initTFT() {
     // Initialise the TFT
     tft.begin();
+    tft.setRotation(3);
+    tft.setSwapBytes(true);
+    tft.invertDisplay(false);
+    tft.setTextFont(1);
     tft.setTextColor(0xFFFF, 0x0000);
     tft.fillScreen(TFT_BLACK);
-    tft.setSwapBytes(true);
-    
-    tft.invertDisplay(false);
-    tft.setRotation(1);
     tft.fillScreen(TFT_BLACK);
     tft.setCursor(0, 0);
     tft.setTextColor(TFT_WHITE);
@@ -42,22 +41,22 @@ void initTFT() {
 // Funktion zum Anzeigen eines JPEG-Bildes von einer URL
 void displayJPEGFromURL(String url) {
     // TODO Prüfen ob Bild schon im Speicher ist, wenn nicht, dann runterladen, wenn doch, dann rendern
-  HTTPClient http;
-  http.begin(url); // Beginne die HTTP-Anfrage
+    HTTPClient http;
+    http.begin(url);  // Beginne die HTTP-Anfrage
 
-  int httpCode = http.GET(); // Starte die GET-Anfrage
+    int httpCode = http.GET();  // Starte die GET-Anfrage
 
-  // Prüfe den HTTP-Statuscode
-  if (httpCode == HTTP_CODE_OK) {
-    // Hole den Stream
-    WiFiClient *stream = http.getStreamPtr();
-    // TODO Render Image
-    //https://github.com/Bodmer/TFT_eSPI/blob/master/examples/Generic/ESP32_SDcard_jpeg/ESP32_SDcard_jpeg.ino
-  } else {
-    Serial.println("Bild konnte nicht geladen werden. HTTP-Anfrage fehlgeschlagen.");
-  }
+    // Prüfe den HTTP-Statuscode
+    if (httpCode == HTTP_CODE_OK) {
+        // Hole den Stream
+        WiFiClient *stream = http.getStreamPtr();
+        // TODO Render Image
+        // https://github.com/Bodmer/TFT_eSPI/blob/master/examples/Generic/ESP32_SDcard_jpeg/ESP32_SDcard_jpeg.ino
+    } else {
+        Serial.println("Bild konnte nicht geladen werden. HTTP-Anfrage fehlgeschlagen.");
+    }
 
-  http.end(); // Beende die HTTP-Sitzung
+    http.end();  // Beende die HTTP-Sitzung
 }
 
 void bootLogTFT(String s) {
@@ -69,9 +68,9 @@ void bootLogTFT(String s) {
 void showCardInfo() {
     if (lastDisplayStatus != displayStatus) {
         lastDisplayStatus = displayStatus;
-        tft.fillRect(0, 25, 319, 239, TFT_BLACK);
-        tft.setCursor(0, 46);
-        tft.setTextSize(3);
+        tft.fillRect(0, 18, 319, 239, TFT_BLACK);
+        tft.setCursor(0, 39);
+        tft.setTextFont(4);
         tft.setTextColor(TFT_WHITE);
         tft.print("Einweisung: ");
         if (einweisung == -1) {
@@ -96,7 +95,7 @@ void showCardInfo() {
 }
 
 void handleTouh() {
-    //debounce
+    // debounce
     if (millis() - timestampLastChange >= 200) {
         pressed = tft.getTouch(&x, &y);
         if (pressed) {
@@ -113,11 +112,11 @@ void handleTouh() {
 void displayStatusBar() {
     // Fill Top
     uint16_t color = TFT_WHITE;
-    tft.fillRect(0, 0, 319, 25, color);
+    tft.fillRect(0, 0, 319, 18, color);
     // Draw Name
-    tft.setCursor(3, 3);
+    tft.setCursor(3, 1);
     color = TFT_BLACK;
-    tft.setTextSize(2);
+    tft.setTextFont(2);
     tft.setTextColor(color);
     tft.print(terminalName);
     // Draw MQTT
@@ -135,7 +134,7 @@ void displayStatusBar() {
     time_t now = time(nullptr);
     struct tm timeinfo;
     gmtime_r(&now, &timeinfo);
-    tft.setCursor(190, 3);
+    tft.setCursor(190, 1);
     tft.setTextColor(color);
     tft.print(timeinfo.tm_hour);
     tft.print(":");
@@ -154,7 +153,7 @@ void displayStatusBar() {
     } else {
         color = TFT_RED;
     }
-    tft.setCursor(255, 3);
+    tft.setCursor(255, 1);
     tft.setTextColor(color);
     tft.print(srenth);
     tft.print("db");
@@ -177,23 +176,23 @@ void showUnit(int i) {
     if (ausgewahltesGerat == -1) {
         showCardInfo();
     } else if (lastDisplayStatus != displayStatus) {
-        //const char *nameC = docc["maschines"][i]["name"];
-        //char imgC[25] = "/";
-        //strcat(imgC, docc["maschines"][i]["img"]);
-        //const char *costC = docc["maschines"][i]["cost"];
+        // const char *nameC = docc["maschines"][i]["name"];
+        // char imgC[25] = "/";
+        // strcat(imgC, docc["maschines"][i]["img"]);
+        // const char *costC = docc["maschines"][i]["cost"];
         lastDisplayStatus = displayStatus;
         int xText = 0;
-        tft.fillRect(0, 25, 319, 240, TFT_BLACK);
-        //TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
-        tft.setCursor(xText, 30);
-        tft.setTextSize(2);
+        tft.fillRect(0, 18, 320, 230, TFT_BLACK);
+        // TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
+        tft.setCursor(xText, 27);
+        tft.setTextFont(4);
         tft.setTextColor(TFT_WHITE);
         tft.println(Machine::machines[i].name);  // Schreibe namen names[ausgewahltesGerat]
-        tft.setTextSize(2);
+        tft.setTextFont(4);
         tft.setCursor(xText, tft.getCursorY());
-        tft.print("Kosten:");  // GeräteKosten
-        tft.println(Machine::machines[i].cost);    // -> Varriable costs[ausgewahltesGerat]
-        tft.print("Einweisung vom: ");
+        tft.print("Kosten:");                    // GeräteKosten
+        tft.println(Machine::machines[i].cost);  // -> Varriable costs[ausgewahltesGerat]
+        tft.print("Einweisung am:");
         if (einweisung == -1) {
             tft.setTextColor(TFT_RED);
         } else {
@@ -201,14 +200,14 @@ void showUnit(int i) {
         }
         tft.println(Machine::formatDate(Machine::machines[i].safetyInstructionDate));
         tft.setTextColor(TFT_WHITE);
-        tft.println("Sicherheitsbelehrung vom:");
+        tft.print("Sicherheitsbl:");
         if (Machine::safetyInstructionDate == 0) {
             tft.setTextColor(TFT_RED);
         } else {
             tft.setTextColor(TFT_GREEN);
         }
         tft.println(Machine::formatDate(Machine::safetyInstructionDate));
-        tft.setCursor(0, 150);
+        // tft.setCursor(0, 150);
         tft.setTextColor(TFT_WHITE);
         tft.println("Halte deine Karte vor das");
         tft.println("Terminal um das Geraet");
@@ -230,45 +229,45 @@ void showUnit(int i) {
 }
 
 void bitteWarten() {
-            tft.setTextSize(4);
-        tft.fillScreen(TFT_SILVER);
-        tft.setCursor(0, 80);
-        tft.setTextColor(TFT_WHITE, TFT_SILVER);
-        tft.println(" Bitte Warten");
-        displayStatusBar();
+    tft.setTextFont(4);  // 6
+    tft.fillScreen(TFT_SILVER);
+    tft.setCursor(0, 80);
+    tft.setTextColor(TFT_WHITE, TFT_SILVER);
+    tft.println(" Bitte Warten");
+    displayStatusBar();
 }
 
 void showError() {
-        tft.setTextSize(4);
-        tft.fillScreen(TFT_SILVER);
-        tft.setCursor(0, 80);
-        tft.setTextColor(TFT_WHITE, TFT_SILVER);
-        tft.println(" Fehler ");
-        displayStatusBar();
-        delay(5000);
+    tft.setTextFont(4);  // 6;
+    tft.fillScreen(TFT_SILVER);
+    tft.setCursor(0, 80);
+    tft.setTextColor(TFT_WHITE, TFT_SILVER);
+    tft.println(" Fehler ");
+    displayStatusBar();
+    delay(5000);
 }
 
 void showOK(int i) {
     // Clear draw bereich
     if (lastDisplayStatus != displayStatus) {
-        //const char *nameC = docc["maschines"][i]["name"];
-        //char imgC[25] = "/";
-        //strcat(imgC, docc["maschines"][i]["img"]);
-        //const char *costC = docc["maschines"][i]["cost"];
+        // const char *nameC = docc["maschines"][i]["name"];
+        // char imgC[25] = "/";
+        // strcat(imgC, docc["maschines"][i]["img"]);
+        // const char *costC = docc["maschines"][i]["cost"];
         lastDisplayStatus = displayStatus;
         int xText = 110;
-        tft.fillRect(0, 25, 319, 239, TFT_BLACK);
-        //TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
+        tft.fillRect(0, 18, 319, 239, TFT_BLACK);
+        // TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
         tft.setCursor(xText, 30);
-        tft.setTextSize(3);
+        tft.setTextFont(4);
         tft.setTextColor(TFT_WHITE);
         tft.println(Machine::machines[i].name);  // Schreibe namen names[ausgewahltesGerat]
-        tft.setTextSize(2);
+        tft.setTextFont(2);
         tft.setCursor(xText, tft.getCursorY());
-        tft.print("Kosten:");  // GeräteKosten
-        tft.println(Machine::machines[i].cost);    // -> Varriable costs[ausgewahltesGerat]
+        tft.print("Kosten:");                    // GeräteKosten
+        tft.println(Machine::machines[i].cost);  // -> Varriable costs[ausgewahltesGerat]
         tft.setCursor(0, 140);
-        tft.setTextSize(4);
+        tft.setTextFont(4);  // 6;
         tft.setTextColor(TFT_BLACK, TFT_GREEN);
         tft.print(" Freigegeben ");  // TODO: Testen ob es passt
     }
@@ -289,9 +288,9 @@ void dimmDisplay() {
         timestampLastChange = millis();
     }
     if (millis() - timestampLastChange >= 10000) {
-        analogWrite(TFT_BL, 240);
+        analogWrite(TFT_BL, 100);
     } else {
-        analogWrite(TFT_BL, 200);
+        analogWrite(TFT_BL, 240);
     }
 }
 
@@ -300,26 +299,18 @@ void handleTouchInput() {
     // Oben Links (319, 30)
     if (pressed && Machine::machineCount > 0) {
         pressed = false;
-        if (y > 30) {
+        if (y < 222) {
             displayStatus = 3;
-            if (x < 100) {
-                if (y < 130) {
-                    ausgewahltesGerat = 0;
-                } else {
-                    ausgewahltesGerat = 0;
-                }
-            } else if (x < 200) {
-                if (y < 130) {
-                    ausgewahltesGerat = 0;
-                } else {
-                    ausgewahltesGerat = 0;
-                }
+            if (y < 22) {
+                ausgewahltesGerat = 4;
+            } else if(y < 72) {
+                ausgewahltesGerat = 3;
+            } else if (y < 122) {
+                ausgewahltesGerat = 2;
+            } else if (y < 172) {
+                ausgewahltesGerat = 1;
             } else {
-                if (y < 130) {
-                    ausgewahltesGerat = 0;
-                } else {
-                    ausgewahltesGerat = 0;
-                }
+                ausgewahltesGerat = 0;
             }
         }
     } else {
@@ -329,23 +320,23 @@ void handleTouchInput() {
 }
 
 void showMenu() {
-    tft.fillRect(0, 25, 319, 239, TFT_WHITE);
-     int countter = 0;
-    int xKords[] = {0, 0, 100, 100, 200, 200};
-    int yKords[] = {30, 130, 30, 130, 30, 130};
-    if (Machine::machineCount>2) {
+    tft.fillRect(0, 18, 319, 239, TFT_WHITE);
+    int countter = 0;
+    int xKords[] = {0, 0, 0, 0, 0, 0};
+    int yKords[] = {18, 18 + 50, 18 + 100, 18 + 150, 18 + 200, 218};
+    if (Machine::machineCount > 2) {
     } else if (Machine::machineCount == 2) {
     } else if (Machine::machineCount == 1) {
     } else if (Machine::machineCount == 0 && lastCardRead == "") {
-        tft.setTextSize(4);
+        tft.setTextFont(4);  // 6;
         tft.fillScreen(TFT_SILVER);
         tft.setCursor(0, 80);
         tft.setTextColor(TFT_WHITE, TFT_SILVER);
-        tft.println(" Bitte Karte     scannen");
+        tft.println(" Bitte Karte scannen");
         displayStatusBar();
         return;
     } else {
-        tft.setTextSize(4);
+        tft.setTextFont(4);  // 6;
         tft.fillScreen(TFT_SILVER);
         tft.setCursor(0, 60);
         tft.setTextColor(TFT_WHITE, TFT_SILVER);
@@ -353,14 +344,16 @@ void showMenu() {
         displayStatusBar();
         return;
     }
-
-    for (int i = 0; i < Machine::machineCount;i++) {
-        //char imgC[25] = "/";
-        //strcat(imgC, v["img"]);
-        //TJpgDec.drawFsJpg(xKords[countter], yKords[countter], imgC, LittleFS);
-        tft.setTextSize(1);
+    uint16_t colors[] = {TFT_RED, TFT_ORANGE, TFT_YELLOW, TFT_GREEN, TFT_BLUE, TFT_PURPLE};
+    for (int i = 0; i < Machine::machineCount; i++) {
+        // char imgC[25] = "/";
+        // strcat(imgC, v["img"]);
+        // TJpgDec.drawFsJpg(xKords[countter], yKords[countter], imgC, LittleFS);
+        tft.setTextFont(4);
+        tft.fillRect(xKords[countter], yKords[countter], 320, 48, colors[i]);
         tft.setCursor(xKords[countter], yKords[countter]);
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        tft.setTextColor(TFT_WHITE, colors[i]);
+        // Maximal 17 Zeichen
         tft.println(Machine::getMachines()[i].name);
         countter++;
     }
