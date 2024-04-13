@@ -21,7 +21,7 @@ long timestampLastChange = 0;
  * 1-> Start Bildschirm
  * 2-> CardInfo
  * 3-> Gerät Info
- * 4 -> pls scann
+ * 4-> Error
  */
 
 // Funktionen
@@ -82,12 +82,12 @@ void showCardInfo() {
         tft.println(einweisung);
         tft.setTextColor(TFT_WHITE);
         tft.print("Sicherheitsbelehrung: ");
-        if (sicherheitsbelehrung == -1) {
+        if (Machine::safetyInstructionDate == 0) {
             tft.setTextColor(TFT_RED);
         } else {
             tft.setTextColor(TFT_GREEN);
         }
-        tft.println(sicherheitsbelehrung);
+        tft.println(Machine::safetyInstructionDate);
     }
     if (pressed) {
         displayStatus = 1;
@@ -96,16 +96,17 @@ void showCardInfo() {
 }
 
 void handleTouh() {
-
-  // Pressed will be set true is there is a valid touch on the screen
-  pressed = tft.getTouch(&x, &y);
-    if (pressed) {
-        Serial.print("->(");
-        Serial.print(x);
-        Serial.print(", ");
-        Serial.print(y);
-        Serial.println(")");
-        timestampLastChange = millis();
+    //debounce
+    if (millis() - timestampLastChange >= 200) {
+        pressed = tft.getTouch(&x, &y);
+        if (pressed) {
+            Serial.print("->(");
+            Serial.print(x);
+            Serial.print(", ");
+            Serial.print(y);
+            Serial.println(")");
+            timestampLastChange = millis();
+        }
     }
 }
 
@@ -134,7 +135,7 @@ void displayStatusBar() {
     time_t now = time(nullptr);
     struct tm timeinfo;
     gmtime_r(&now, &timeinfo);
-    tft.setCursor(195, 3);
+    tft.setCursor(190, 3);
     tft.setTextColor(color);
     tft.print(timeinfo.tm_hour);
     tft.print(":");
@@ -153,7 +154,7 @@ void displayStatusBar() {
     } else {
         color = TFT_RED;
     }
-    tft.setCursor(260, 3);
+    tft.setCursor(255, 3);
     tft.setTextColor(color);
     tft.print(srenth);
     tft.print("db");
@@ -176,23 +177,39 @@ void showUnit(int i) {
     if (ausgewahltesGerat == -1) {
         showCardInfo();
     } else if (lastDisplayStatus != displayStatus) {
-        const char *nameC = docc["maschines"][i]["name"];
-        char imgC[25] = "/";
-        strcat(imgC, docc["maschines"][i]["img"]);
-        const char *costC = docc["maschines"][i]["cost"];
+        //const char *nameC = docc["maschines"][i]["name"];
+        //char imgC[25] = "/";
+        //strcat(imgC, docc["maschines"][i]["img"]);
+        //const char *costC = docc["maschines"][i]["cost"];
         lastDisplayStatus = displayStatus;
-        int xText = 110;
-        tft.fillRect(0, 25, 319, 239, TFT_BLACK);
+        int xText = 0;
+        tft.fillRect(0, 25, 319, 240, TFT_BLACK);
         //TJpgDec.drawFsJpg(0, 30, imgC, LittleFS);  // Bild in groß imgNamesBig[ausgewahltesGerat]
         tft.setCursor(xText, 30);
-        tft.setTextSize(3);
+        tft.setTextSize(2);
         tft.setTextColor(TFT_WHITE);
-        tft.println(nameC);  // Schreibe namen names[ausgewahltesGerat]
+        tft.println(Machine::machines[i].name);  // Schreibe namen names[ausgewahltesGerat]
         tft.setTextSize(2);
         tft.setCursor(xText, tft.getCursorY());
         tft.print("Kosten:");  // GeräteKosten
-        tft.println(costC);    // -> Varriable costs[ausgewahltesGerat]
-        tft.setCursor(0, 140);
+        tft.println(Machine::machines[i].cost);    // -> Varriable costs[ausgewahltesGerat]
+        tft.print("Einweisung vom: ");
+        if (einweisung == -1) {
+            tft.setTextColor(TFT_RED);
+        } else {
+            tft.setTextColor(TFT_GREEN);
+        }
+        tft.println(Machine::formatDate(Machine::machines[i].safetyInstructionDate));
+        tft.setTextColor(TFT_WHITE);
+        tft.println("Sicherheitsbelehrung vom:");
+        if (Machine::safetyInstructionDate == 0) {
+            tft.setTextColor(TFT_RED);
+        } else {
+            tft.setTextColor(TFT_GREEN);
+        }
+        tft.println(Machine::formatDate(Machine::safetyInstructionDate));
+        tft.setCursor(0, 150);
+        tft.setTextColor(TFT_WHITE);
         tft.println("Halte deine Karte vor das");
         tft.println("Terminal um das Geraet");
         tft.println("freizuschalten.");
@@ -219,6 +236,16 @@ void bitteWarten() {
         tft.setTextColor(TFT_WHITE, TFT_SILVER);
         tft.println(" Bitte Warten");
         displayStatusBar();
+}
+
+void showError() {
+        tft.setTextSize(4);
+        tft.fillScreen(TFT_SILVER);
+        tft.setCursor(0, 80);
+        tft.setTextColor(TFT_WHITE, TFT_SILVER);
+        tft.println(" Fehler ");
+        displayStatusBar();
+        delay(5000);
 }
 
 void showOK(int i) {
@@ -269,7 +296,9 @@ void dimmDisplay() {
 }
 
 void handleTouchInput() {
-    if (pressed) {
+    // Unten Recgts: 21, 231
+    // Oben Links (319, 30)
+    if (pressed && Machine::machineCount > 0) {
         pressed = false;
         if (y > 30) {
             displayStatus = 3;
@@ -277,22 +306,25 @@ void handleTouchInput() {
                 if (y < 130) {
                     ausgewahltesGerat = 0;
                 } else {
-                    ausgewahltesGerat = 1;
+                    ausgewahltesGerat = 0;
                 }
             } else if (x < 200) {
                 if (y < 130) {
-                    ausgewahltesGerat = 2;
+                    ausgewahltesGerat = 0;
                 } else {
-                    ausgewahltesGerat = 3;
+                    ausgewahltesGerat = 0;
                 }
             } else {
                 if (y < 130) {
-                    ausgewahltesGerat = 4;
+                    ausgewahltesGerat = 0;
                 } else {
-                    ausgewahltesGerat = 5;
+                    ausgewahltesGerat = 0;
                 }
             }
         }
+    } else {
+        ausgewahltesGerat = -1;
+        displayStatus = 1;
     }
 }
 
@@ -322,7 +354,7 @@ void showMenu() {
         return;
     }
 
-    for (int i; i< Machine::machineCount;i++) {
+    for (int i = 0; i < Machine::machineCount;i++) {
         //char imgC[25] = "/";
         //strcat(imgC, v["img"]);
         //TJpgDec.drawFsJpg(xKords[countter], yKords[countter], imgC, LittleFS);
@@ -353,5 +385,9 @@ void handleDisplayMenue() {
     }
     if (displayStatus == 4) {
         showOK(ausgewahltesGerat);
+    }
+    if (displayStatus == 5) {
+        showError();
+        displayStatus = 1;
     }
 }

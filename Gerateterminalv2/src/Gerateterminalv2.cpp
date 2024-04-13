@@ -7,7 +7,6 @@
 #define CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 int ausgewahltesGerat = -1;// Index der Config geräte
 int einweisung = 0;// Wie lnge eine Einweisung noch vorhanden ist
-int sicherheitsbelehrung = 0;// Wie lange eine Sicherheitsbelehrung noch vorhanden ist
 long cardSendTimestamp = 0;//Wann die MQTT nachricht der Karte gesendet wurde
 long lastStatusUpdate = 0;
 String lastCardRead = "";// ID der letzten Karte
@@ -28,13 +27,18 @@ JsonDocument docc;
 #include "nfc.h"
 // Funktionen
 
+
+void causeCrash() {
+  volatile int *ptr = (int *)(0x00); // Zeiger auf Speicherstelle NULL
+  *ptr = 1; // Schreibe in Speicherstelle NULL, verursacht Zugriffsverletzung und führt zu einem Absturz
+}
 //TODO: ersetzen durch frische Config
 void initFilsystem() {
   //Load file system information
   
   if (!LittleFS.begin(true)) {
     bootLogTFT("An error has occured while initializing littlefs");
-    sleep(5000);
+    delay(5000);
     ESP.restart();
   }
 /*
@@ -85,7 +89,8 @@ void getConfig() {
   if (!file) {
     Serial.println("Failed to open config file");
     Machine::whitelist[0] = "0.4mm Edelstahldüse";
-    Machine::whitelistCount = 1;
+    Machine::whitelist[0] = "0.4mm Edelstahldüseee";
+    Machine::whitelistCount = 2;
     return;
   }
 DeserializationError error = deserializeJson(docc, file); // `file` ist schon geöffnet mit LittleFS.open("/config.json", "r");
@@ -120,6 +125,7 @@ DeserializationError error = deserializeJson(docc, file); // `file` ist schon ge
   //mqttPassword = docc["mqtt"]["mqttPassword"].as<String>();
 
   file.close();
+  LittleFS.end();
   bootLogTFT("finished reading filesystem information");
   //bootLogTFT(geraet);
   //bootLogTFT(mqttChannel);
@@ -173,10 +179,10 @@ void loop() {
   //Chck Wlan connection and reconnect
   checkWifi();
   //Touch on Device, switch to Image and Menue(Frischalten/Freigeben, Sperren, Kosten Info, Zurück)-> bestätigung durch Karte
-  //handleTouh();
+  handleTouh();
   //Check card -> New Card -> Display Name Einweisungen kompatible und Sicherheitsbelehrung.(zurück Button)
   boolean isCard =  readTag();
-  if (lastCardReadTimestamp + 10000 < millis() && !isCard && lastCardRead != "") {//Keine Karte seit 10 Sekunden
+  if (lastCardReadTimestamp + 10000 < millis() && !isCard && lastCardRead != "" && timestampLastChange + 10000 < millis()) {//Keine Karte seit 10 Sekunden
     // Karte weg
     lastCardRead = "";
     //if (displayStatus == 2 || displayStatus == 4) {

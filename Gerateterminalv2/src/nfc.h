@@ -56,10 +56,14 @@ boolean readTag(){
       content.toUpperCase();
       Serial.println("Card read:" + content);
       Serial.println("Last card read: " + lastCardRead);
-      if (lastCardRead != content) {
-        lastCardRead = content;
-        Machine::loadMachines(content);
-        //checkCard(content);
+      if (displayStatus == 1) {
+        if (lastCardRead != content) {
+          lastCardRead = content;
+          Machine::loadMachines(content);
+          //checkCard(content);
+        }
+      } else if (displayStatus == 3) {
+        Machine::machines[ausgewahltesGerat].requestActivateMachine(content);
       }
       lastCardReadTimestamp = millis();
   }

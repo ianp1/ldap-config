@@ -4,11 +4,13 @@
 #include <HTTPClient.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include <TimeLib.h>
 extern int lastDisplayStatus;
 extern int ausgewahltesGerat;
 extern int displayStatus;
 extern String terminalName;
 extern void bitteWarten();
+extern long timestampLastChange;
 
 class Machine {
    public:
@@ -43,6 +45,16 @@ class Machine {
 
     static Machine* getMachines() {
         return machines;
+    }
+
+    static String formatDate(time_t timestamp) {
+        char buf[11]; // Speicher für das Datum im Format DD.MM.YYYY plus Null-Terminator
+        tmElements_t tm;
+
+        breakTime(timestamp, tm); // Konvertiere den Unix-Zeitstempel in eine Zeitstruktur
+
+        snprintf(buf, sizeof(buf), "%02d.%02d.%04d", tm.Day, tm.Month, tmYearToCalendar(tm.Year));
+        return String(buf);
     }
 
     static unsigned long parseDate(const String& dateString) {
@@ -93,7 +105,8 @@ class Machine {
         deserializeJson(doc, json);
         // print doc
         //serializeJsonPretty(doc, Serial);
-        //safetyInstructionDate = parseDate(doc["safetyInstructionDate"] | "");
+        Serial.println(doc["safetyInstructionDate"] | "");
+        safetyInstructionDate = parseDate(doc["safetyInstructionDate"] | "");
 
         JsonArray devices = doc["devices"];
 
@@ -147,6 +160,7 @@ class Machine {
         //Serial.println(parseDate(doc["safetyInstructionDate"] | ""));
         //safetyInstructionDate = parseDate(doc["safetyInstructionDate"] | "");
         //Serial.println("Deine Sicherheitsbelehrung ist noch gültig bis: " + safetyInstructionDate);
+        //sicherheitsbelehrung = safetyInstructionDate
     }
 
     static void loadMachines(String rfid) {
@@ -172,17 +186,17 @@ class Machine {
                 "            \"displayName\": \"0.4mm Edelstahldüse\","
                 "            \"deviceType\": \"Prusa i3 MK3\","
                 "            \"status\": \"mqttManaged\","
-                "            \"cost\": null,"
+                "            \"cost\": \"5.5\","
                 "            \"imageUrl\": \"https://www.fablab-luebeck.de/user/pages/lasercutter/_lasercutter/lasercutter.jpg\","
                 "            \"deviceId\": \"cn=0.4mm Edelstahldüse,cn=PrusaMK3,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck\","
                 "            \"mentor\": true,"
                 "            \"trainingDate\": \"20230928000000Z\""
                 "        },"
                 "       {"
-                "            \"displayName\": \"0.4mm Edelstahldüseee\","
+                "            \"displayName\": \"Namexy2\","
                 "            \"deviceType\": \"Prusa i3 MK3\","
                 "            \"status\": \"mqttManaged\","
-                "            \"cost\": null,"
+                "            \"cost\": \"1.1\","
                 "            \"imageUrl\": \"https://www.fablab-luebeck.de/user/pages/lasercutter/_lasercutter/lasercutter.jpg\","
                 "            \"deviceId\": \"cn=0.4mm Edelstahldüse,cn=PrusaMK3,ou=einweisung,dc=ldap-provider,dc=fablab-luebeck\","
                 "            \"mentor\": true,"
@@ -197,9 +211,11 @@ class Machine {
         } else {
             Serial.print("Error on HTTPS request: ");
             Serial.println(https.errorToString(httpCode).c_str());
+            displayStatus = 5;
         }
 
         https.end();
+        timestampLastChange = millis();
     }
 
     void requestActivateMachine(const String& rfid) {
@@ -234,15 +250,18 @@ class Machine {
                 isActive = false;
                 Serial.println("Anfrage fehlgeschlagen mit Status " + String(httpCode));
                 Serial.println(response);
+                displayStatus = 5;
             }
         } else {
             Serial.println("Error on HTTPS request: " + httpCode);
             // Serial.println("Error on HTTPS request: " + https.errorToString(httpCode).c_str());
             isActive = false;
+            displayStatus = 5;
         }
         https.end();
         Serial.println("Gerät freischalten Fertig");
         lastDisplayStatus -1;
+        timestampLastChange = millis();
     }
 };
 

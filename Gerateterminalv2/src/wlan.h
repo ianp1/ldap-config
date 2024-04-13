@@ -80,11 +80,8 @@ void initWlan() {
     Serial.print(".");
     if (abortCounter >=20) {
       bootLogTFT("WLAN verbindet nicht, starte neu.");
-      sleep(5000);
+      delay(5000);
       ESP.restart();
-      sleep(100);
-      ESP.restart();
-      sleep(100);
     }
   }
   Serial.println("");
@@ -127,7 +124,7 @@ void initOTA() {
  */
 time_t initTime() {
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");
-  setenv("TZ", "CET-1CEST-2,M3.5.0/2,M10.5.0/3", 1);
+  setenv("TZ", "CET-1CEST,M3.5.0/2,M10.5.0/3", 1);
   tzset();
   bootLogTFT("Waiting for NTP time sync: ");
   int cT = 0;
@@ -141,7 +138,7 @@ time_t initTime() {
     }
     if (cT >= 150){// nach 15 Sekunden
       bootLogTFT("Zeitserver braucht zu lange");
-      sleep(5000);
+      delay(5000);
       ESP.restart();
     }
   }
