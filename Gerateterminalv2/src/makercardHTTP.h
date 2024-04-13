@@ -7,6 +7,8 @@
 extern int lastDisplayStatus;
 extern int ausgewahltesGerat;
 extern int displayStatus;
+extern String terminalName;
+extern void bitteWarten();
 
 class Machine {
    public:
@@ -85,7 +87,7 @@ class Machine {
         return ((unsigned long)time) + 0;
     }
 
-    static void parseJSON(String json, String appid, String rfid) {
+    static void parseJSON(String json, String rfid) {
         JsonDocument doc;  // Adjust the size based on the complexity of your JSON
 
         deserializeJson(doc, json);
@@ -132,7 +134,7 @@ class Machine {
             Serial.println(name + " erfolgreich hinzugefügt");
         }
         if (whitelistCount == 1 && machineCount == 1) {
-            machines->requestActivateMachine(appid, rfid);
+            machines->requestActivateMachine(rfid);
         }
         
         //UBaseType_t stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
@@ -147,13 +149,14 @@ class Machine {
         //Serial.println("Deine Sicherheitsbelehrung ist noch gültig bis: " + safetyInstructionDate);
     }
 
-    static void loadMachines(String appId, String rfid) {
+    static void loadMachines(String rfid) {
+        bitteWarten();
         WiFiClientSecure client;
         client.setInsecure();  // Use this only if you don't have the certificate
 
         HTTPClient https;
 
-        String url = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/MakercardApp/Devices/" + appId + "/" + rfid;
+        String url = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/MakercardApp/Devices/" + terminalName + "/" + rfid;
         https.begin(client, url);
 
         int httpCode = https.GET();
@@ -176,7 +179,7 @@ class Machine {
                 "            \"trainingDate\": \"20230928000000Z\""
                 "        },"
                 "       {"
-                "            \"displayName\": \"0.4mm Edelstahldüse\","
+                "            \"displayName\": \"0.4mm Edelstahldüseee\","
                 "            \"deviceType\": \"Prusa i3 MK3\","
                 "            \"status\": \"mqttManaged\","
                 "            \"cost\": null,"
@@ -189,7 +192,7 @@ class Machine {
                 "    \"safetyInstructionDate\": \"20231201000000Z\""
                 "}";
 
-            parseJSON(payload, appId, rfid);
+            parseJSON(payload, rfid);
             lastDisplayStatus = -1;
         } else {
             Serial.print("Error on HTTPS request: ");
@@ -199,12 +202,13 @@ class Machine {
         https.end();
     }
 
-    void requestActivateMachine(const String& appId, const String& rfid) {
+    void requestActivateMachine(const String& rfid) {
+        bitteWarten();
         Serial.println("Gerät freischalten");
         WiFiClientSecure client;
 
         HTTPClient https;
-        String url = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/MakercardApp/Devices/" + deviceId + "/activate/" + appId + "/" + rfid;
+        String url = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/MakercardApp/Devices/" + deviceId + "/activate/" + terminalName + "/" + rfid;
         Serial.println(url);
 
         https.begin(client, url);
@@ -212,6 +216,9 @@ class Machine {
 
         if (httpCode > 0) {
             String response = https.getString();
+            Serial.print("HTTP Code: ");
+            Serial.println(httpCode);
+            Serial.print("Response: ");
             Serial.println(response);
 
             if (httpCode == 200 && response.indexOf("<!DOCTYPE html>") == -1) {
@@ -233,8 +240,9 @@ class Machine {
             // Serial.println("Error on HTTPS request: " + https.errorToString(httpCode).c_str());
             isActive = false;
         }
-
         https.end();
+        Serial.println("Gerät freischalten Fertig");
+        lastDisplayStatus -1;
     }
 };
 

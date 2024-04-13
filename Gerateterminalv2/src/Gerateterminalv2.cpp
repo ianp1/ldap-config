@@ -15,6 +15,7 @@ long lastCardReadTimestamp = 0;// Wann das letzte mal eine Karte gelesen wurde
 long mqttDisconnectedTimestamp = 0;// Wann der MQTT teil die verbindung verloren hat
 const int dailyRestartHour = 4;
 const int restartDelayInMinutes = 10;
+String terminalName = "Kein Name";
 JsonDocument docc;
 // Filesystem
 #include "FS.h"
@@ -100,7 +101,7 @@ DeserializationError error = deserializeJson(docc, file); // `file` ist schon ge
   for (int i = 0; i < Machine::whitelistCount; i++) {
     Machine::whitelist[i] = arr[i].as<String>();
   }
-
+  terminalName = docc["GeräteTerminalName"].as<String>();
   // Beispiel, um die geladenen Werte zu überprüfen
   bootLogTFT("Geladene Whitelist:");
   for (int i = 0; i < Machine::whitelistCount; i++) {
@@ -175,12 +176,14 @@ void loop() {
   //handleTouh();
   //Check card -> New Card -> Display Name Einweisungen kompatible und Sicherheitsbelehrung.(zurück Button)
   boolean isCard =  readTag();
-  if (lastCardReadTimestamp + 2000 < millis() && !isCard) {//Keine Karte seit 10 Sekunden
+  if (lastCardReadTimestamp + 10000 < millis() && !isCard && lastCardRead != "") {//Keine Karte seit 10 Sekunden
     // Karte weg
     lastCardRead = "";
-    if (displayStatus == 2 || displayStatus == 4) {
+    //if (displayStatus == 2 || displayStatus == 4) {
       displayStatus = 1;
-    }
+      lastDisplayStatus = -1;
+      Machine::machineCount = 0;
+    //}
   }
   handleDisplayMenue();
   ArduinoOTA.handle();

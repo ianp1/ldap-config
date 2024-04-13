@@ -58,7 +58,7 @@ boolean readTag(){
       Serial.println("Last card read: " + lastCardRead);
       if (lastCardRead != content) {
         lastCardRead = content;
-        Machine::loadMachines("Terminal", content);
+        Machine::loadMachines(content);
         //checkCard(content);
       }
       lastCardReadTimestamp = millis();

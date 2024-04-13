@@ -21,6 +21,7 @@ long timestampLastChange = 0;
  * 1-> Start Bildschirm
  * 2-> CardInfo
  * 3-> Gerät Info
+ * 4 -> pls scann
  */
 
 // Funktionen
@@ -117,16 +118,16 @@ void displayStatusBar() {
     color = TFT_BLACK;
     tft.setTextSize(2);
     tft.setTextColor(color);
-    tft.print("Hallo");
+    tft.print(terminalName);
     // Draw MQTT
-    tft.setCursor(145, 3);
+    /*tft.setCursor(145, 3);
     if (true) {
         color = TFT_GREEN;
     } else {
         color = TFT_RED;
     }
     tft.setTextColor(color);
-    tft.print("MQTT");
+    tft.print("MQTT");*/
 
     // Draw Time
     color = TFT_BLACK;
@@ -211,13 +212,22 @@ void showUnit(int i) {
     }
 }
 
+void bitteWarten() {
+            tft.setTextSize(4);
+        tft.fillScreen(TFT_SILVER);
+        tft.setCursor(0, 80);
+        tft.setTextColor(TFT_WHITE, TFT_SILVER);
+        tft.println(" Bitte Warten");
+        displayStatusBar();
+}
+
 void showOK(int i) {
     // Clear draw bereich
     if (lastDisplayStatus != displayStatus) {
-        const char *nameC = docc["maschines"][i]["name"];
-        char imgC[25] = "/";
-        strcat(imgC, docc["maschines"][i]["img"]);
-        const char *costC = docc["maschines"][i]["cost"];
+        //const char *nameC = docc["maschines"][i]["name"];
+        //char imgC[25] = "/";
+        //strcat(imgC, docc["maschines"][i]["img"]);
+        //const char *costC = docc["maschines"][i]["cost"];
         lastDisplayStatus = displayStatus;
         int xText = 110;
         tft.fillRect(0, 25, 319, 239, TFT_BLACK);
@@ -225,11 +235,11 @@ void showOK(int i) {
         tft.setCursor(xText, 30);
         tft.setTextSize(3);
         tft.setTextColor(TFT_WHITE);
-        tft.println(nameC);  // Schreibe namen names[ausgewahltesGerat]
+        tft.println(Machine::machines[i].name);  // Schreibe namen names[ausgewahltesGerat]
         tft.setTextSize(2);
         tft.setCursor(xText, tft.getCursorY());
         tft.print("Kosten:");  // GeräteKosten
-        tft.println(costC);    // -> Varriable costs[ausgewahltesGerat]
+        tft.println(Machine::machines[i].cost);    // -> Varriable costs[ausgewahltesGerat]
         tft.setCursor(0, 140);
         tft.setTextSize(4);
         tft.setTextColor(TFT_BLACK, TFT_GREEN);
@@ -243,7 +253,7 @@ void showOK(int i) {
 
 void dimmDisplay() {
     if (pressed) {
-        if (millis() - timestampLastChange >= 50000) {  // TODO: Funktioniert noch nicht, touch geht durch
+        if (millis() - timestampLastChange >= 10000) {  // TODO: Funktioniert noch nicht, touch geht durch
             pressed = false;
         }
         timestampLastChange = millis();
@@ -251,7 +261,7 @@ void dimmDisplay() {
     if (lastDisplayStatus != displayStatus) {
         timestampLastChange = millis();
     }
-    if (millis() - timestampLastChange >= 50000) {
+    if (millis() - timestampLastChange >= 10000) {
         analogWrite(TFT_BL, 240);
     } else {
         analogWrite(TFT_BL, 200);
@@ -294,11 +304,21 @@ void showMenu() {
     if (Machine::machineCount>2) {
     } else if (Machine::machineCount == 2) {
     } else if (Machine::machineCount == 1) {
+    } else if (Machine::machineCount == 0 && lastCardRead == "") {
+        tft.setTextSize(4);
+        tft.fillScreen(TFT_SILVER);
+        tft.setCursor(0, 80);
+        tft.setTextColor(TFT_WHITE, TFT_SILVER);
+        tft.println(" Bitte Karte     scannen");
+        displayStatusBar();
+        return;
     } else {
-        tft.setTextSize(5);
+        tft.setTextSize(4);
+        tft.fillScreen(TFT_SILVER);
         tft.setCursor(0, 60);
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        tft.println("Leider hast du Keine Einweisungen für dieses Terminal");
+        tft.setTextColor(TFT_WHITE, TFT_SILVER);
+        tft.println("Keine Gerate");
+        displayStatusBar();
         return;
     }
 
