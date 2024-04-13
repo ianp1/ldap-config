@@ -83,6 +83,8 @@ void getConfig() {
   File file = LittleFS.open("/config.json", "r");
   if (!file) {
     Serial.println("Failed to open config file");
+    Machine::whitelist[0] = "0.4mm Edelstahldüse";
+    Machine::whitelistCount = 1;
     return;
   }
 DeserializationError error = deserializeJson(docc, file); // `file` ist schon geöffnet mit LittleFS.open("/config.json", "r");

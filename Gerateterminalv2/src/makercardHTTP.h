@@ -4,6 +4,9 @@
 #include <HTTPClient.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+extern int lastDisplayStatus;
+extern int ausgewahltesGerat;
+extern int displayStatus;
 
 class Machine {
    public:
@@ -26,14 +29,15 @@ class Machine {
     // DateTime equivalent in Arduino is usually handled with `unsigned long` or `time_t`
     unsigned long einweisung;
     String error;
+    int number;
 
     // Standardkonstruktor
     Machine()
-        : name(""), img(""), cost(""), deviceId(""), description(""), isMentor(false), isActive(false), einweisung(0), deviceType(""), error("") {}
+        : name(""), img(""), cost(""), deviceId(""), description(""), isMentor(false), isActive(false), einweisung(0), deviceType(""), error(""), number(0) {}
 
     // Konstruktor mit Parametern
-    Machine(String name, String img, String cost, String deviceId, String description, bool isMentor, bool isActive, unsigned long einweisung, String deviceType)
-        : name(name), img(img), cost(cost), deviceId(deviceId), description(description), isMentor(isMentor), isActive(isActive), einweisung(einweisung), deviceType(deviceType) {}
+    Machine(String name, String img, String cost, String deviceId, String description, bool isMentor, bool isActive, unsigned long einweisung, String deviceType, int number)
+        : name(name), img(img), cost(cost), deviceId(deviceId), description(description), isMentor(isMentor), isActive(isActive), einweisung(einweisung), deviceType(deviceType), number(number) {}
 
     static Machine* getMachines() {
         return machines;
@@ -81,7 +85,7 @@ class Machine {
         return ((unsigned long)time) + 0;
     }
 
-    static void parseJSON(String json) {
+    static void parseJSON(String json, String appid, String rfid) {
         JsonDocument doc;  // Adjust the size based on the complexity of your JSON
 
         deserializeJson(doc, json);
@@ -124,9 +128,13 @@ class Machine {
             unsigned long einweisung = parseDate(device["trainingDate"] | "");
 
             // Create a new Machine object and add it to the array
-            machines[machineCount++] = Machine(name, img, cost, deviceId, description, isMentor, isActive, einweisung, deviceType);
+            machines[machineCount++] = Machine(name, img, cost, deviceId, description, isMentor, isActive, einweisung, deviceType, machineCount);
             Serial.println(name + " erfolgreich hinzugefügt");
         }
+        if (whitelistCount == 1 && machineCount == 1) {
+            machines->requestActivateMachine(appid, rfid);
+        }
+        
         //UBaseType_t stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
         //Serial.print("Stack High Water Mark: ");
         //Serial.println(stackHighWaterMark);
@@ -181,7 +189,8 @@ class Machine {
                 "    \"safetyInstructionDate\": \"20231201000000Z\""
                 "}";
 
-            parseJSON(payload);
+            parseJSON(payload, appId, rfid);
+            lastDisplayStatus = -1;
         } else {
             Serial.print("Error on HTTPS request: ");
             Serial.println(https.errorToString(httpCode).c_str());
@@ -191,6 +200,7 @@ class Machine {
     }
 
     void requestActivateMachine(const String& appId, const String& rfid) {
+        Serial.println("Gerät freischalten");
         WiFiClientSecure client;
 
         HTTPClient https;
@@ -206,6 +216,8 @@ class Machine {
 
             if (httpCode == 200 && response.indexOf("<!DOCTYPE html>") == -1) {
                 isActive = true;
+                displayStatus = 4;
+                ausgewahltesGerat = number;
             } else {
                 if (response.indexOf("<!DOCTYPE html>") != -1) {
                     error = "Du befindest dich im falschem Netzwerk. Bitte verbinde dich mit dem FabLab-WLAN.";

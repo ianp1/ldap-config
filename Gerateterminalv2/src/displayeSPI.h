@@ -288,18 +288,28 @@ void handleTouchInput() {
 
 void showMenu() {
     tft.fillRect(0, 25, 319, 239, TFT_WHITE);
-    JsonArray array = docc["maschines"].as<JsonArray>();
-    int countter = 0;
+     int countter = 0;
     int xKords[] = {0, 0, 100, 100, 200, 200};
     int yKords[] = {30, 130, 30, 130, 30, 130};
-    for (JsonVariant v : array) {
-        char imgC[25] = "/";
-        strcat(imgC, v["img"]);
+    if (Machine::machineCount>2) {
+    } else if (Machine::machineCount == 2) {
+    } else if (Machine::machineCount == 1) {
+    } else {
+        tft.setTextSize(5);
+        tft.setCursor(0, 60);
+        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        tft.println("Leider hast du Keine Einweisungen für dieses Terminal");
+        return;
+    }
+
+    for (int i; i< Machine::machineCount;i++) {
+        //char imgC[25] = "/";
+        //strcat(imgC, v["img"]);
         //TJpgDec.drawFsJpg(xKords[countter], yKords[countter], imgC, LittleFS);
         tft.setTextSize(1);
         tft.setCursor(xKords[countter], yKords[countter]);
         tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        tft.println(v["name"].as<String>());
+        tft.println(Machine::getMachines()[i].name);
         countter++;
     }
 }
