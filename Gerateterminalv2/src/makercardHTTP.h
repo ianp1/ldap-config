@@ -47,6 +47,136 @@ class Machine {
         return machines;
     }
 
+    static String getFilenameFromURL(String url) {
+        int lastIndex = url.lastIndexOf('/');
+        String s = url.substring(lastIndex + 1);
+        s.toLowerCase();
+        return "/" + s;
+    }
+
+    static bool imageExist(String url) {
+        String filename = getFilenameFromURL(url);
+        if (fileExists(filename)) {
+            Serial.println("File already exists.");
+            return true;  // oder return false, je nachdem was erwartet wird
+        }
+        return false;
+    }
+
+    static bool fileExists(String filename) {
+        Serial.println(filename);
+        return LittleFS.exists(filename);
+    }
+
+    static bool downloadAndSaveImage(String url) {
+        String filename = getFilenameFromURL(url);
+        if (imageExist(url)) {
+            return true;
+        }
+        HTTPClient http;
+        http.begin(url);
+        int httpCode = http.GET();
+
+        if (httpCode == HTTP_CODE_OK) {
+            File file = LittleFS.open(filename, "w");
+            if (!file) {
+                Serial.println("Failed to open file for writing");
+                return false;
+            }
+
+            WiFiClient* stream = http.getStreamPtr();
+            uint8_t buffer[1024] = {0};
+            int bytesRead;
+            while ((bytesRead = stream->read(buffer, sizeof(buffer))) > 0) {
+                file.write(buffer, bytesRead);
+            }
+
+            file.close();
+            http.end();
+            Serial.println("File downloaded and saved successfully.");
+            return true;
+        } else {
+            Serial.printf("HTTP GET failed, error: %s\n", http.errorToString(httpCode).c_str());
+            http.end();
+            return false;
+        }
+    }
+
+    static String UploadImage(String url) {
+        HTTPClient http;
+        http.begin("https://imageresizer.com/api/tasks/import/url");
+        http.addHeader("Content-Type", "application/json");
+
+        String body = "{\"url\":\"" + url + "\"}";
+        int httpResponseCode = http.POST(body);
+
+        if (httpResponseCode > 0) {
+            String response = http.getString();
+            Serial.println(response);
+            DynamicJsonDocument doc(1024);
+            deserializeJson(doc, response);
+            String id = doc["id"];
+            http.end();
+            Serial.println(id);
+            return id;
+        } else {
+            http.end();
+            return "Error";
+        }
+    }
+
+    static String startJob(String imgID, String width, String height) {
+        HTTPClient http;
+        http.begin("https://imageresizer.com/api/jobs");
+        http.addHeader("Content-Type", "application/json");
+
+        String body = "{\"tag\":\"resize-editor-conversion\",\"tasks\":{\"resize\":{\"dimensions\":{\"width\":" + width + ",\"height\":" + height + "},\"operation\":\"convert\",\"input\":\"" + imgID + "\",\"input_format\":\"jpg\",\"output_format\":\"jpg\",\"resize_as\":\"dimensions\",\"options\":{\"image_rotate\":0,\"image_vertical_flip\":false,\"image_horizontal_flip\":false,\"background_color\":\"#000000\",\"fill_background\":false,\"auto-orient\":true,\"strip\":true,\"image_custom_width\":" + width +",\"image_custom_height\":" + height + ",\"jpeg_compress_image_quality\":95}},\"exportTask\":{\"operation\":\"export/url\",\"input\":\"resize\"}}}";
+        int httpResponseCode = http.POST(body);
+
+        if (httpResponseCode > 0) {
+            String response = http.getString();
+            Serial.println(response);
+            DynamicJsonDocument doc(1024);
+            deserializeJson(doc, response);
+            String jobId = doc["id"];
+            Serial.println(jobId);
+            http.end();
+            return jobId;
+        } else {
+            http.end();
+            return "Error";
+        }
+    }
+
+    static String getUpdate(String id) {
+        HTTPClient http;
+        http.begin("https://imageresizer.com/api/jobs/" + id);
+        int httpResponseCode = http.GET();
+
+        if (httpResponseCode > 0) {
+            String response = http.getString();
+            Serial.println(response);
+            DynamicJsonDocument doc(1024);
+            deserializeJson(doc, response);
+            JsonArray tasks = doc["tasks"];
+            for (JsonObject task : tasks) {
+                const char* name = task["name"];
+                const char* status = task["status"];
+
+                if (strcmp(name, "exportTask") == 0 && strcmp(status, "completed") == 0) {
+                    const char* url = task["result"]["url"];
+                    return String(url);
+                }
+            }
+            return "";
+            http.end();
+            return response;  // Return the JSON response directly
+        } else {
+            http.end();
+            return "Error";
+        }
+    }
+
     static String formatDate(time_t timestamp) {
         char buf[11];  // Speicher für das Datum im Format DD.MM.YYYY plus Null-Terminator
         tmElements_t tm;
@@ -172,14 +302,14 @@ class Machine {
 
         String url = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/MakercardApp/Devices/" + terminalName + "/" + rfid;
         https.begin(client, url);
-
+        https.setTimeout(10000);
         int httpCode = https.GET();
 
         if (httpCode > 0) {
             String payload = https.getString();
             Serial.println(payload);
             // Parse the payload as JSON and process it
-            payload =
+            /*payload =
                 "{"
                 "    \"devices\": ["
                 "        {"
@@ -203,7 +333,7 @@ class Machine {
                 "            \"trainingDate\": \"20230928000000Z\""
                 "        },"
                 "       {"
-                "            \"displayName\": \"Namexy2\","
+                "            \"displayName\": \"Namexy3\","
                 "            \"deviceType\": \"Prusa i3 MK3\","
                 "            \"status\": \"mqttManaged\","
                 "            \"cost\": \"2.1\","
@@ -213,7 +343,7 @@ class Machine {
                 "            \"trainingDate\": \"20230928000000Z\""
                 "        },"
                 "       {"
-                "            \"displayName\": \"Namexy2\","
+                "            \"displayName\": \"Namexy4\","
                 "            \"deviceType\": \"Prusa i3 MK3\","
                 "            \"status\": \"mqttManaged\","
                 "            \"cost\": \"3.1\","
@@ -223,7 +353,7 @@ class Machine {
                 "            \"trainingDate\": \"20230928000000Z\""
                 "        },"
                 "       {"
-                "            \"displayName\": \"Namexy2\","
+                "            \"displayName\": \"Namexy5\","
                 "            \"deviceType\": \"Prusa i3 MK3\","
                 "            \"status\": \"mqttManaged\","
                 "            \"cost\": \"4.1\","
@@ -234,7 +364,7 @@ class Machine {
                 "        }"
                 "    ],"
                 "    \"safetyInstructionDate\": \"20231201000000Z\""
-                "}";
+                "}";*/
 
             parseJSON(payload, rfid);
             lastDisplayStatus = -1;
@@ -252,12 +382,14 @@ class Machine {
         bitteWarten();
         Serial.println("Gerät freischalten");
         WiFiClientSecure client;
+        client.setInsecure();  // Use this only if you don't have the certificate
 
         HTTPClient https;
         String url = "https://einweisungen.fablab-luebeck.de/api/v1.0/index.php/MakercardApp/Devices/" + deviceId + "/activate/" + terminalName + "/" + rfid;
         Serial.println(url);
 
         https.begin(client, url);
+        https.setTimeout(10000);
         int httpCode = https.POST("");
 
         if (httpCode > 0) {
@@ -288,6 +420,7 @@ class Machine {
             isActive = false;
             displayStatus = 5;
         }
+        Serial.println(https.errorToString(httpCode).c_str());
         https.end();
         Serial.println("Gerät freischalten Fertig");
         lastDisplayStatus - 1;

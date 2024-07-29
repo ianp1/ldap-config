@@ -2,9 +2,13 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <esp_sleep.h>
-#include <makercardHTTP.h>
 #include <time.h>
-#define CONFIG_LITTLEFS_SPIFFS_COMPAT 1
+// Filesystem
+#include "FS.h"
+#include <LittleFS.h>
+
+
+//#define CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 int ausgewahltesGerat = -1;  // Index der Config geräte
 int einweisung = 0;          // Wie lnge eine Einweisung noch vorhanden ist
 long cardSendTimestamp = 0;  // Wann die MQTT nachricht der Karte gesendet wurde
@@ -16,10 +20,8 @@ const int dailyRestartHour = 4;
 const int restartDelayInMinutes = 10;
 String terminalName = "Kein Name";
 JsonDocument docc;
-// Filesystem
-#include <LittleFS.h>
 
-#include "FS.h"
+#include <makercardHTTP.h>
 // TFT
 #include "displayeSPI.h"
 // WLAN/OTA/time
@@ -28,10 +30,38 @@ JsonDocument docc;
 #include "nfc.h"
 // Funktionen
 
-void causeCrash() {
-    volatile int *ptr = (int *)(0x00);  // Zeiger auf Speicherstelle NULL
-    *ptr = 1;                           // Schreibe in Speicherstelle NULL, verursacht Zugriffsverletzung und führt zu einem Absturz
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
+    Serial.printf("Listing directory: %s\r\n", dirname);
+
+    File root = fs.open(dirname);
+    if(!root){
+        Serial.println("- failed to open directory");
+        return;
+    }
+    if(!root.isDirectory()){
+        Serial.println(" - not a directory");
+        return;
+    }
+
+    File file = root.openNextFile();
+    while(file){
+        if(file.isDirectory()){
+            Serial.print("  DIR : ");
+            Serial.println(file.name());
+            if(levels){
+                listDir(fs, file.path(), levels -1);
+            }
+        } else {
+            Serial.print("  FILE: ");
+            Serial.print(file.name());
+            Serial.print("\tSIZE: ");
+            Serial.println(file.size());
+        }
+        file = root.openNextFile();
+    }
 }
+
+
 // TODO: ersetzen durch frische Config
 void initFilsystem() {
     // Load file system information
@@ -41,7 +71,9 @@ void initFilsystem() {
         delay(5000);
         ESP.restart();
     }
+    listDir(LittleFS, "/", 1);
 }
+
 
 // TODO: online Update erst ab Version 2 oder nie
 void getConfig() {
@@ -84,7 +116,6 @@ void getConfig() {
     // mqttPassword = docc["mqtt"]["mqttPassword"].as<String>();
 
     file.close();
-    LittleFS.end();
     bootLogTFT("finished reading filesystem information");
     // bootLogTFT(geraet);
     // bootLogTFT(mqttChannel);
