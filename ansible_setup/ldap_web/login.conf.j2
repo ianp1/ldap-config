@@ -1,6 +1,6 @@
 <IfModule mod_ssl.c>
     <VirtualHost *:443>
-        ServerName login-rep.fablab-luebeck.de
+        ServerName login.fablab-luebeck.de
 
         DocumentRoot /usr/share/self-service-password/htdocs
         DirectoryIndex index.php
@@ -38,7 +38,7 @@
 
         SSLEngine on
 
-        SSLCertificateFile /etc/ssl/login-rep.fablab-luebeck.de/cert.pem
-        SSLCertificateKeyFile /etc/ssl/login-rep.fablab-luebeck.de/privkey.pem
+        SSLCertificateFile /etc/ssl/login.fablab-luebeck.de/fullchain.pem
+        SSLCertificateKeyFile /etc/ssl/login.fablab-luebeck.de/privkey.pem
     </VirtualHost>
 </IfModule>

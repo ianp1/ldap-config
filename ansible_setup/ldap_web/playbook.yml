@@ -5,10 +5,10 @@
   vars:
     domains:
 # Remember to place a dns rebind protection exception in your router!
-    - domain: login-rep.fablab-luebeck.de
+    - domain: login.fablab-luebeck.de
       target_ip: 192.168.8.211
       certificate: yes
-    - domain: einweisungen-rep.fablab-luebeck.de
+    - domain: einweisungen.fablab-luebeck.de
       target_ip: 192.168.8.211
       certificate: yes
   tasks:
@@ -116,6 +116,10 @@
             id: "000"
           - name: "login"
             id: "001"
+          - name: "einweisungen-http"
+            id: "000"
+          - name: "login-http"
+            id: "001"
       notify:
         - restart apache
     - name: enable apache site
@@ -126,6 +130,10 @@
           - name: "einweisungen"
             id: "000"
           - name: "login"
+            id: "001"
+          - name: "einweisungen-http"
+            id: "000"
+          - name: "login-http"
             id: "001"
       notify:
         - restart apache

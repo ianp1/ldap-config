@@ -16,6 +16,7 @@
         packages:
           - nagios-nrpe-server
           - nagios-plugins
+          - python3-jmespath
       notify:
       - restart client services
     - name: Configure nrpe on clients

@@ -20,7 +20,7 @@ define host{
         max_check_attempts      10
         check_command           check-host-alive
         notification_period     24x7
-        notification_interval   30
+        notification_interval   360
         notification_options    d,r
         contact_groups          Fablab-IT
         register                0; dont show in register - its a template
@@ -44,6 +44,7 @@ define service {
         check_interval          3
         retry_interval          1
         register                0
+        notification_interval   360
 }
 
 define service {

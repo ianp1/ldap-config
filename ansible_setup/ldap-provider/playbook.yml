@@ -3,9 +3,9 @@
   hosts: ldap-provider-rep
   become: yes
   vars:
-    openldap_server_domain: ldap-provider-rep.fablab-luebeck.de
+    openldap_server_domain: ldap-provider.fablab-luebeck.de
     domains:
-      - domain: ldap-provider-rep.fablab-luebeck.de
+      - domain: ldap-provider.fablab-luebeck.de
         target_ip: 192.168.8.211
         certificate: yes
     mqtt: no
@@ -25,7 +25,10 @@
         packages:
         - slapd
         - ldap-utils
+        - debconf
+        - debconf-utils
     - name: "Configure slapd"
+      when: false # ignore this task
       debconf:
         name: slapd
         question: "{{ item.question }}"
@@ -56,6 +59,7 @@
           value: "{{ vault_ldap_admin_password }}"
           type: password
     - name: reconfigure slapd
+      when: false # ignore this task
       command: dpkg-reconfigure -f noninteractive slapd
     - name: restart slapd
       service:
