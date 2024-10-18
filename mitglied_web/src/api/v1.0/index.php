@@ -1253,10 +1253,16 @@
 			$einweisungSuche = ldap_search($ldapconn, $geraet, "(&(objectClass=einweisung)(eingewiesener=$nutzer))", array("dn"));
 			$einweisungErg = ldap_get_entries($ldapconn, $einweisungSuche);
 			if ($einweisungErg["count"] > 0) {
-				ldap_mod_replace($ldapconn, $einweisungErg[0]["dn"], array(
+				$newValues = array(
 					"aktiviert" => $aktiviert,
 					"kommentar" => $kommentar
-				));
+				);
+				foreach($newValues as $key=>$val) {
+					if ($val === '') {
+						$newValues[$key] = array();
+					}
+				}
+				ldap_mod_replace($ldapconn, $einweisungErg[0]["dn"], $newValues	);
 			} else {
 				return $response -> withStatus(404);
 			}
